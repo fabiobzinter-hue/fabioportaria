@@ -67,32 +67,32 @@ export const ResidentList = ({
             onClick={() => onSelectResident(resident)}
           >
             <CardContent className="p-6">
-              <div className="flex items-center gap-4">
-                <Avatar className="h-12 w-12">
-                  <AvatarFallback className="bg-primary text-primary-foreground font-semibold">
-                    {getInitials(resident.name)}
-                  </AvatarFallback>
-                </Avatar>
-                
-                <div className="flex-1 min-w-0">
-                  <h3 className="font-semibold text-lg text-foreground truncate">
-                    {resident.name}
-                  </h3>
-                  <div className="flex items-center gap-2 text-muted-foreground">
-                    <Phone className="h-4 w-4" />
-                    <span className="text-sm">{resident.phone}</span>
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+                <div className="flex items-center gap-4">
+                  <Avatar className="h-12 w-12">
+                    <AvatarFallback className="bg-primary text-primary-foreground font-semibold">
+                      {getInitials(resident.name)}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-semibold text-lg text-foreground truncate">
+                      {resident.name}
+                    </h3>
+                    <div className="flex items-center gap-2 text-muted-foreground">
+                      <Phone className="h-4 w-4" />
+                      <span className="text-sm">{resident.phone}</span>
+                    </div>
+                    {resident.role && (
+                      <Badge variant="outline" className="mt-2 text-xs">
+                        {resident.role}
+                      </Badge>
+                    )}
                   </div>
-                  {resident.role && (
-                    <Badge variant="outline" className="mt-2 text-xs">
-                      {resident.role}
-                    </Badge>
-                  )}
                 </div>
-                
                 <Button
                   variant="default"
                   size="lg"
-                  className="shrink-0"
+                  className="w-full sm:w-auto mt-4 sm:mt-0 shrink-0"
                 >
                   <Package className="h-5 w-5 mr-2" />
                   Registrar Entrega
