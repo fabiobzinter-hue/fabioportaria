@@ -67,7 +67,7 @@ export const ResidentList = ({
             onClick={() => onSelectResident(resident)}
           >
             <CardContent className="p-6">
-              <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+              <div className="flex flex-col gap-4">
                 <div className="flex items-center gap-4">
                   <Avatar className="h-12 w-12">
                     <AvatarFallback className="bg-primary text-primary-foreground font-semibold">
@@ -92,7 +92,7 @@ export const ResidentList = ({
                 <Button
                   variant="default"
                   size="lg"
-                  className="w-full sm:w-auto mt-4 sm:mt-0 shrink-0"
+                  className="w-full px-4 py-2 text-sm rounded bg-blue-600 text-white mt-2"
                 >
                   <Package className="h-5 w-5 mr-2" />
                   Registrar Entrega
