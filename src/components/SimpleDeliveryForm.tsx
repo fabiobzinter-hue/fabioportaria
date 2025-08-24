@@ -291,6 +291,28 @@ export const SimpleDeliveryForm = ({ onBack, moradores }: SimpleDeliveryFormProp
             </Card>
           )}
 
+          {/* PREVIEW DA MENSAGEM (como estava antes) */}
+          {selectedMorador && codigoRetirada && (
+            <Card className="bg-blue-50 border-blue-200">
+              <CardHeader>
+                <CardTitle className="text-lg text-blue-800">📱 Mensagem WhatsApp</CardTitle>
+                <p className="text-sm text-blue-600">Esta mensagem será enviada para o morador:</p>
+              </CardHeader>
+              <CardContent className="bg-white p-4 rounded border">
+                <div className="text-sm font-mono whitespace-pre-line text-gray-800">
+                  🏢 *Condomínio Arco Iris*{"\n"}{"\n"}
+                  📦 *Nova Encomenda Chegou!*{"\n"}{"\n"}
+                  Olá *{selectedMorador.nome}*, você tem uma nova encomenda!{"\n"}{"\n"}
+                  📅 Data: {new Date().toLocaleDateString('pt-BR')}{"\n"}
+                  ⏰ Hora: {new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}{"\n"}
+                  🔑 Código de retirada: *{codigoRetirada}*{"\n"}{"\n"}
+                  Para retirar, apresente este código na portaria.{"\n"}{"\n"}
+                  Não responda esta mensagem, este é um atendimento automático.
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
           {/* Observações */}
           <div>
             <Label>Observações</Label>
