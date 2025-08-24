@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 // Force deployment trigger - Fixed code generation and WhatsApp messaging
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -30,90 +30,64 @@ export const SimpleDeliveryForm = ({ onBack, moradores }: SimpleDeliveryFormProp
   const [photoPreview, setPhotoPreview] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isProcessingPhoto, setIsProcessingPhoto] = useState(false);
+  const [codigoRetirada, setCodigoRetirada] = useState('');
   const { toast } = useToast();
 
-  const [codigoRetirada, setCodigoRetirada] = useState('');
-
-  // Gerar código quando encontrar morador (funcionamento original)
+  // Gerar código sempre que um morador for selecionado
   const gerarCodigo = () => {
-    // Garantir código único usando timestamp + random
-    const timestamp = Date.now().toString().slice(-3); // últimos 3 dígitos do timestamp
-    const random = Math.floor(10 + Math.random() * 90); // 2 dígitos aleatórios
-    const codigo = timestamp + random.toString().padStart(2, '0'); // 5 dígitos únicos
-    
-    console.log('🔑 Código gerado:', codigo);
+    const codigo = Math.floor(10000 + Math.random() * 90000).toString();
     setCodigoRetirada(codigo);
     return codigo;
   };
 
+  // Auto-selecionar morador se há apenas um na lista
+  useEffect(() => {
+    if (moradores.length === 1 && !selectedMorador) {
+      const morador = moradores[0];
+      setSelectedMorador(morador);
+      setApartamento(morador.apartamento);
+      const codigo = Math.floor(10000 + Math.random() * 90000).toString();
+      setCodigoRetirada(codigo);
+      
+      toast({
+        title: "✅ Morador selecionado automaticamente!",
+        description: `Código de retirada: ${codigo}`,
+      });
+    }
+  }, [moradores, selectedMorador]);
+
   const buscarMoradores = () => {
-    console.log('🔍 buscarMoradores chamado, apartamento:', apartamento);
-    console.log('🏠 Lista de moradores:', moradores);
-    
     if (!apartamento.trim()) {
-      console.log('⚠️ Apartamento vazio');
-      alert('Digite um apartamento!');
-      return;
-    }
-    
-    // Se não tem moradores, criar um fake para teste
-    if (!moradores || moradores.length === 0) {
-      console.log('🆘 CRIANDO MORADOR FAKE PARA TESTE');
-      const moradorFake = {
-        id: '1',
-        nome: 'Morador Teste ' + apartamento,
-        apartamento: apartamento.trim(),
-        bloco: 'A',
-        telefone: '11999999999'
-      };
-      setSelectedMorador(moradorFake);
-      const codigo = gerarCodigo();
-      console.log('✅ Morador fake criado:', moradorFake);
-      console.log('🔑 Código gerado:', codigo);
-      
       toast({
-        title: "✅ Morador encontrado!",
-        description: `Código gerado: ${codigo}`,
+        variant: "destructive",
+        title: "Digite um apartamento",
+        description: "Informe o número do apartamento.",
       });
       return;
     }
+
+    // Primeiro tenta encontrar na lista
+    let moradorEncontrado = moradores.find(m => m.apartamento === apartamento.trim());
     
-    const encontrados = moradores.filter(m => {
-      console.log('🔎 Comparando:', m.apartamento, 'com', apartamento.trim());
-      return m.apartamento === apartamento.trim();
-    });
-    
-    console.log('📋 Moradores encontrados:', encontrados);
-    
-    if (encontrados.length > 0) {
-      setSelectedMorador(encontrados[0]);
-      const codigo = gerarCodigo();
-      
-      console.log('✅ Morador selecionado:', encontrados[0]);
-      console.log('🔑 Código gerado:', codigo);
-      
-      toast({
-        title: "✅ Morador encontrado!",
-        description: `Código gerado: ${codigo}`,
-      });
-    } else {
-      console.log('❌ Nenhum morador encontrado');
-      // Criar morador fake se não encontrar
-      const moradorFake = {
+    // Se não encontrar, cria um morador temporário
+    if (!moradorEncontrado) {
+      moradorEncontrado = {
         id: Date.now().toString(),
-        nome: 'Morador ' + apartamento,
+        nome: `Morador do Apto ${apartamento}`,
         apartamento: apartamento.trim(),
         bloco: 'A',
         telefone: '11999999999'
       };
-      setSelectedMorador(moradorFake);
-      const codigo = gerarCodigo();
-      
-      toast({
-        title: "⚠️ Morador não cadastrado",
-        description: `Código temporário gerado: ${codigo}`,
-      });
     }
+
+    // Define o morador e gera o código imediatamente
+    setSelectedMorador(moradorEncontrado);
+    const codigo = gerarCodigo();
+    
+    toast({
+      title: "✅ Morador selecionado!",
+      description: `Código de retirada: ${codigo}`,
+    });
   };
 
   // Função para processar arquivo selecionado
@@ -207,7 +181,7 @@ export const SimpleDeliveryForm = ({ onBack, moradores }: SimpleDeliveryFormProp
       const data = now.toLocaleDateString('pt-BR');
       const hora = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
       
-      // 1. SALVAR NO LOCALSTORAGE (funcionamento original simples)
+      // 1. Salvar no localStorage
       const delivery = {
         id: Date.now().toString(),
         resident: {
@@ -230,30 +204,11 @@ export const SimpleDeliveryForm = ({ onBack, moradores }: SimpleDeliveryFormProp
       deliveries.push(delivery);
       localStorage.setItem('deliveries', JSON.stringify(deliveries));
 
-      // 2. SALVAR NO SUPABASE TAMBÉM (para backup)
+      // 2. Enviar para webhook com mensagem formatada
+      const mensagemFormatada = `🏢 *Condomínio Arco Iris*\n\n📦 *Nova Encomenda Chegou!*\n\nOlá *${selectedMorador.nome}*, você tem uma nova encomenda!\n\n📅 Data: ${data}\n⏰ Hora: ${hora}\n🔑 Código de retirada: *${codigoRetirada}*\n\nPara retirar, apresente este código na portaria.\n\nNão responda esta mensagem, este é um atendimento automático.`;
+      
       try {
-        await supabase
-          .from('entregas')
-          .insert({
-            morador_id: selectedMorador.id,
-            data_entrega: now.toISOString(),
-            status: 'pendente',
-            observacoes: observacoes || null,
-            foto_url: photoPreview,
-            codigo_retirada: codigoRetirada
-          });
-      } catch (error) {
-        console.log('⚠️ Erro Supabase (continuando):', error);
-      }
-
-      // 3. ENVIAR WHATSAPP COM MENSAGEM BONITA (como funcionava antes)
-      try {
-        console.log('📱 Enviando WhatsApp para:', selectedMorador.telefone);
-        console.log('🔑 Código na mensagem:', codigoRetirada);
-        
-        const mensagemFormatada = `🏢 *Condomínio Arco Iris*\n\n📦 *Nova Encomenda Chegou!*\n\nOlá *${selectedMorador.nome}*, você tem uma nova encomenda!\n\n📅 Data: ${data}\n⏰ Hora: ${hora}\n🔑 Código de retirada: *${codigoRetirada}*\n\nPara retirar, apresente este código na portaria.\n\nNão responda esta mensagem, este é um atendimento automático.`;
-        
-        const response = await fetch('https://ofaifvyowixzktwvxrps.supabase.co/functions/v1/send-whatsapp-message', {
+        const webhookResponse = await fetch('https://ofaifvyowixzktwvxrps.supabase.co/functions/v1/send-whatsapp-message', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -271,13 +226,50 @@ export const SimpleDeliveryForm = ({ onBack, moradores }: SimpleDeliveryFormProp
           })
         });
         
-        if (response.ok) {
-          console.log('✅ WhatsApp enviado com sucesso');
+        if (!webhookResponse.ok) {
+          const errorText = await webhookResponse.text();
+          console.error('Erro webhook:', webhookResponse.status, errorText);
+          toast({
+            variant: "destructive",
+            title: "Webhook erro",
+            description: `Status: ${webhookResponse.status} - ${errorText.substring(0, 100)}`,
+          });
         } else {
-          console.error('❌ Erro na resposta WhatsApp:', response.status);
+          console.log('Webhook enviado com sucesso!');
+        }
+      } catch (webhookError) {
+        console.error('Erro webhook:', webhookError);
+        toast({
+          variant: "destructive",
+          title: "Erro no WhatsApp",
+          description: "Não foi possível enviar mensagem WhatsApp",
+        });
+      }
+
+      // 3. Salvar no Supabase também
+      try {
+        const { error: supabaseError } = await supabase
+          .from('entregas')
+          .insert({
+            morador_nome: selectedMorador.nome,
+            apartamento: selectedMorador.apartamento,
+            bloco: selectedMorador.bloco,
+            telefone: selectedMorador.telefone,
+            codigo_retirada: codigoRetirada,
+            observacoes: observacoes,
+            foto_url: photoPreview,
+            data_entrega: now.toISOString(),
+            status: 'pendente',
+            condominio_id: 1 // Ajustar conforme necessário
+          });
+          
+        if (supabaseError) {
+          console.log('Erro Supabase:', supabaseError);
+        } else {
+          console.log('Salvo no Supabase com sucesso!');
         }
       } catch (error) {
-        console.error('❌ Erro ao enviar WhatsApp:', error);
+        console.log('Erro Supabase (continuando):', error);
       }
 
       toast({
@@ -287,7 +279,6 @@ export const SimpleDeliveryForm = ({ onBack, moradores }: SimpleDeliveryFormProp
 
       onBack();
     } catch (error: any) {
-      console.error('❌ Erro geral:', error);
       toast({
         variant: "destructive",
         title: "❌ Erro",

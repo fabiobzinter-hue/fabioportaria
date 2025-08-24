@@ -166,13 +166,13 @@ export const Dashboard = ({ authUser, onLogout, initialView }: DashboardProps) =
         return selectedResident ? (
           <SimpleDeliveryForm
             onBack={() => setCurrentView("residents")}
-            moradores={selectedResidents.map(r => ({
-              id: r.id,
-              nome: r.name,
+            moradores={[{
+              id: selectedResident.id,
+              nome: selectedResident.name,
               apartamento: apartmentInfo.apartamento,
               bloco: apartmentInfo.bloco,
-              telefone: r.phone
-            }))}
+              telefone: selectedResident.phone
+            }]}
           />
         ) : null;
       case "withdrawal":
