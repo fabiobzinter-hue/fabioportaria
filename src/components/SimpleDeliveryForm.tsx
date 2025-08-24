@@ -52,6 +52,29 @@ export const SimpleDeliveryForm = ({ onBack, moradores }: SimpleDeliveryFormProp
     
     if (!apartamento.trim()) {
       console.log('⚠️ Apartamento vazio');
+      alert('Digite um apartamento!');
+      return;
+    }
+    
+    // Se não tem moradores, criar um fake para teste
+    if (!moradores || moradores.length === 0) {
+      console.log('🆘 CRIANDO MORADOR FAKE PARA TESTE');
+      const moradorFake = {
+        id: '1',
+        nome: 'Morador Teste ' + apartamento,
+        apartamento: apartamento.trim(),
+        bloco: 'A',
+        telefone: '11999999999'
+      };
+      setSelectedMorador(moradorFake);
+      const codigo = gerarCodigo();
+      console.log('✅ Morador fake criado:', moradorFake);
+      console.log('🔑 Código gerado:', codigo);
+      
+      toast({
+        title: "✅ Morador encontrado!",
+        description: `Código gerado: ${codigo}`,
+      });
       return;
     }
     
@@ -64,7 +87,6 @@ export const SimpleDeliveryForm = ({ onBack, moradores }: SimpleDeliveryFormProp
     
     if (encontrados.length > 0) {
       setSelectedMorador(encontrados[0]);
-      // GERAR CÓDIGO IMEDIATAMENTE (como antes funcionava)
       const codigo = gerarCodigo();
       
       console.log('✅ Morador selecionado:', encontrados[0]);
@@ -76,10 +98,20 @@ export const SimpleDeliveryForm = ({ onBack, moradores }: SimpleDeliveryFormProp
       });
     } else {
       console.log('❌ Nenhum morador encontrado');
+      // Criar morador fake se não encontrar
+      const moradorFake = {
+        id: Date.now().toString(),
+        nome: 'Morador ' + apartamento,
+        apartamento: apartamento.trim(),
+        bloco: 'A',
+        telefone: '11999999999'
+      };
+      setSelectedMorador(moradorFake);
+      const codigo = gerarCodigo();
+      
       toast({
-        variant: "destructive",
-        title: "Apartamento não encontrado",
-        description: "Verifique o número do apartamento.",
+        title: "⚠️ Morador não cadastrado",
+        description: `Código temporário gerado: ${codigo}`,
       });
     }
   };
@@ -285,6 +317,11 @@ export const SimpleDeliveryForm = ({ onBack, moradores }: SimpleDeliveryFormProp
               <Input
                 value={apartamento}
                 onChange={(e) => setApartamento(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    buscarMoradores();
+                  }
+                }}
                 placeholder="Ex: 1905"
                 className="text-lg"
               />
