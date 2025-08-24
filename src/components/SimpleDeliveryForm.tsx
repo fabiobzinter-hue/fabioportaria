@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
-import { ArrowLeft, Camera, Package, Send } from 'lucide-react';
+import { ArrowLeft, Camera, Package, Send, X } from 'lucide-react';
 import { CameraCapture } from './CameraCapture';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -189,6 +189,9 @@ export const SimpleDeliveryForm = ({ onBack, moradores }: SimpleDeliveryFormProp
           {/* Foto */}
           <div>
             <Label>Foto da Encomenda *</Label>
+            <p className="text-sm text-muted-foreground mb-2">
+              Escolha uma das opções abaixo para adicionar uma foto:
+            </p>
             <div className="space-y-2">
               <Button
                 onClick={() => setShowCamera(true)}
@@ -196,7 +199,7 @@ export const SimpleDeliveryForm = ({ onBack, moradores }: SimpleDeliveryFormProp
                 className="w-full"
               >
                 <Camera className="h-4 w-4 mr-2" />
-                Tirar Foto
+                Tirar Foto (Câmera Avançada)
               </Button>
               
               <label htmlFor="photo-file" className="w-full">
@@ -215,6 +218,41 @@ export const SimpleDeliveryForm = ({ onBack, moradores }: SimpleDeliveryFormProp
                   id="photo-file"
                   type="file"
                   accept="image/*"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      setPhotoFile(file);
+                      const reader = new FileReader();
+                      reader.onload = (e) => {
+                        setPhotoPreview(e.target?.result as string);
+                      };
+                      reader.readAsDataURL(file);
+                      toast({
+                        title: "Foto selecionada!",
+                        description: "Foto da galeria carregada com sucesso.",
+                      });
+                    }
+                  }}
+                  className="hidden"
+                />
+              </label>
+              
+              <label htmlFor="photo-camera" className="w-full">
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full"
+                  asChild
+                >
+                  <span>
+                    <Camera className="h-4 w-4 mr-2" />
+                    Câmera Rápida
+                  </span>
+                </Button>
+                <Input
+                  id="photo-camera"
+                  type="file"
+                  accept="image/*"
                   capture="environment"
                   onChange={(e) => {
                     const file = e.target.files?.[0];
@@ -225,6 +263,10 @@ export const SimpleDeliveryForm = ({ onBack, moradores }: SimpleDeliveryFormProp
                         setPhotoPreview(e.target?.result as string);
                       };
                       reader.readAsDataURL(file);
+                      toast({
+                        title: "Foto capturada!",
+                        description: "Foto tirada com sucesso.",
+                      });
                     }
                   }}
                   className="hidden"
@@ -232,11 +274,29 @@ export const SimpleDeliveryForm = ({ onBack, moradores }: SimpleDeliveryFormProp
               </label>
               
               {photoPreview && (
-                <img
-                  src={photoPreview}
-                  alt="Preview"
-                  className="w-full h-32 object-cover rounded"
-                />
+                <div className="space-y-2">
+                  <img
+                    src={photoPreview}
+                    alt="Preview"
+                    className="w-full h-40 object-cover rounded border"
+                  />
+                  <Button
+                    onClick={() => {
+                      setPhotoFile(null);
+                      setPhotoPreview('');
+                      toast({
+                        title: "Foto removida",
+                        description: "Você pode adicionar uma nova foto.",
+                      });
+                    }}
+                    variant="destructive"
+                    size="sm"
+                    className="w-full"
+                  >
+                    <X className="h-4 w-4 mr-2" />
+                    Remover Foto
+                  </Button>
+                </div>
               )}
             </div>
           </div>

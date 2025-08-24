@@ -2,10 +2,18 @@
   "rewrites": [
     { "source": "/(.*)", "destination": "/" }
   ],
-  "git": {
-    "commit": {
-      "message": "Adiciona vercel.json para corrigir rotas SPA no Vercel"
-    },
-    "push": {}
+  "components": {
+    "UserCard": {
+      "div": {
+        "className": "flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 p-2 bg-white rounded-lg shadow"
+      },
+      "avatar": {
+        "className": "flex items-center gap-2"
+      },
+      "button": {
+        "className": "w-full sm:w-auto px-4 py-2 text-sm rounded bg-blue-600 text-white sm:ml-2 mt-2 sm:mt-0",
+        "text": "Registrar"
+      }
+    }
   }
 }
