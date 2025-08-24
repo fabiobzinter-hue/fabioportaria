@@ -598,6 +598,9 @@ export const WithdrawalPanel = ({ onBack, onChange, condominioNome }: Withdrawal
             <Clock className="h-5 w-5 text-warning" />
             Encomendas Pendentes ({deliveries.length})
           </CardTitle>
+          <p className="text-sm text-muted-foreground mt-2">
+            💡 Clique em qualquer encomenda abaixo para selecioná-la automaticamente, ou digite o código manualmente acima.
+          </p>
         </CardHeader>
         <CardContent>
           {deliveries.length === 0 ? (
@@ -608,7 +611,19 @@ export const WithdrawalPanel = ({ onBack, onChange, condominioNome }: Withdrawal
           ) : (
             <div className="space-y-3">
               {deliveries.map((delivery) => (
-                <div key={delivery.id} className="flex items-center gap-4 p-4 bg-muted/50 rounded-lg">
+                <div 
+                  key={delivery.id} 
+                  className="flex items-center gap-4 p-4 bg-muted/50 rounded-lg cursor-pointer hover:bg-muted/70 transition-colors duration-200 border-2 border-transparent hover:border-primary/30"
+                  onClick={() => {
+                    // Auto-fill the withdrawal code and search
+                    setWithdrawalCode(delivery.withdrawalCode);
+                    // Simulate clicking the search button
+                    setTimeout(() => {
+                      searchByCode();
+                    }, 100);
+                  }}
+                  title="Clique para selecionar esta encomenda"
+                >
                   <Avatar className="h-10 w-10">
                     <AvatarFallback className="bg-primary text-primary-foreground font-semibold text-sm">
                       {getInitials(delivery.resident.name)}
@@ -636,9 +651,14 @@ export const WithdrawalPanel = ({ onBack, onChange, condominioNome }: Withdrawal
                     </p>
                   </div>
                   
-                  <Badge variant="warning" className="shrink-0">
-                    Pendente
-                  </Badge>
+                  <div className="flex flex-col items-center gap-1">
+                    <Badge variant="warning" className="shrink-0">
+                      Pendente
+                    </Badge>
+                    <span className="text-xs text-muted-foreground">
+                      Clique aqui
+                    </span>
+                  </div>
                 </div>
               ))}
             </div>

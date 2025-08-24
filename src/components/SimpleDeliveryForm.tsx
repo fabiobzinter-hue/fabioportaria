@@ -1,11 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
-import { ArrowLeft, Camera, Package, Send, X } from 'lucide-react';
-import { CameraCapture } from './CameraCapture';
+import { ArrowLeft, Camera, Package, Send, X, Image } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -28,9 +27,13 @@ export const SimpleDeliveryForm = ({ onBack, moradores }: SimpleDeliveryFormProp
   const [observacoes, setObservacoes] = useState('');
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string>('');
-  const [showCamera, setShowCamera] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isProcessingPhoto, setIsProcessingPhoto] = useState(false);
   const { toast } = useToast();
+  
+  // Refs para os inputs de arquivo
+  const cameraInputRef = useRef<HTMLInputElement>(null);
+  const galleryInputRef = useRef<HTMLInputElement>(null);
 
   const codigoRetirada = Math.floor(10000 + Math.random() * 90000).toString();
 
@@ -52,14 +55,92 @@ export const SimpleDeliveryForm = ({ onBack, moradores }: SimpleDeliveryFormProp
     }
   };
 
-  const handleCameraCapture = (file: File, preview: string) => {
-    setPhotoFile(file);
-    setPhotoPreview(preview);
-    setShowCamera(false);
-    toast({
-      title: "Foto capturada!",
-      description: "Foto salva com sucesso.",
-    });
+  // Função para processar arquivo selecionado
+  const processFile = (file: File) => {
+    setIsProcessingPhoto(true);
+    
+    // Verificar se é uma imagem
+    if (!file.type.startsWith('image/')) {
+      toast({
+        variant: "destructive",
+        title: "Arquivo inválido",
+        description: "Por favor, selecione apenas arquivos de imagem."
+      });
+      setIsProcessingPhoto(false);
+      return;
+    }
+
+    // Verificar tamanho do arquivo (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast({
+        variant: "destructive",
+        title: "Arquivo muito grande",
+        description: "Por favor, selecione uma imagem menor que 5MB."
+      });
+      setIsProcessingPhoto(false);
+      return;
+    }
+
+    // Criar preview da imagem
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const preview = e.target?.result as string;
+      if (preview) {
+        setPhotoFile(file);
+        setPhotoPreview(preview);
+        
+        toast({
+          title: "Foto processada!",
+          description: "Foto salva com sucesso."
+        });
+      }
+      setIsProcessingPhoto(false);
+    };
+    
+    reader.onerror = () => {
+      toast({
+        variant: "destructive",
+        title: "Erro ao processar imagem",
+        description: "Não foi possível processar a imagem selecionada."
+      });
+      setIsProcessingPhoto(false);
+    };
+    
+    reader.readAsDataURL(file);
+  };
+
+  // Handler para input de câmera
+  const handleCameraInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      processFile(file);
+    }
+    // Limpar input para permitir selecionar o mesmo arquivo novamente
+    e.target.value = '';
+  };
+
+  // Handler para input de galeria
+  const handleGalleryInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      processFile(file);
+    }
+    // Limpar input para permitir selecionar o mesmo arquivo novamente
+    e.target.value = '';
+  };
+
+  // Função para abrir câmera
+  const openCamera = () => {
+    if (cameraInputRef.current) {
+      cameraInputRef.current.click();
+    }
+  };
+
+  // Função para abrir galeria
+  const openGallery = () => {
+    if (galleryInputRef.current) {
+      galleryInputRef.current.click();
+    }
   };
 
   const handleSubmit = async () => {
@@ -129,15 +210,6 @@ export const SimpleDeliveryForm = ({ onBack, moradores }: SimpleDeliveryFormProp
     }
   };
 
-  if (showCamera) {
-    return (
-      <CameraCapture
-        onCapture={handleCameraCapture}
-        onClose={() => setShowCamera(false)}
-      />
-    );
-  }
-
   return (
     <div className="space-y-4 p-4">
       <Button onClick={onBack} variant="ghost">
@@ -186,60 +258,96 @@ export const SimpleDeliveryForm = ({ onBack, moradores }: SimpleDeliveryFormProp
             />
           </div>
 
-          {/* Foto */}
+          {/* Foto - Nova implementação simples */}
           <div>
-            <Label>Foto da Encomenda *</Label>
-            <p className="text-sm text-muted-foreground mb-2">
-              Adicione uma foto da encomenda para confirmação:
+            <Label>📷 Foto da Encomenda *</Label>
+            <p className="text-sm text-muted-foreground mb-3">
+              💡 Escolha como adicionar a foto da encomenda:
             </p>
-            <div className="space-y-2">
-              {!photoPreview ? (
+            
+            {!photoPreview ? (
+              <div className="space-y-3">
+                {/* Botão Câmera */}
                 <Button
-                  onClick={() => setShowCamera(true)}
-                  variant="outline"
-                  className="w-full h-32 border-dashed border-2 border-gray-300 hover:border-gray-400"
+                  onClick={openCamera}
+                  disabled={isProcessingPhoto}
+                  variant="default"
+                  className="w-full h-16 text-white bg-blue-600 hover:bg-blue-700"
                 >
                   <div className="text-center">
-                    <Camera className="h-8 w-8 mx-auto mb-2 text-gray-400" />
-                    <div className="text-lg font-medium">Adicionar Foto</div>
-                    <div className="text-sm text-gray-500">Toque para tirar foto ou escolher da galeria</div>
+                    <Camera className="h-6 w-6 mx-auto mb-1" />
+                    <div className="text-sm font-medium">
+                      {isProcessingPhoto ? 'Processando...' : '📷 Tirar Foto'}
+                    </div>
                   </div>
                 </Button>
-              ) : (
-                <div className="space-y-2">
-                  <div className="relative">
-                    <img
-                      src={photoPreview}
-                      alt="Preview"
-                      className="w-full h-40 object-cover rounded border"
-                    />
-                    <Button
-                      onClick={() => {
-                        setPhotoFile(null);
-                        setPhotoPreview('');
-                        toast({
-                          title: "Foto removida",
-                          description: "Você pode adicionar uma nova foto.",
-                        });
-                      }}
-                      variant="destructive"
-                      size="sm"
-                      className="absolute top-2 right-2 rounded-full w-8 h-8 p-0"
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
+                
+                {/* Botão Galeria */}
+                <Button
+                  onClick={openGallery}
+                  disabled={isProcessingPhoto}
+                  variant="outline"
+                  className="w-full h-16 border-2 border-dashed border-gray-300 hover:border-gray-400"
+                >
+                  <div className="text-center">
+                    <Image className="h-6 w-6 mx-auto mb-1 text-gray-600" />
+                    <div className="text-sm font-medium text-gray-700">
+                      {isProcessingPhoto ? 'Processando...' : '🖼️ Escolher da Galeria'}
+                    </div>
                   </div>
+                </Button>
+                
+                <p className="text-xs text-center text-gray-500">
+                  ⚡ Dica: Use "Tirar Foto" para câmera rápida ou "Galeria" para fotos existentes
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                <div className="relative">
+                  <img
+                    src={photoPreview}
+                    alt="Preview da encomenda"
+                    className="w-full h-48 object-cover rounded-lg border-2 border-green-200"
+                  />
                   <Button
-                    onClick={() => setShowCamera(true)}
+                    onClick={() => {
+                      setPhotoFile(null);
+                      setPhotoPreview('');
+                      toast({
+                        title: "Foto removida",
+                        description: "Você pode adicionar uma nova foto.",
+                      });
+                    }}
+                    variant="destructive"
+                    size="sm"
+                    className="absolute top-2 right-2 rounded-full w-8 h-8 p-0"
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-2">
+                  <Button
+                    onClick={openCamera}
+                    disabled={isProcessingPhoto}
                     variant="outline"
                     className="w-full"
                   >
                     <Camera className="h-4 w-4 mr-2" />
-                    Trocar Foto
+                    Nova Foto
+                  </Button>
+                  <Button
+                    onClick={openGallery}
+                    disabled={isProcessingPhoto}
+                    variant="outline"
+                    className="w-full"
+                  >
+                    <Image className="h-4 w-4 mr-2" />
+                    Trocar
                   </Button>
                 </div>
-              )}
-            </div>
+              </div>
+            )}
           </div>
 
           {/* Submit */}
@@ -260,6 +368,24 @@ export const SimpleDeliveryForm = ({ onBack, moradores }: SimpleDeliveryFormProp
           </Button>
         </CardContent>
       </Card>
+      
+      {/* Inputs file ocultos */}
+      <input
+        ref={cameraInputRef}
+        type="file"
+        accept="image/*"
+        capture="environment"
+        onChange={handleCameraInput}
+        className="hidden"
+      />
+      
+      <input
+        ref={galleryInputRef}
+        type="file"
+        accept="image/*"
+        onChange={handleGalleryInput}
+        className="hidden"
+      />
     </div>
   );
 };

@@ -312,18 +312,18 @@ export const AdminEmployees = () => {
   }
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-3 sm:p-6 space-y-4 sm:space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Gestão de Funcionários</h2>
-          <p className="text-gray-600">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Gestão de Funcionários</h2>
+          <p className="text-sm sm:text-base text-gray-600">
             Cadastre e gerencie os funcionários do condomínio
           </p>
         </div>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
-            <Button onClick={() => resetForm()}>
+            <Button onClick={() => resetForm()} className="w-full sm:w-auto">
               <Plus className="h-4 w-4 mr-2" />
               Novo Funcionário
             </Button>
@@ -442,79 +442,172 @@ export const AdminEmployees = () => {
           placeholder="Buscar funcionários..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="max-w-sm"
+          className="w-full sm:max-w-sm"
         />
       </div>
 
-      {/* Table */}
+      {/* Instruction */}
+      <div className="bg-blue-50 p-3 rounded-lg">
+        <p className="text-sm text-blue-700">
+          💡 Clique em qualquer funcionário para editar suas informações diretamente.
+        </p>
+      </div>
+
+      {/* Mobile Cards / Desktop Table */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center">
-            <Users className="h-5 w-5 mr-2" />
+          <CardTitle className="flex items-center text-base sm:text-lg">
+            <Users className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
             Funcionários ({filteredFuncionarios.length})
           </CardTitle>
         </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Nome</TableHead>
-                <TableHead>CPF</TableHead>
-                <TableHead>Cargo</TableHead>
-                <TableHead>Condomínio</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Ações</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredFuncionarios.map((funcionario) => (
-                <TableRow key={funcionario.id}>
-                  <TableCell className="font-medium">{funcionario.nome}</TableCell>
-                  <TableCell>{funcionario.cpf}</TableCell>
-                  <TableCell>
-                    <Badge variant="outline">
-                      {funcionario.cargo}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>{getCondominioNome(funcionario.condominio_id)}</TableCell>
-                  <TableCell>
-                    <Badge variant={funcionario.ativo ? "default" : "secondary"}>
-                      {funcionario.ativo ? "Ativo" : "Inativo"}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center space-x-2">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleToggleStatus(funcionario)}
-                      >
-                        {funcionario.ativo ? (
-                          <UserX className="h-4 w-4 text-red-600" />
-                        ) : (
-                          <UserCheck className="h-4 w-4 text-green-600" />
-                        )}
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleEdit(funcionario)}
-                      >
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleDelete(funcionario.id)}
-                      >
-                        <Trash2 className="h-4 w-4 text-red-600" />
-                      </Button>
+        <CardContent className="p-2 sm:p-6">
+          {/* Mobile View - Cards */}
+          <div className="block md:hidden space-y-3">
+            {filteredFuncionarios.map((funcionario) => (
+              <div 
+                key={funcionario.id}
+                className="bg-gray-50 rounded-lg p-4 cursor-pointer hover:bg-gray-100 transition-colors border-2 border-transparent hover:border-primary/30"
+                onClick={() => handleEdit(funcionario)}
+                title="Clique para editar este funcionário"
+              >
+                <div className="flex items-start justify-between mb-3">
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-base text-gray-900">{funcionario.nome}</h3>
+                    <div className="flex items-center gap-2 mt-1">
+                      <Badge variant="outline" className="text-xs">
+                        {funcionario.cargo}
+                      </Badge>
+                      <Badge variant={funcionario.ativo ? "default" : "secondary"} className="text-xs">
+                        {funcionario.ativo ? "Ativo" : "Inativo"}
+                      </Badge>
                     </div>
-                  </TableCell>
+                  </div>
+                  <span className="text-xs text-gray-500">Toque para editar</span>
+                </div>
+                
+                <div className="flex items-center justify-between">
+                  <div className="text-sm text-gray-600 font-mono">
+                    {funcionario.cpf}
+                  </div>
+                  
+                  <div className="flex items-center space-x-1" onClick={(e) => e.stopPropagation()}>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-8 w-8 p-0"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleToggleStatus(funcionario);
+                      }}
+                    >
+                      {funcionario.ativo ? (
+                        <UserX className="h-3 w-3 text-red-600" />
+                      ) : (
+                        <UserCheck className="h-3 w-3 text-green-600" />
+                      )}
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-8 w-8 p-0"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDelete(funcionario.id);
+                      }}
+                    >
+                      <Trash2 className="h-3 w-3 text-red-600" />
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Desktop View - Table */}
+          <div className="hidden md:block overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Nome</TableHead>
+                  <TableHead>CPF</TableHead>
+                  <TableHead>Cargo</TableHead>
+                  <TableHead>Condomínio</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Ações</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {filteredFuncionarios.map((funcionario) => (
+                  <TableRow 
+                    key={funcionario.id}
+                    className="cursor-pointer hover:bg-gray-50 transition-colors"
+                    onClick={() => handleEdit(funcionario)}
+                    title="Clique para editar este funcionário"
+                  >
+                    <TableCell className="font-medium">{funcionario.nome}</TableCell>
+                    <TableCell className="font-mono">{funcionario.cpf}</TableCell>
+                    <TableCell>
+                      <Badge variant="outline">
+                        {funcionario.cargo}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>{getCondominioNome(funcionario.condominio_id)}</TableCell>
+                    <TableCell>
+                      <Badge variant={funcionario.ativo ? "default" : "secondary"}>
+                        {funcionario.ativo ? "Ativo" : "Inativo"}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center space-x-2" onClick={(e) => e.stopPropagation()}>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleToggleStatus(funcionario);
+                          }}
+                        >
+                          {funcionario.ativo ? (
+                            <UserX className="h-4 w-4 text-red-600" />
+                          ) : (
+                            <UserCheck className="h-4 w-4 text-green-600" />
+                          )}
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleEdit(funcionario);
+                          }}
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDelete(funcionario.id);
+                          }}
+                        >
+                          <Trash2 className="h-4 w-4 text-red-600" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+
+          {filteredFuncionarios.length === 0 && (
+            <div className="text-center py-8">
+              <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+              <p className="text-gray-500">Nenhum funcionário encontrado</p>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

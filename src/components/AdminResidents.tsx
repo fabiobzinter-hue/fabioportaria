@@ -318,18 +318,18 @@ export const AdminResidents = () => {
   }
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-3 sm:p-6 space-y-4 sm:space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Gestão de Moradores</h2>
-          <p className="text-gray-600">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Gestão de Moradores</h2>
+          <p className="text-sm sm:text-base text-gray-600">
             Cadastre e gerencie os moradores do condomínio
           </p>
         </div>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
-            <Button onClick={() => resetForm()}>
+            <Button onClick={() => resetForm()} className="w-full sm:w-auto">
               <Plus className="h-4 w-4 mr-2" />
               Novo Morador
             </Button>
@@ -440,82 +440,176 @@ export const AdminResidents = () => {
           placeholder="Buscar moradores..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="max-w-sm"
+          className="w-full sm:max-w-sm"
         />
       </div>
 
-      {/* Table */}
+      {/* Instruction */}
+      <div className="bg-blue-50 p-3 rounded-lg">
+        <p className="text-sm text-blue-700">
+          💡 Clique em qualquer morador para editar suas informações diretamente.
+        </p>
+      </div>
+
+      {/* Mobile Cards / Desktop Table */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center">
-            <Home className="h-5 w-5 mr-2" />
+          <CardTitle className="flex items-center text-base sm:text-lg">
+            <Home className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
             Moradores ({filteredMoradores.length})
           </CardTitle>
         </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Nome</TableHead>
-                <TableHead>Apartamento</TableHead>
-                <TableHead>Telefone</TableHead>
-                <TableHead>Condomínio</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Ações</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredMoradores.map((morador) => (
-                <TableRow key={morador.id}>
-                  <TableCell className="font-medium">{morador.nome}</TableCell>
-                  <TableCell>
-                    <Badge variant="outline">
-                      {formatApartment(morador.apartamento, morador.bloco)}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="flex items-center">
-                    <Phone className="h-4 w-4 mr-1 text-gray-400" />
-                    {morador.telefone}
-                  </TableCell>
-                  <TableCell>{getCondominioNome(morador.condominio_id)}</TableCell>
-                  <TableCell>
-                    <Badge variant={morador.ativo ? "default" : "secondary"}>
-                      {morador.ativo ? "Ativo" : "Inativo"}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center space-x-2">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleToggleStatus(morador)}
-                      >
-                        {morador.ativo ? (
-                          <UserX className="h-4 w-4 text-red-600" />
-                        ) : (
-                          <UserCheck className="h-4 w-4 text-green-600" />
-                        )}
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleEdit(morador)}
-                      >
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleDelete(morador.id)}
-                      >
-                        <Trash2 className="h-4 w-4 text-red-600" />
-                      </Button>
+        <CardContent className="p-2 sm:p-6">
+          {/* Mobile View - Cards */}
+          <div className="block md:hidden space-y-3">
+            {filteredMoradores.map((morador) => (
+              <div 
+                key={morador.id}
+                className="bg-gray-50 rounded-lg p-4 cursor-pointer hover:bg-gray-100 transition-colors border-2 border-transparent hover:border-primary/30"
+                onClick={() => handleEdit(morador)}
+                title="Clique para editar este morador"
+              >
+                <div className="flex items-start justify-between mb-3">
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-base text-gray-900">{morador.nome}</h3>
+                    <div className="flex items-center gap-2 mt-1">
+                      <Badge variant="outline" className="text-xs">
+                        {formatApartment(morador.apartamento, morador.bloco)}
+                      </Badge>
+                      <Badge variant={morador.ativo ? "default" : "secondary"} className="text-xs">
+                        {morador.ativo ? "Ativo" : "Inativo"}
+                      </Badge>
                     </div>
-                  </TableCell>
+                  </div>
+                  <span className="text-xs text-gray-500">Toque para editar</span>
+                </div>
+                
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center text-sm text-gray-600">
+                    <Phone className="h-3 w-3 mr-1" />
+                    {morador.telefone}
+                  </div>
+                  
+                  <div className="flex items-center space-x-1" onClick={(e) => e.stopPropagation()}>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-8 w-8 p-0"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleToggleStatus(morador);
+                      }}
+                    >
+                      {morador.ativo ? (
+                        <UserX className="h-3 w-3 text-red-600" />
+                      ) : (
+                        <UserCheck className="h-3 w-3 text-green-600" />
+                      )}
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-8 w-8 p-0"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDelete(morador.id);
+                      }}
+                    >
+                      <Trash2 className="h-3 w-3 text-red-600" />
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Desktop View - Table */}
+          <div className="hidden md:block overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Nome</TableHead>
+                  <TableHead>Apartamento</TableHead>
+                  <TableHead>Telefone</TableHead>
+                  <TableHead>Condomínio</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Ações</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {filteredMoradores.map((morador) => (
+                  <TableRow 
+                    key={morador.id}
+                    className="cursor-pointer hover:bg-gray-50 transition-colors"
+                    onClick={() => handleEdit(morador)}
+                    title="Clique para editar este morador"
+                  >
+                    <TableCell className="font-medium">{morador.nome}</TableCell>
+                    <TableCell>
+                      <Badge variant="outline">
+                        {formatApartment(morador.apartamento, morador.bloco)}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="flex items-center">
+                      <Phone className="h-4 w-4 mr-1 text-gray-400" />
+                      {morador.telefone}
+                    </TableCell>
+                    <TableCell>{getCondominioNome(morador.condominio_id)}</TableCell>
+                    <TableCell>
+                      <Badge variant={morador.ativo ? "default" : "secondary"}>
+                        {morador.ativo ? "Ativo" : "Inativo"}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center space-x-2" onClick={(e) => e.stopPropagation()}>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleToggleStatus(morador);
+                          }}
+                        >
+                          {morador.ativo ? (
+                            <UserX className="h-4 w-4 text-red-600" />
+                          ) : (
+                            <UserCheck className="h-4 w-4 text-green-600" />
+                          )}
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleEdit(morador);
+                          }}
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDelete(morador.id);
+                          }}
+                        >
+                          <Trash2 className="h-4 w-4 text-red-600" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+
+          {filteredMoradores.length === 0 && (
+            <div className="text-center py-8">
+              <Home className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+              <p className="text-gray-500">Nenhum morador encontrado</p>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

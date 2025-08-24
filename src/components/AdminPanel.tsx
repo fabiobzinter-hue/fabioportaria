@@ -74,60 +74,60 @@ export const AdminPanel = ({ onBack }: AdminPanelProps) => {
       </div>
 
       {/* Navigation */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+      <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 py-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-4 mb-6">
           <Button
             variant={currentView === "dashboard" ? "default" : "outline"}
-            className="h-20 flex flex-col items-center justify-center space-y-2"
+            className="h-16 sm:h-20 flex flex-col items-center justify-center space-y-1 sm:space-y-2 text-xs sm:text-sm px-2"
             onClick={() => setCurrentView("dashboard")}
           >
-            <BarChart3 className="h-6 w-6" />
-            <span className="text-sm">Dashboard</span>
+            <BarChart3 className="h-4 w-4 sm:h-6 sm:w-6" />
+            <span>Dashboard</span>
           </Button>
 
           <Button
             variant={currentView === "employees" ? "default" : "outline"}
-            className="h-20 flex flex-col items-center justify-center space-y-2"
+            className="h-16 sm:h-20 flex flex-col items-center justify-center space-y-1 sm:space-y-2 text-xs sm:text-sm px-2"
             onClick={() => setCurrentView("employees")}
           >
-            <Users className="h-6 w-6" />
-            <span className="text-sm">Funcionários</span>
+            <Users className="h-4 w-4 sm:h-6 sm:w-6" />
+            <span>Funcionários</span>
           </Button>
 
           <Button
             variant={currentView === "residents" ? "default" : "outline"}
-            className="h-20 flex flex-col items-center justify-center space-y-2"
+            className="h-16 sm:h-20 flex flex-col items-center justify-center space-y-1 sm:space-y-2 text-xs sm:text-sm px-2"
             onClick={() => setCurrentView("residents")}
           >
-            <Home className="h-6 w-6" />
-            <span className="text-sm">Moradores</span>
+            <Home className="h-4 w-4 sm:h-6 sm:w-6" />
+            <span>Moradores</span>
           </Button>
 
           <Button
             variant={currentView === "reports" ? "default" : "outline"}
-            className="h-20 flex flex-col items-center justify-center space-y-2"
+            className="h-16 sm:h-20 flex flex-col items-center justify-center space-y-1 sm:space-y-2 text-xs sm:text-sm px-2"
             onClick={() => setCurrentView("reports")}
           >
-            <FileText className="h-6 w-6" />
-            <span className="text-sm">Relatórios</span>
+            <FileText className="h-4 w-4 sm:h-6 sm:w-6" />
+            <span>Relatórios</span>
           </Button>
         </div>
         {/* Botão de Condomínios apenas para super_administrador */}
         {user?.funcionario?.cargo === 'super_administrador' && (
-          <div className="grid grid-cols-1 md:grid-cols-1 gap-4 mb-8">
+          <div className="grid grid-cols-1 gap-2 sm:gap-4 mb-6">
             <Button
               variant={currentView === "condominiums" ? "default" : "outline"}
-              className="h-20 flex flex-col items-center justify-center space-y-2"
+              className="h-16 sm:h-20 flex flex-col items-center justify-center space-y-1 sm:space-y-2 text-xs sm:text-sm"
               onClick={() => setCurrentView("condominiums")}
             >
-              <Building className="h-6 w-6" />
-              <span className="text-sm">Condomínios</span>
+              <Building className="h-4 w-4 sm:h-6 sm:w-6" />
+              <span>Condomínios</span>
             </Button>
           </div>
         )}
 
         {/* Content */}
-        <div className="bg-white rounded-lg shadow-sm border">
+        <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
           {renderCurrentView()}
         </div>
       </div>
