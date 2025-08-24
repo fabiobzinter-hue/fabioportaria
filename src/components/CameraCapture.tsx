@@ -1,7 +1,7 @@
-import React, { useRef, useState, useCallback } from 'react';
-import Webcam from 'react-webcam';
+import React, { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
-import { Camera, X, RotateCcw, AlertCircle } from 'lucide-react';
+import { Camera, X, Image, AlertCircle } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 interface CameraCaptureProps {
   onCapture: (file: File, preview: string) => void;
@@ -9,120 +9,99 @@ interface CameraCaptureProps {
 }
 
 export const CameraCapture = ({ onCapture, onClose }: CameraCaptureProps) => {
-  const webcamRef = useRef<Webcam>(null);
-  const [isReady, setIsReady] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [facingMode, setFacingMode] = useState<'user' | 'environment'>('environment');
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
 
-  // Configurações da webcam
-  const videoConstraints = {
-    width: { ideal: 1280, min: 640 },
-    height: { ideal: 720, min: 480 },
-    facingMode: facingMode
+  // Função para capturar foto via input file (mais confiável)
+  const handleCameraCapture = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
   };
 
-  const handleUserMedia = useCallback(() => {
-    console.log('📸 Câmera iniciada com sucesso');
-    setIsReady(true);
-    setIsLoading(false);
-    setError(null);
-  }, []);
-
-  const handleUserMediaError = useCallback((error: string | DOMException) => {
-    console.error('❌ Erro na câmera:', error);
-    setIsLoading(false);
-    setIsReady(false);
+  // Função para escolher da galeria
+  const handleGallerySelect = () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.multiple = false;
     
-    let errorMessage = 'Erro ao acessar câmera';
-    
-    if (typeof error === 'string') {
-      errorMessage = error;
-    } else if (error instanceof DOMException) {
-      switch (error.name) {
-        case 'NotAllowedError':
-          errorMessage = 'Permissão de câmera negada. Permita o acesso à câmera nas configurações do navegador.';
-          break;
-        case 'NotFoundError':
-          errorMessage = 'Câmera não encontrada. Verifique se o dispositivo possui câmera.';
-          break;
-        case 'NotSupportedError':
-          errorMessage = 'Câmera não suportada neste dispositivo ou navegador.';
-          break;
-        case 'NotReadableError':
-          errorMessage = 'Câmera está sendo usada por outro aplicativo. Feche outros apps que usam a câmera.';
-          break;
-        case 'OverconstrainedError':
-          errorMessage = 'Configuração de câmera não suportada neste dispositivo.';
-          break;
-        default:
-          errorMessage = `Erro: ${error.message || 'Falha desconhecida'}`;
+    input.onchange = (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (file) {
+        processFile(file);
       }
-    }
+    };
     
-    setError(errorMessage);
-  }, []);
+    input.click();
+  };
 
-  const capturePhoto = useCallback(() => {
-    if (!webcamRef.current || !isReady) {
-      console.error('❌ Webcam não está pronta');
-      setError('Câmera ainda não está pronta. Aguarde um momento.');
+  // Processar arquivo selecionado
+  const processFile = (file: File) => {
+    setIsLoading(true);
+    
+    // Verificar se é uma imagem
+    if (!file.type.startsWith('image/')) {
+      toast({
+        variant: "destructive",
+        title: "Arquivo inválido",
+        description: "Por favor, selecione apenas arquivos de imagem."
+      });
+      setIsLoading(false);
       return;
     }
 
-    try {
-      console.log('📸 Capturando foto...');
-      
-      // Capturar screenshot da webcam
-      const imageSrc = webcamRef.current.getScreenshot();
-      
-      if (!imageSrc) {
-        console.error('❌ Falha ao capturar imagem');
-        setError('Falha ao capturar imagem. Tente novamente.');
-        return;
-      }
-
-      // Converter dataURL para blob e depois para File
-      fetch(imageSrc)
-        .then(res => res.blob())
-        .then(blob => {
-          const file = new File([blob], `foto-${Date.now()}.jpg`, { 
-            type: 'image/jpeg',
-            lastModified: Date.now()
-          });
-          
-          console.log('✅ Foto capturada com sucesso');
-          console.log('Tamanho do arquivo:', Math.round(blob.size / 1024), 'KB');
-          
-          onCapture(file, imageSrc);
-        })
-        .catch(error => {
-          console.error('❌ Erro ao processar imagem:', error);
-          setError('Erro ao processar imagem');
-        });
-        
-    } catch (error) {
-      console.error('❌ Erro ao capturar foto:', error);
-      setError('Erro inesperado ao capturar foto');
+    // Verificar tamanho do arquivo (max 10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      toast({
+        variant: "destructive",
+        title: "Arquivo muito grande",
+        description: "Por favor, selecione uma imagem menor que 10MB."
+      });
+      setIsLoading(false);
+      return;
     }
-  }, [isReady, onCapture]);
 
-  const switchCamera = useCallback(() => {
-    setFacingMode(prev => prev === 'user' ? 'environment' : 'user');
-    setIsLoading(true);
-    setIsReady(false);
-  }, []);
+    // Criar preview da imagem
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const preview = e.target?.result as string;
+      if (preview) {
+        console.log('✅ Foto processada com sucesso');
+        toast({
+          title: "Foto capturada!",
+          description: "Foto salva com sucesso."
+        });
+        onCapture(file, preview);
+      }
+      setIsLoading(false);
+    };
+    
+    reader.onerror = () => {
+      toast({
+        variant: "destructive",
+        title: "Erro ao processar imagem",
+        description: "Não foi possível processar a imagem selecionada."
+      });
+      setIsLoading(false);
+    };
+    
+    reader.readAsDataURL(file);
+  };
 
-  const retryCamera = useCallback(() => {
-    setError(null);
-    setIsLoading(true);
-    setIsReady(false);
-  }, []);
+  // Handler para input file com câmera
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      processFile(file);
+    }
+  };
 
   return (
-    <div className="fixed inset-0 bg-black z-50 flex flex-col">
+    <div className="fixed inset-0 bg-black/90 z-50 flex flex-col items-center justify-center p-4">
       {/* Header */}
-      <div className="absolute top-4 left-4 z-10 flex gap-2">
+      <div className="absolute top-4 left-4 z-10">
         <Button
           onClick={onClose}
           variant="destructive"
@@ -131,89 +110,71 @@ export const CameraCapture = ({ onCapture, onClose }: CameraCaptureProps) => {
         >
           <X className="h-6 w-6" />
         </Button>
-        
-        {isReady && (
-          <Button
-            onClick={switchCamera}
-            variant="secondary"
-            size="sm"
-            className="rounded-full w-12 h-12 p-0"
-          >
-            <RotateCcw className="h-5 w-5" />
-          </Button>
-        )}
       </div>
 
-      {/* Camera View */}
-      <div className="flex-1 relative overflow-hidden">
-        <Webcam
-          ref={webcamRef}
-          audio={false}
-          screenshotFormat="image/jpeg"
-          screenshotQuality={0.85}
-          videoConstraints={videoConstraints}
-          onUserMedia={handleUserMedia}
-          onUserMediaError={handleUserMediaError}
-          className="w-full h-full object-cover"
-          mirrored={facingMode === 'user'}
+      {/* Conteúdo principal */}
+      <div className="text-center text-white max-w-md">
+        <div className="mb-8">
+          <Camera className="h-20 w-20 mx-auto mb-4 text-blue-400" />
+          <h2 className="text-2xl font-bold mb-2">Adicionar Foto</h2>
+          <p className="text-gray-300">Escolha como deseja adicionar a foto da encomenda</p>
+        </div>
+
+        {/* Botões de ação */}
+        <div className="space-y-4">
+          {/* Botão Câmera */}
+          <Button
+            onClick={handleCameraCapture}
+            disabled={isLoading}
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 text-lg"
+            size="lg"
+          >
+            <Camera className="h-6 w-6 mr-3" />
+            {isLoading ? 'Processando...' : 'Tirar Foto'}
+          </Button>
+
+          {/* Botão Galeria */}
+          <Button
+            onClick={handleGallerySelect}
+            disabled={isLoading}
+            variant="outline"
+            className="w-full border-gray-300 text-gray-700 py-4 text-lg bg-white hover:bg-gray-50"
+            size="lg"
+          >
+            <Image className="h-6 w-6 mr-3" />
+            Escolher da Galeria
+          </Button>
+
+          {/* Botão Cancelar */}
+          <Button
+            onClick={onClose}
+            disabled={isLoading}
+            variant="ghost"
+            className="w-full text-gray-300 hover:text-white py-4 text-lg"
+            size="lg"
+          >
+            Cancelar
+          </Button>
+        </div>
+
+        {/* Input file oculto para câmera */}
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          capture="environment"
+          onChange={handleFileChange}
+          className="hidden"
         />
       </div>
-      
-      {/* Loading */}
+
+      {/* Loading overlay */}
       {isLoading && (
         <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-20">
           <div className="text-white text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
-            <div className="text-xl">Carregando câmera...</div>
-            <div className="text-sm mt-2">Aguarde a inicialização</div>
+            <div className="text-xl">Processando foto...</div>
           </div>
-        </div>
-      )}
-
-      {/* Error */}
-      {error && (
-        <div className="absolute inset-0 bg-black/80 flex items-center justify-center z-20">
-          <div className="text-white text-center max-w-sm mx-4">
-            <AlertCircle className="h-16 w-16 mx-auto mb-4 text-red-400" />
-            <div className="text-xl mb-4">Erro na Câmera</div>
-            <div className="text-sm mb-6">{error}</div>
-            <div className="space-y-2">
-              <Button onClick={retryCamera} className="w-full">
-                <RotateCcw className="h-4 w-4 mr-2" />
-                Tentar Novamente
-              </Button>
-              <Button onClick={switchCamera} variant="outline" className="w-full">
-                Trocar Câmera
-              </Button>
-              <Button onClick={onClose} variant="outline" className="w-full">
-                Cancelar
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
-      
-      {/* Controls */}
-      {isReady && !error && (
-        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex gap-6 z-10">
-          <Button
-            onClick={onClose}
-            variant="destructive"
-            size="lg"
-            className="rounded-full w-16 h-16 p-0"
-          >
-            <X className="h-8 w-8" />
-          </Button>
-          
-          <Button
-            onClick={capturePhoto}
-            disabled={!isReady}
-            variant="default"
-            size="lg"
-            className="bg-white text-black rounded-full w-20 h-20 p-0 border-4 border-white hover:bg-gray-100 disabled:opacity-50"
-          >
-            <Camera className="h-10 w-10" />
-          </Button>
         </div>
       )}
     </div>
