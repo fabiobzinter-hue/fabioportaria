@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+// Force deployment trigger - Fixed code generation and WhatsApp messaging
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
