@@ -36,7 +36,12 @@ export const SimpleDeliveryForm = ({ onBack, moradores }: SimpleDeliveryFormProp
 
   // Gerar código quando encontrar morador (funcionamento original)
   const gerarCodigo = () => {
-    const codigo = Math.floor(10000 + Math.random() * 90000).toString();
+    // Garantir código único usando timestamp + random
+    const timestamp = Date.now().toString().slice(-3); // últimos 3 dígitos do timestamp
+    const random = Math.floor(10 + Math.random() * 90); // 2 dígitos aleatórios
+    const codigo = timestamp + random.toString().padStart(2, '0'); // 5 dígitos únicos
+    
+    console.log('🔑 Código gerado:', codigo);
     setCodigoRetirada(codigo);
     return codigo;
   };
@@ -198,9 +203,12 @@ export const SimpleDeliveryForm = ({ onBack, moradores }: SimpleDeliveryFormProp
 
       // 3. ENVIAR WHATSAPP COM MENSAGEM BONITA (como funcionava antes)
       try {
+        console.log('📱 Enviando WhatsApp para:', selectedMorador.telefone);
+        console.log('🔑 Código na mensagem:', codigoRetirada);
+        
         const mensagemFormatada = `🏢 *Condomínio Arco Iris*\n\n📦 *Nova Encomenda Chegou!*\n\nOlá *${selectedMorador.nome}*, você tem uma nova encomenda!\n\n📅 Data: ${data}\n⏰ Hora: ${hora}\n🔑 Código de retirada: *${codigoRetirada}*\n\nPara retirar, apresente este código na portaria.\n\nNão responda esta mensagem, este é um atendimento automático.`;
         
-        await fetch('https://ofaifvyowixzktwvxrps.supabase.co/functions/v1/send-whatsapp-message', {
+        const response = await fetch('https://ofaifvyowixzktwvxrps.supabase.co/functions/v1/send-whatsapp-message', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -218,7 +226,11 @@ export const SimpleDeliveryForm = ({ onBack, moradores }: SimpleDeliveryFormProp
           })
         });
         
-        console.log('✅ WhatsApp enviado com sucesso');
+        if (response.ok) {
+          console.log('✅ WhatsApp enviado com sucesso');
+        } else {
+          console.error('❌ Erro na resposta WhatsApp:', response.status);
+        }
       } catch (error) {
         console.error('❌ Erro ao enviar WhatsApp:', error);
       }
