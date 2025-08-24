@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -30,10 +30,6 @@ export const SimpleDeliveryForm = ({ onBack, moradores }: SimpleDeliveryFormProp
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isProcessingPhoto, setIsProcessingPhoto] = useState(false);
   const { toast } = useToast();
-  
-  // Refs para os inputs de arquivo
-  const cameraInputRef = useRef<HTMLInputElement>(null);
-  const galleryInputRef = useRef<HTMLInputElement>(null);
 
   const codigoRetirada = Math.floor(10000 + Math.random() * 90000).toString();
 
@@ -127,20 +123,6 @@ export const SimpleDeliveryForm = ({ onBack, moradores }: SimpleDeliveryFormProp
     }
     // Limpar input para permitir selecionar o mesmo arquivo novamente
     e.target.value = '';
-  };
-
-  // Função para abrir câmera
-  const openCamera = () => {
-    if (cameraInputRef.current) {
-      cameraInputRef.current.click();
-    }
-  };
-
-  // Função para abrir galeria
-  const openGallery = () => {
-    if (galleryInputRef.current) {
-      galleryInputRef.current.click();
-    }
   };
 
   const handleSubmit = async () => {
@@ -258,48 +240,53 @@ export const SimpleDeliveryForm = ({ onBack, moradores }: SimpleDeliveryFormProp
             />
           </div>
 
-          {/* Foto - Nova implementação simples */}
+          {/* Foto - Implementação ULTRA SIMPLES */}
           <div>
             <Label>📷 Foto da Encomenda *</Label>
             <p className="text-sm text-muted-foreground mb-3">
-              💡 Escolha como adicionar a foto da encomenda:
+              💡 Escolha uma opção para adicionar a foto:
             </p>
             
             {!photoPreview ? (
               <div className="space-y-3">
-                {/* Botão Câmera */}
-                <Button
-                  onClick={openCamera}
-                  disabled={isProcessingPhoto}
-                  variant="default"
-                  className="w-full h-16 text-white bg-blue-600 hover:bg-blue-700"
-                >
-                  <div className="text-center">
-                    <Camera className="h-6 w-6 mx-auto mb-1" />
-                    <div className="text-sm font-medium">
-                      {isProcessingPhoto ? 'Processando...' : '📷 Tirar Foto'}
-                    </div>
+                {/* DIRECT INPUT BUTTONS - Muito mais simples */}
+                <label className="block">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    capture="environment"
+                    onChange={handleCameraInput}
+                    className="hidden"
+                  />
+                  <div className="w-full h-16 bg-blue-600 hover:bg-blue-700 text-white rounded-lg flex items-center justify-center cursor-pointer transition-colors">
+                    <Camera className="h-6 w-6 mr-2" />
+                    <span className="font-medium">
+                      {isProcessingPhoto ? 'Processando...' : '📷 TIRAR FOTO'}
+                    </span>
                   </div>
-                </Button>
+                </label>
                 
-                {/* Botão Galeria */}
-                <Button
-                  onClick={openGallery}
-                  disabled={isProcessingPhoto}
-                  variant="outline"
-                  className="w-full h-16 border-2 border-dashed border-gray-300 hover:border-gray-400"
-                >
-                  <div className="text-center">
-                    <Image className="h-6 w-6 mx-auto mb-1 text-gray-600" />
-                    <div className="text-sm font-medium text-gray-700">
-                      {isProcessingPhoto ? 'Processando...' : '🖼️ Escolher da Galeria'}
-                    </div>
+                <label className="block">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleGalleryInput}
+                    className="hidden"
+                  />
+                  <div className="w-full h-16 border-2 border-dashed border-gray-300 hover:border-gray-400 rounded-lg flex items-center justify-center cursor-pointer transition-colors">
+                    <Image className="h-6 w-6 mr-2 text-gray-600" />
+                    <span className="font-medium text-gray-700">
+                      {isProcessingPhoto ? 'Processando...' : '🖼️ GALERIA'}
+                    </span>
                   </div>
-                </Button>
+                </label>
                 
-                <p className="text-xs text-center text-gray-500">
-                  ⚡ Dica: Use "Tirar Foto" para câmera rápida ou "Galeria" para fotos existentes
-                </p>
+                <div className="bg-green-50 p-3 rounded-lg border border-green-200">
+                  <p className="text-xs text-green-700 text-center">
+                    ✨ <strong>TIRAR FOTO:</strong> Abre câmera do celular<br/>
+                    🖼️ <strong>GALERIA:</strong> Escolhe foto existente
+                  </p>
+                </div>
               </div>
             ) : (
               <div className="space-y-3">
@@ -327,24 +314,46 @@ export const SimpleDeliveryForm = ({ onBack, moradores }: SimpleDeliveryFormProp
                 </div>
                 
                 <div className="grid grid-cols-2 gap-2">
-                  <Button
-                    onClick={openCamera}
-                    disabled={isProcessingPhoto}
-                    variant="outline"
-                    className="w-full"
-                  >
-                    <Camera className="h-4 w-4 mr-2" />
-                    Nova Foto
-                  </Button>
-                  <Button
-                    onClick={openGallery}
-                    disabled={isProcessingPhoto}
-                    variant="outline"
-                    className="w-full"
-                  >
-                    <Image className="h-4 w-4 mr-2" />
-                    Trocar
-                  </Button>
+                  <label className="block">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      capture="environment"
+                      onChange={handleCameraInput}
+                      className="hidden"
+                    />
+                    <Button
+                      variant="outline"
+                      className="w-full"
+                      disabled={isProcessingPhoto}
+                      asChild
+                    >
+                      <div>
+                        <Camera className="h-4 w-4 mr-2" />
+                        Nova Foto
+                      </div>
+                    </Button>
+                  </label>
+                  
+                  <label className="block">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleGalleryInput}
+                      className="hidden"
+                    />
+                    <Button
+                      variant="outline"
+                      className="w-full"
+                      disabled={isProcessingPhoto}
+                      asChild
+                    >
+                      <div>
+                        <Image className="h-4 w-4 mr-2" />
+                        Trocar
+                      </div>
+                    </Button>
+                  </label>
                 </div>
               </div>
             )}
@@ -368,24 +377,6 @@ export const SimpleDeliveryForm = ({ onBack, moradores }: SimpleDeliveryFormProp
           </Button>
         </CardContent>
       </Card>
-      
-      {/* Inputs file ocultos */}
-      <input
-        ref={cameraInputRef}
-        type="file"
-        accept="image/*"
-        capture="environment"
-        onChange={handleCameraInput}
-        className="hidden"
-      />
-      
-      <input
-        ref={galleryInputRef}
-        type="file"
-        accept="image/*"
-        onChange={handleGalleryInput}
-        className="hidden"
-      />
     </div>
   );
 };

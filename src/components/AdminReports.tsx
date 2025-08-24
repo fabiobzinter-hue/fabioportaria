@@ -309,21 +309,21 @@ export const AdminReports = () => {
   }
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-3 sm:p-6 space-y-4 sm:space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Relatórios Administrativos</h2>
-          <p className="text-gray-600">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Relatórios Administrativos</h2>
+          <p className="text-sm sm:text-base text-gray-600">
             Acompanhe todas as entregas e atividades do condomínio
           </p>
         </div>
-        <div className="flex space-x-2">
-          <Button variant="outline" onClick={clearFilters}>
+        <div className="flex flex-col sm:flex-row gap-2 sm:gap-2">
+          <Button variant="outline" onClick={clearFilters} className="w-full sm:w-auto">
             <Filter className="h-4 w-4 mr-2" />
             Limpar Filtros
           </Button>
-          <Button onClick={exportToCSV}>
+          <Button onClick={exportToCSV} className="w-full sm:w-auto">
             <Download className="h-4 w-4 mr-2" />
             Exportar CSV
           </Button>
