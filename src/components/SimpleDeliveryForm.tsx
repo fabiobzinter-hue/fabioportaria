@@ -310,7 +310,7 @@ export const SimpleDeliveryForm = ({ onBack, moradores }: SimpleDeliveryFormProp
                   <div className="w-full h-16 bg-blue-600 hover:bg-blue-700 text-white rounded-lg flex items-center justify-center cursor-pointer transition-colors">
                     <Camera className="h-6 w-6 mr-2" />
                     <span className="font-medium">
-                      {isProcessingPhoto ? 'Processando...' : '📷 TIRAR FOTO'}
+                      {isProcessingPhoto ? 'Processando...' : 'TIRAR FOTO'}
                     </span>
                   </div>
                 </label>
@@ -325,15 +325,15 @@ export const SimpleDeliveryForm = ({ onBack, moradores }: SimpleDeliveryFormProp
                   <div className="w-full h-16 border-2 border-dashed border-gray-300 hover:border-gray-400 rounded-lg flex items-center justify-center cursor-pointer transition-colors">
                     <Image className="h-6 w-6 mr-2 text-gray-600" />
                     <span className="font-medium text-gray-700">
-                      {isProcessingPhoto ? 'Processando...' : '🖼️ GALERIA'}
+                      {isProcessingPhoto ? 'Processando...' : 'GALERIA'}
                     </span>
                   </div>
                 </label>
                 
                 <div className="bg-green-50 p-3 rounded-lg border border-green-200">
                   <p className="text-xs text-green-700 text-center">
-                    ✨ <strong>📷 TIRAR FOTO:</strong> Abre câmera do celular<br/>
-                    🖼️ <strong>GALERIA:</strong> Escolhe foto existente
+                    <strong>TIRAR FOTO:</strong> Abre câmera do celular<br/>
+                    <strong>GALERIA:</strong> Escolhe foto existente
                   </p>
                 </div>
               </div>
