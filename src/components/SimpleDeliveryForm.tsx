@@ -31,7 +31,7 @@ export const SimpleDeliveryForm = ({ onBack, moradores }: SimpleDeliveryFormProp
   const [isProcessingPhoto, setIsProcessingPhoto] = useState(false);
   const { toast } = useToast();
 
-  const codigoRetirada = Math.floor(10000 + Math.random() * 90000).toString();
+  const [codigoRetirada, setCodigoRetirada] = useState('');
 
   const buscarMoradores = () => {
     if (!apartamento.trim()) return;
@@ -138,9 +138,34 @@ export const SimpleDeliveryForm = ({ onBack, moradores }: SimpleDeliveryFormProp
     setIsSubmitting(true);
 
     try {
-      // Salvar no localStorage no formato unificado "deliveries"
+      // 1. SALVAR NO SUPABASE PRIMEIRO (para gerar código automático)
+      const now = new Date();
+      const data = now.toLocaleDateString('pt-BR');
+      const hora = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+      
+      const { data: entregaData, error: saveError } = await supabase
+        .from('entregas')
+        .insert({
+          morador_id: selectedMorador.id,
+          data_entrega: now.toISOString(),
+          status: 'pendente',
+          observacoes: observacoes || null,
+          foto_url: photoPreview // Base64 da foto
+        })
+        .select('id, codigo_retirada')
+        .single();
+
+      if (saveError) {
+        console.error('❌ Erro ao salvar no Supabase:', saveError);
+        throw new Error('Falha ao salvar no banco de dados');
+      }
+
+      const codigoGerado = entregaData.codigo_retirada;
+      setCodigoRetirada(codigoGerado);
+
+      // 2. SALVAR NO LOCALSTORAGE (para compatibilidade)
       const delivery = {
-        id: Date.now().toString(),
+        id: entregaData.id.toString(),
         resident: {
           id: selectedMorador.id,
           name: selectedMorador.nome,
@@ -150,10 +175,10 @@ export const SimpleDeliveryForm = ({ onBack, moradores }: SimpleDeliveryFormProp
           bloco: selectedMorador.bloco,
           apartamento: selectedMorador.apartamento,
         },
-        withdrawalCode: codigoRetirada,
+        withdrawalCode: codigoGerado,
         photo: photoPreview,
         observations: observacoes,
-        timestamp: new Date().toISOString(),
+        timestamp: now.toISOString(),
         status: 'pendente'
       };
 
@@ -161,31 +186,45 @@ export const SimpleDeliveryForm = ({ onBack, moradores }: SimpleDeliveryFormProp
       deliveries.push(delivery);
       localStorage.setItem('deliveries', JSON.stringify(deliveries));
 
-      // Enviar WhatsApp
+      // 3. ENVIAR WHATSAPP COM FORMATO BONITO (igual ao screenshot)
       try {
+        const mensagemFormatada = `🏢 *Condomínio Arco Iris*\n\n📦 *Nova Encomenda Chegou!*\n\nOlá *${selectedMorador.nome}*, você tem uma nova encomenda!\n\n📅 Data: ${data}\n⏰ Hora: ${hora}\n🔑 Código de retirada: *${codigoGerado}*\n\nPara retirar, apresente este código na portaria.\n\nNão responda esta mensagem, este é um atendimento automático.`;
+        
         await fetch('https://ofaifvyowixzktwvxrps.supabase.co/functions/v1/send-whatsapp-message', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             to: selectedMorador.telefone,
-            message: `📦 Nova encomenda chegou!\n\nOlá ${selectedMorador.nome}, você tem uma encomenda!\n\nCódigo: ${codigoRetirada}\nApartamento: ${selectedMorador.apartamento}\n\nApresente este código na portaria para retirar.`
+            message: mensagemFormatada,
+            type: 'delivery',
+            deliveryData: {
+              codigo: codigoGerado,
+              morador: selectedMorador.nome,
+              apartamento: selectedMorador.apartamento,
+              bloco: selectedMorador.bloco,
+              observacoes: observacoes,
+              foto_data_url: photoPreview
+            }
           })
         });
+        
+        console.log('✅ WhatsApp enviado com sucesso');
       } catch (error) {
-        console.error('Erro WhatsApp:', error);
+        console.error('❌ Erro ao enviar WhatsApp:', error);
       }
 
       toast({
-        title: "Encomenda registrada!",
-        description: `Código: ${codigoRetirada}`,
+        title: "✅ Encomenda registrada!",
+        description: `Código gerado: ${codigoGerado} | WhatsApp enviado!`,
       });
 
       onBack();
-    } catch (error) {
+    } catch (error: any) {
+      console.error('❌ Erro geral:', error);
       toast({
         variant: "destructive",
-        title: "Erro",
-        description: "Falha ao registrar encomenda.",
+        title: "❌ Erro",
+        description: error.message || "Falha ao registrar encomenda.",
       });
     } finally {
       setIsSubmitting(false);
@@ -225,7 +264,6 @@ export const SimpleDeliveryForm = ({ onBack, moradores }: SimpleDeliveryFormProp
                 <h3 className="font-bold">{selectedMorador.nome}</h3>
                 <p>Apartamento: {selectedMorador.apartamento}</p>
                 <p>Telefone: {selectedMorador.telefone}</p>
-                <p className="text-lg font-bold text-blue-600">Código: {codigoRetirada}</p>
               </CardContent>
             </Card>
           )}
@@ -283,7 +321,7 @@ export const SimpleDeliveryForm = ({ onBack, moradores }: SimpleDeliveryFormProp
                 
                 <div className="bg-green-50 p-3 rounded-lg border border-green-200">
                   <p className="text-xs text-green-700 text-center">
-                    ✨ <strong>TIRAR FOTO:</strong> Abre câmera do celular<br/>
+                    ✨ <strong>📷 TIRAR FOTO:</strong> Abre câmera do celular<br/>
                     🖼️ <strong>GALERIA:</strong> Escolhe foto existente
                   </p>
                 </div>
