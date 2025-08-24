@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 import { SearchForm } from "./SearchForm";
 import { ResidentList } from "./ResidentList";
-import { DeliveryForm } from "./DeliveryForm";
+import { SimpleDeliveryForm } from "./SimpleDeliveryForm";
 import { ReportsPanel } from "./ReportsPanel";
 import { WithdrawalPanel } from "./WithdrawalPanel";
 import { Badge } from "@/components/ui/badge";
@@ -164,14 +164,15 @@ export const Dashboard = ({ authUser, onLogout, initialView }: DashboardProps) =
         );
       case "delivery":
         return selectedResident ? (
-          <DeliveryForm
-            resident={selectedResident}
-            apartmentInfo={apartmentInfo}
+          <SimpleDeliveryForm
             onBack={() => setCurrentView("residents")}
-            onComplete={handleDeliveryComplete}
-            funcionarioId={authUser.funcionario.id}
-            condominioNome={condominioNome}
-            condominioId={authUser.funcionario.condominio_id}
+            moradores={selectedResidents.map(r => ({
+              id: r.id,
+              nome: r.name,
+              apartamento: apartmentInfo.apartamento,
+              bloco: apartmentInfo.bloco,
+              telefone: r.phone
+            }))}
           />
         ) : null;
       case "withdrawal":
