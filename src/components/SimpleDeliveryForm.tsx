@@ -34,6 +34,13 @@ export const SimpleDeliveryForm = ({ onBack, moradores }: SimpleDeliveryFormProp
 
   const [codigoRetirada, setCodigoRetirada] = useState('');
 
+  // Gerar código quando encontrar morador (funcionamento original)
+  const gerarCodigo = () => {
+    const codigo = Math.floor(10000 + Math.random() * 90000).toString();
+    setCodigoRetirada(codigo);
+    return codigo;
+  };
+
   const buscarMoradores = () => {
     if (!apartamento.trim()) return;
     
@@ -43,6 +50,13 @@ export const SimpleDeliveryForm = ({ onBack, moradores }: SimpleDeliveryFormProp
     
     if (encontrados.length > 0) {
       setSelectedMorador(encontrados[0]);
+      // GERAR CÓDIGO IMEDIATAMENTE (como antes funcionava)
+      const codigo = gerarCodigo();
+      
+      toast({
+        title: "✅ Morador encontrado!",
+        description: `Código gerado: ${codigo}`,
+      });
     } else {
       toast({
         variant: "destructive",
@@ -127,7 +141,7 @@ export const SimpleDeliveryForm = ({ onBack, moradores }: SimpleDeliveryFormProp
   };
 
   const handleSubmit = async () => {
-    if (!selectedMorador || !photoFile) {
+    if (!selectedMorador || !photoFile || !codigoRetirada) {
       toast({
         variant: "destructive",
         title: "Dados incompletos",
@@ -139,34 +153,13 @@ export const SimpleDeliveryForm = ({ onBack, moradores }: SimpleDeliveryFormProp
     setIsSubmitting(true);
 
     try {
-      // 1. SALVAR NO SUPABASE PRIMEIRO (para gerar código automático)
       const now = new Date();
       const data = now.toLocaleDateString('pt-BR');
       const hora = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
       
-      const { data: entregaData, error: saveError } = await supabase
-        .from('entregas')
-        .insert({
-          morador_id: selectedMorador.id,
-          data_entrega: now.toISOString(),
-          status: 'pendente',
-          observacoes: observacoes || null,
-          foto_url: photoPreview // Base64 da foto
-        })
-        .select('id, codigo_retirada')
-        .single();
-
-      if (saveError) {
-        console.error('❌ Erro ao salvar no Supabase:', saveError);
-        throw new Error('Falha ao salvar no banco de dados');
-      }
-
-      const codigoGerado = entregaData.codigo_retirada;
-      setCodigoRetirada(codigoGerado);
-
-      // 2. SALVAR NO LOCALSTORAGE (para compatibilidade)
+      // 1. SALVAR NO LOCALSTORAGE (funcionamento original simples)
       const delivery = {
-        id: entregaData.id.toString(),
+        id: Date.now().toString(),
         resident: {
           id: selectedMorador.id,
           name: selectedMorador.nome,
@@ -176,7 +169,7 @@ export const SimpleDeliveryForm = ({ onBack, moradores }: SimpleDeliveryFormProp
           bloco: selectedMorador.bloco,
           apartamento: selectedMorador.apartamento,
         },
-        withdrawalCode: codigoGerado,
+        withdrawalCode: codigoRetirada,
         photo: photoPreview,
         observations: observacoes,
         timestamp: now.toISOString(),
@@ -187,9 +180,25 @@ export const SimpleDeliveryForm = ({ onBack, moradores }: SimpleDeliveryFormProp
       deliveries.push(delivery);
       localStorage.setItem('deliveries', JSON.stringify(deliveries));
 
-      // 3. ENVIAR WHATSAPP COM FORMATO BONITO (igual ao screenshot)
+      // 2. SALVAR NO SUPABASE TAMBÉM (para backup)
       try {
-        const mensagemFormatada = `🏢 *Condomínio Arco Iris*\n\n📦 *Nova Encomenda Chegou!*\n\nOlá *${selectedMorador.nome}*, você tem uma nova encomenda!\n\n📅 Data: ${data}\n⏰ Hora: ${hora}\n🔑 Código de retirada: *${codigoGerado}*\n\nPara retirar, apresente este código na portaria.\n\nNão responda esta mensagem, este é um atendimento automático.`;
+        await supabase
+          .from('entregas')
+          .insert({
+            morador_id: selectedMorador.id,
+            data_entrega: now.toISOString(),
+            status: 'pendente',
+            observacoes: observacoes || null,
+            foto_url: photoPreview,
+            codigo_retirada: codigoRetirada
+          });
+      } catch (error) {
+        console.log('⚠️ Erro Supabase (continuando):', error);
+      }
+
+      // 3. ENVIAR WHATSAPP COM MENSAGEM BONITA (como funcionava antes)
+      try {
+        const mensagemFormatada = `🏢 *Condomínio Arco Iris*\n\n📦 *Nova Encomenda Chegou!*\n\nOlá *${selectedMorador.nome}*, você tem uma nova encomenda!\n\n📅 Data: ${data}\n⏰ Hora: ${hora}\n🔑 Código de retirada: *${codigoRetirada}*\n\nPara retirar, apresente este código na portaria.\n\nNão responda esta mensagem, este é um atendimento automático.`;
         
         await fetch('https://ofaifvyowixzktwvxrps.supabase.co/functions/v1/send-whatsapp-message', {
           method: 'POST',
@@ -199,7 +208,7 @@ export const SimpleDeliveryForm = ({ onBack, moradores }: SimpleDeliveryFormProp
             message: mensagemFormatada,
             type: 'delivery',
             deliveryData: {
-              codigo: codigoGerado,
+              codigo: codigoRetirada,
               morador: selectedMorador.nome,
               apartamento: selectedMorador.apartamento,
               bloco: selectedMorador.bloco,
@@ -216,7 +225,7 @@ export const SimpleDeliveryForm = ({ onBack, moradores }: SimpleDeliveryFormProp
 
       toast({
         title: "✅ Encomenda registrada!",
-        description: `Código gerado: ${codigoGerado} | WhatsApp enviado!`,
+        description: `Código: ${codigoRetirada} | WhatsApp enviado!`,
       });
 
       onBack();
@@ -265,6 +274,7 @@ export const SimpleDeliveryForm = ({ onBack, moradores }: SimpleDeliveryFormProp
                 <h3 className="font-bold">{selectedMorador.nome}</h3>
                 <p>Apartamento: {selectedMorador.apartamento}</p>
                 <p>Telefone: {selectedMorador.telefone}</p>
+                <p className="text-lg font-bold text-blue-600">🔑 Código: {codigoRetirada}</p>
               </CardContent>
             </Card>
           )}
