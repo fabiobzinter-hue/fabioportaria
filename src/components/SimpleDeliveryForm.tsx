@@ -47,22 +47,35 @@ export const SimpleDeliveryForm = ({ onBack, moradores }: SimpleDeliveryFormProp
   };
 
   const buscarMoradores = () => {
-    if (!apartamento.trim()) return;
+    console.log('🔍 buscarMoradores chamado, apartamento:', apartamento);
+    console.log('🏠 Lista de moradores:', moradores);
     
-    const encontrados = moradores.filter(m => 
-      m.apartamento === apartamento.trim()
-    );
+    if (!apartamento.trim()) {
+      console.log('⚠️ Apartamento vazio');
+      return;
+    }
+    
+    const encontrados = moradores.filter(m => {
+      console.log('🔎 Comparando:', m.apartamento, 'com', apartamento.trim());
+      return m.apartamento === apartamento.trim();
+    });
+    
+    console.log('📋 Moradores encontrados:', encontrados);
     
     if (encontrados.length > 0) {
       setSelectedMorador(encontrados[0]);
       // GERAR CÓDIGO IMEDIATAMENTE (como antes funcionava)
       const codigo = gerarCodigo();
       
+      console.log('✅ Morador selecionado:', encontrados[0]);
+      console.log('🔑 Código gerado:', codigo);
+      
       toast({
         title: "✅ Morador encontrado!",
         description: `Código gerado: ${codigo}`,
       });
     } else {
+      console.log('❌ Nenhum morador encontrado');
       toast({
         variant: "destructive",
         title: "Apartamento não encontrado",
