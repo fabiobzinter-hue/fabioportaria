@@ -4,9 +4,39 @@ import { LoginForm } from '@/components/LoginForm';
 import { Dashboard } from '@/components/Dashboard';
 import { useAuth } from '@/hooks/useAuth';
 import Index from '@/pages/Index';
+import { useEffect } from 'react';
 
 function App() {
   const { user, isLoading, login, logout } = useAuth();
+
+  // Prevenir voltar para fora do app
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      e.returnValue = '';
+    };
+
+    const handlePopState = (e: PopStateEvent) => {
+      // Se estiver logado e tentar voltar, manter no dashboard
+      if (user && window.location.pathname === '/') {
+        window.history.pushState(null, '', '/dashboard');
+      }
+    };
+
+    // Adicionar listeners
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    window.addEventListener('popstate', handlePopState);
+
+    // Garantir que sempre tenha uma entrada no histórico
+    if (user && window.history.length <= 1) {
+      window.history.pushState(null, '', '/dashboard');
+    }
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, [user]);
 
   if (isLoading) {
     return (

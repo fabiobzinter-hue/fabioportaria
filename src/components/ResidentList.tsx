@@ -91,10 +91,10 @@ export const ResidentList = ({
                 </div>
                 <Button
                   variant="default"
-                  size="lg"
-                  className="w-full px-4 py-2 text-sm rounded bg-blue-600 text-white mt-2"
+                  size="sm"
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 text-sm"
                 >
-                  <Package className="h-5 w-5 mr-2" />
+                  <Package className="h-4 w-4 mr-2" />
                   Registrar Entrega
                 </Button>
               </div>

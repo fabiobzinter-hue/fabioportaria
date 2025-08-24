@@ -226,81 +226,46 @@ export const Dashboard = ({ authUser, onLogout, initialView }: DashboardProps) =
       {/* Navigation */}
       <nav className="bg-dashboard-sidebar border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex space-x-1 py-3">
+          <div className="flex flex-wrap gap-3 py-4">
             <Button
               variant={currentView === "search" ? "default" : "ghost"}
-              size="sm"
+              size="lg"
               onClick={() => setCurrentView("search")}
-              className="flex items-center gap-2"
+              className="flex items-center gap-3 px-4 py-3 text-base font-medium"
             >
-              <Package className="h-4 w-4" />
-              <span className="hidden sm:inline">Nova Entrega</span>
+              <Package className="h-5 w-5" />
+              <span>Nova Entrega</span>
             </Button>
             
             <Button
               variant={currentView === "withdrawal" ? "default" : "ghost"}
-              size="sm"
+              size="lg"
               onClick={() => setCurrentView("withdrawal")}
-              className="flex items-center gap-2"
+              className="flex items-center gap-3 px-4 py-3 text-base font-medium"
             >
-              <CheckCircle className="h-4 w-4" />
-              <span className="hidden sm:inline">Retirada</span>
+              <CheckCircle className="h-5 w-5" />
+              <span>Retiradas</span>
             </Button>
             
             <Button
               variant={currentView === "reports" ? "default" : "ghost"}
-              size="sm"
+              size="lg"
               onClick={() => setCurrentView("reports")}
-              className="flex items-center gap-2"
+              className="flex items-center gap-3 px-4 py-3 text-base font-medium"
             >
-              <BarChart3 className="h-4 w-4" />
-              <span className="hidden sm:inline">Relatórios</span>
-            </Button>
-
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={clearHistory}
-              className="flex items-center gap-2"
-            >
-              <Trash2 className="h-4 w-4" />
-              <span className="hidden sm:inline">Limpar Histórico</span>
-            </Button>
-
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                // Teste simples de câmera
-                if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-                  navigator.mediaDevices.getUserMedia({ video: true })
-                    .then(stream => {
-                      stream.getTracks().forEach(track => track.stop());
-                      alert('✅ Câmera funcionando!');
-                    })
-                    .catch(error => {
-                      console.error('❌ Erro na câmera:', error);
-                      alert(`❌ Erro na câmera: ${error.message}`);
-                    });
-                } else {
-                  alert('❌ Câmera não suportada neste navegador');
-                }
-              }}
-              className="flex items-center gap-2"
-            >
-              <Camera className="h-4 w-4" />
-              <span className="hidden sm:inline">Teste Câmera</span>
+              <BarChart3 className="h-5 w-5" />
+              <span>Relatórios</span>
             </Button>
 
             {canSeeAdmin && (
               <Button
-                variant="outline"
-                size="sm"
+                variant={currentView === "admin" ? "default" : "ghost"}
+                size="lg"
                 onClick={() => setCurrentView("admin")}
-                className="flex items-center gap-2"
+                className="flex items-center gap-3 px-4 py-3 text-base font-medium"
               >
-                <Settings className="h-4 w-4" />
-                <span className="hidden sm:inline">Administração</span>
+                <Settings className="h-5 w-5" />
+                <span>Administração</span>
               </Button>
             )}
           </div>
