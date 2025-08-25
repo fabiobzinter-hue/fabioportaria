@@ -15,10 +15,10 @@ interface WhatsAppMessageRequest {
     apartamento: string;
     bloco?: string;
     observacoes?: string;
-    foto?: string;
-    foto_base64?: string;
-    foto_data_url?: string;
-    foto_mime?: string;
+    foto_url?: string;  // ✅ URL da imagem
+    data?: string;
+    hora?: string;
+    condominio?: string;
   };
   withdrawalData?: {
     codigo: string;
@@ -26,8 +26,10 @@ interface WhatsAppMessageRequest {
     apartamento: string;
     bloco?: string;
     descricao?: string;
+    foto_url?: string;  // ✅ URL da imagem
     data: string;
     hora: string;
+    condominio?: string;
   };
 }
 
@@ -40,32 +42,48 @@ const handler = async (req: Request): Promise<Response> => {
   try {
     const { to, message, type, deliveryData, withdrawalData }: WhatsAppMessageRequest = await req.json();
 
-    console.log('Sending WhatsApp message:', { to, type, deliveryData, withdrawalData });
+    console.log('=== WHATSAPP MESSAGE RECEIVED ===');
+    console.log('To:', to);
+    console.log('Type:', type);
+    console.log('DeliveryData:', JSON.stringify(deliveryData, null, 2));
+    console.log('WithdrawalData:', JSON.stringify(withdrawalData, null, 2));
 
     // Send to n8n webhook
     const webhookUrl = 'https://n8n-webhook.xdc7yi.easypanel.host/webhook/portariainteligente';
+    
+    const webhookPayload = {
+      to: to,
+      message: message,
+      type: type,
+      deliveryData: deliveryData,
+      withdrawalData: withdrawalData,
+      timestamp: new Date().toISOString()
+    };
+    
+    console.log('=== SENDING TO WEBHOOK ===');
+    console.log('URL:', webhookUrl);
+    console.log('Payload:', JSON.stringify(webhookPayload, null, 2));
     
     const webhookResponse = await fetch(webhookUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        to: to,
-        message: message,
-        type: type,
-        deliveryData: deliveryData,
-        withdrawalData: withdrawalData,
-        timestamp: new Date().toISOString()
-      }),
+      body: JSON.stringify(webhookPayload),
     });
 
+    console.log('=== WEBHOOK RESPONSE ===');
+    console.log('Status:', webhookResponse.status);
+    console.log('Status Text:', webhookResponse.statusText);
+
     if (!webhookResponse.ok) {
-      throw new Error(`Webhook failed with status: ${webhookResponse.status}`);
+      const errorText = await webhookResponse.text();
+      console.error('Webhook Error Response:', errorText);
+      throw new Error(`Webhook failed with status: ${webhookResponse.status} - ${errorText}`);
     }
 
     const result = await webhookResponse.json();
-    console.log('WhatsApp message sent successfully:', result);
+    console.log('✅ WhatsApp message sent successfully:', result);
 
     return new Response(JSON.stringify({ 
       success: true, 

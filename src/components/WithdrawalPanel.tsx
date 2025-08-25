@@ -16,6 +16,7 @@ import {
   User
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 
 interface WithdrawalPanelProps {
@@ -50,6 +51,7 @@ export const WithdrawalPanel = ({ onBack, onChange, condominioNome }: Withdrawal
   const [isSearching, setIsSearching] = useState(false);
   const [withdrawalDescription, setWithdrawalDescription] = useState("");
   const { toast } = useToast();
+  const { user } = useAuth(); // Obter usuário logado
 
   const getInitials = (name: string) => {
     return name
@@ -62,8 +64,17 @@ export const WithdrawalPanel = ({ onBack, onChange, condominioNome }: Withdrawal
 
   const loadPendingDeliveries = async () => {
     try {
+      // Obter ID do condomínio do usuário logado
+      const condominioId = user?.funcionario?.condominio_id;
+      if (!condominioId) {
+        console.log('⚠️ Usuário não possui condomínio associado');
+        setDeliveries([]);
+        return;
+      }
+      
       // Carregar do Supabase
       console.log('📦 Carregando entregas pendentes do Supabase...');
+      console.log('🏢 Filtrando por condomínio:', condominioId);
       
       const { data: entregas, error } = await supabase
         .from('entregas')
@@ -78,6 +89,7 @@ export const WithdrawalPanel = ({ onBack, onChange, condominioNome }: Withdrawal
           )
         `)
         .eq('status', 'pendente')
+        .eq('condominio_id', condominioId)
         .order('data_entrega', { ascending: false });
 
       if (error) {
@@ -134,11 +146,13 @@ export const WithdrawalPanel = ({ onBack, onChange, condominioNome }: Withdrawal
   };
 
   useEffect(() => {
-    loadPendingDeliveries();
-  }, []);
+    if (user?.funcionario?.condominio_id) {
+      loadPendingDeliveries();
+    }
+  }, [user]);
 
-  const searchByCode = async () => {
-    if (!withdrawalCode.trim()) {
+  const searchByCodeDirect = async (code: string) => {
+    if (!code.trim()) {
       toast({
         variant: "destructive",
         title: "Digite um código",
@@ -151,7 +165,7 @@ export const WithdrawalPanel = ({ onBack, onChange, condominioNome }: Withdrawal
     
     try {
       // Buscar no Supabase primeiro
-      console.log('🔍 Buscando entrega no Supabase com código:', withdrawalCode.trim());
+      console.log('🔍 Buscando entrega no Supabase com código:', code.trim());
       
       const { data: entrega, error: searchError } = await supabase
         .from('entregas')
@@ -165,7 +179,7 @@ export const WithdrawalPanel = ({ onBack, onChange, condominioNome }: Withdrawal
             bloco
           )
         `)
-        .eq('codigo_retirada', withdrawalCode.trim())
+        .eq('codigo_retirada', code.trim())
         .single();
 
       if (searchError) {
@@ -174,7 +188,7 @@ export const WithdrawalPanel = ({ onBack, onChange, condominioNome }: Withdrawal
         // Se não encontrar no Supabase, buscar no localStorage
         const savedDeliveries = JSON.parse(localStorage.getItem('deliveries') || '[]');
         const delivery = savedDeliveries.find((d: Delivery) => 
-          d.withdrawalCode === withdrawalCode.trim()
+          d.withdrawalCode === code.trim()
         );
         
         if (delivery) {
@@ -189,7 +203,7 @@ export const WithdrawalPanel = ({ onBack, onChange, condominioNome }: Withdrawal
           const { data: todasEntregas } = await supabase
             .from('entregas')
             .select('codigo_retirada, status, created_at')
-            .eq('codigo_retirada', withdrawalCode.trim());
+            .eq('codigo_retirada', code.trim());
           
           console.log('🔍 Debug - Todas as entregas com este código:', todasEntregas);
           
@@ -198,12 +212,11 @@ export const WithdrawalPanel = ({ onBack, onChange, condominioNome }: Withdrawal
             title: "Código não encontrado",
             description: "Código inválido ou encomenda não registrada.",
           });
-          setFoundDelivery(null);
         }
-      } else if (entrega) {
+      } else {
         console.log('✅ Entrega encontrada no Supabase:', entrega);
         
-        // Converter para o formato do Delivery
+        // Converter entrega do Supabase para o formato Delivery
         const delivery: Delivery = {
           id: entrega.id,
           resident: {
@@ -225,35 +238,32 @@ export const WithdrawalPanel = ({ onBack, onChange, condominioNome }: Withdrawal
         setFoundDelivery(delivery);
         toast({
           title: "Encomenda encontrada!",
-          description: `Encomenda para ${delivery.resident.name} (${entrega.status})`,
+          description: `Encomenda para ${delivery.resident.name}`,
         });
-      } else {
-        toast({
-          variant: "destructive",
-          title: "Código não encontrado",
-          description: "Código inválido ou encomenda não registrada.",
-        });
-        setFoundDelivery(null);
       }
     } catch (error) {
-      console.error('❌ Erro na busca:', error);
+      console.error('❌ Erro durante a busca:', error);
       toast({
         variant: "destructive",
-        title: "Erro na busca",
+        title: "Erro",
         description: "Falha ao buscar encomenda.",
       });
-      setFoundDelivery(null);
     } finally {
       setIsSearching(false);
     }
   };
 
+  const searchByCode = async () => {
+    return searchByCodeDirect(withdrawalCode);
+  };
+
+
   const confirmWithdrawal = async () => {
-    if (!foundDelivery || !withdrawalDescription.trim()) {
+    if (!foundDelivery) {
       toast({
         variant: "destructive",
-        title: "Descrição obrigatória",
-        description: "Por favor, adicione uma descrição da retirada.",
+        title: "Encomenda não encontrada",
+        description: "Por favor, busque uma encomenda primeiro.",
       });
       return;
     }
@@ -369,7 +379,7 @@ export const WithdrawalPanel = ({ onBack, onChange, condominioNome }: Withdrawal
           },
           body: JSON.stringify({
             to: foundDelivery.resident.phone,
-            message: `🏢 *${condominioNome || 'Condomínio'}*\n\n✅ *Encomenda Retirada*\n\nOlá *${foundDelivery.resident.name}*, sua encomenda foi retirada com sucesso!\n\n📅 Data: ${data}\n⏰ Hora: ${hora}\n🔑 Código: ${foundDelivery.withdrawalCode}\n📝 ${withdrawalDescription}\n\nNão responda esta mensagem, este é um atendimento automático.`,
+            message: `🏢 *${condominioNome || 'Condomínio'}*\n\n✅ *Encomenda Retirada*\n\nOlá *${foundDelivery.resident.name}*, sua encomenda foi retirada com sucesso!\n\n📅 Data: ${data}\n⏰ Hora: ${hora}\n🔑 Código: ${foundDelivery.withdrawalCode}${withdrawalDescription.trim() ? `\n📝 ${withdrawalDescription}` : ''}\n\nNão responda esta mensagem, este é um atendimento automático.`,
             type: 'withdrawal',
             withdrawalData: {
               codigo: foundDelivery.withdrawalCode,
@@ -377,8 +387,10 @@ export const WithdrawalPanel = ({ onBack, onChange, condominioNome }: Withdrawal
               apartamento: foundDelivery.apartmentInfo.apartamento,
               bloco: foundDelivery.apartmentInfo.bloco,
               descricao: withdrawalDescription,
+              foto_url: foundDelivery.photo, // ✅ URL da imagem incluída
               data: data,
-              hora: hora
+              hora: hora,
+              condominio: condominioNome || 'Condomínio'
             }
           }),
         });
@@ -386,7 +398,43 @@ export const WithdrawalPanel = ({ onBack, onChange, condominioNome }: Withdrawal
         if (response.ok) {
           console.log('✅ WhatsApp withdrawal notification sent successfully');
         } else {
-          console.error('❌ Failed to send WhatsApp withdrawal notification');
+          console.error('❌ Failed to send WhatsApp withdrawal notification via Supabase');
+          
+          // 🚑 FALLBACK: Tentar webhook direto
+          console.log('🚑 Tentando webhook direto para retirada...');
+          try {
+            const directResponse = await fetch('https://n8n-webhook.xdc7yi.easypanel.host/webhook/portariainteligente', {
+              method: 'POST',
+              headers: { 
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                to: foundDelivery.resident.phone,
+                message: `🏢 *${condominioNome || 'Condomínio'}*\n\n✅ *Encomenda Retirada*\n\nOlá *${foundDelivery.resident.name}*, sua encomenda foi retirada com sucesso!\n\n📅 Data: ${data}\n⏰ Hora: ${hora}\n🔑 Código: ${foundDelivery.withdrawalCode}${withdrawalDescription.trim() ? `\n📝 ${withdrawalDescription}` : ''}\n\nNão responda esta mensagem, este é um atendimento automático.`,
+                type: 'withdrawal',
+                withdrawalData: {
+                  codigo: foundDelivery.withdrawalCode,
+                  morador: foundDelivery.resident.name,
+                  apartamento: foundDelivery.apartmentInfo.apartamento,
+                  bloco: foundDelivery.apartmentInfo.bloco,
+                  descricao: withdrawalDescription,
+                  foto_url: foundDelivery.photo,
+                  data: data,
+                  hora: hora,
+                  condominio: condominioNome || 'Condomínio'
+                }
+              })
+            });
+            
+            if (directResponse.ok) {
+              const directResult = await directResponse.json();
+              console.log('✅ Webhook direto de retirada funcionou!', directResult);
+            } else {
+              console.error('❌ Webhook direto de retirada também falhou:', directResponse.status);
+            }
+          } catch (directError) {
+            console.error('❌ Erro no webhook direto de retirada:', directError);
+          }
         }
       } catch (error) {
         console.error('❌ Error sending WhatsApp withdrawal notification:', error);
@@ -542,11 +590,14 @@ export const WithdrawalPanel = ({ onBack, onChange, condominioNome }: Withdrawal
                 <Label className="text-sm font-medium text-muted-foreground">
                   Foto da Encomenda
                 </Label>
-                <img
-                  src={foundDelivery.photo}
-                  alt="Encomenda"
-                  className="w-full h-48 object-cover rounded-lg shadow-card mt-2"
-                />
+                <div className="mt-2 bg-gray-50 rounded-lg p-2">
+                  <img
+                    src={foundDelivery.photo}
+                    alt="Encomenda"
+                    className="w-full h-64 object-contain rounded-lg shadow-md"
+                    style={{ maxHeight: '300px' }}
+                  />
+                </div>
               </div>
             )}
 
@@ -565,15 +616,18 @@ export const WithdrawalPanel = ({ onBack, onChange, condominioNome }: Withdrawal
             {/* Withdrawal Description */}
             <div>
               <Label className="text-sm font-medium text-muted-foreground">
-                Descrição da Retirada *
+                Descrição da Retirada (opcional)
               </Label>
               <Textarea
-                placeholder="Ex: Retirado pelo filho, Esposa retirou, etc..."
+                placeholder="Ex: Retirado pelo filho, Esposa retirou, etc... (opcional)"
                 value={withdrawalDescription}
                 onChange={(e) => setWithdrawalDescription(e.target.value)}
                 className="mt-1"
                 rows={3}
               />
+              <p className="text-xs text-muted-foreground mt-1">
+                💡 Campo opcional - use apenas se necessário especificar quem retirou
+              </p>
             </div>
 
             {/* Confirm Button */}
@@ -582,7 +636,6 @@ export const WithdrawalPanel = ({ onBack, onChange, condominioNome }: Withdrawal
               size="lg"
               variant="success"
               className="w-full"
-              disabled={!withdrawalDescription.trim()}
             >
               <CheckCircle className="h-5 w-5 mr-2" />
               Confirmar Retirada
@@ -615,12 +668,10 @@ export const WithdrawalPanel = ({ onBack, onChange, condominioNome }: Withdrawal
                   key={delivery.id} 
                   className="flex items-center gap-4 p-4 bg-muted/50 rounded-lg cursor-pointer hover:bg-muted/70 transition-colors duration-200 border-2 border-transparent hover:border-primary/30"
                   onClick={() => {
-                    // Auto-fill the withdrawal code and search
+                    // Auto-fill the withdrawal code and search directly
                     setWithdrawalCode(delivery.withdrawalCode);
-                    // Simulate clicking the search button
-                    setTimeout(() => {
-                      searchByCode();
-                    }, 100);
+                    // Search directly with the code to avoid timing issues
+                    searchByCodeDirect(delivery.withdrawalCode);
                   }}
                   title="Clique para selecionar esta encomenda"
                 >

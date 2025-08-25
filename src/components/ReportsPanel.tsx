@@ -45,10 +45,12 @@ export const ReportsPanel = ({ onBack, condominioId }: ReportsPanelProps) => {
       setError(null);
       try {
         console.log('📊 Carregando relatórios do Supabase...');
+        console.log('🏢 Filtrando por condomínio:', condominioId);
         
         const baseQuery = supabase
           .from('entregas')
           .select(`id, codigo_retirada, created_at, data_entrega, data_retirada, descricao_retirada, observacoes, status, foto_url, morador_id`)
+          .eq('condominio_id', condominioId)
           .order('created_at', { ascending: false })
           .limit(100);
 
@@ -161,6 +163,7 @@ export const ReportsPanel = ({ onBack, condominioId }: ReportsPanelProps) => {
                       const baseQuery = supabase
                         .from('entregas')
                         .select(`id, codigo_retirada, created_at, data_entrega, data_retirada, descricao_retirada, observacoes, status, foto_url, morador_id`)
+                        .eq('condominio_id', condominioId)
                         .order('created_at', { ascending: false })
                         .limit(100);
 

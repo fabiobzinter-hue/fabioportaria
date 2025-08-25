@@ -34,11 +34,13 @@ import {
   Search,
   UserCheck,
   UserX,
-  Phone
+  Phone,
+  Upload
 } from 'lucide-react';
 import { supabase } from '../integrations/supabase/client';
 import { useToast } from '../hooks/use-toast';
 import { useAuth } from '../hooks/useAuth'; // Importar useAuth
+import { BulkResidentUpload } from './BulkResidentUpload';
 
 interface Morador {
   id: string;
@@ -63,6 +65,7 @@ export const AdminResidents = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingMorador, setEditingMorador] = useState<Morador | null>(null);
+  const [showBulkUpload, setShowBulkUpload] = useState(false); // Estado para upload em lote
   const { toast } = useToast();
   const { user } = useAuth(); // Obter usuário logado
   const [userCondominioId, setUserCondominioId] = useState<string | null>(null);
@@ -317,6 +320,20 @@ export const AdminResidents = () => {
     );
   }
 
+  // Se está na tela de upload em lote, mostrar esse componente
+  if (showBulkUpload) {
+    return (
+      <BulkResidentUpload 
+        onBack={() => setShowBulkUpload(false)}
+        onSuccess={() => {
+          if (userCondominioId) {
+            loadData(userCondominioId);
+          }
+        }}
+      />
+    );
+  }
+
   return (
     <div className="p-3 sm:p-6 space-y-4 sm:space-y-6">
       {/* Header */}
@@ -327,13 +344,22 @@ export const AdminResidents = () => {
             Cadastre e gerencie os moradores do condomínio
           </p>
         </div>
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogTrigger asChild>
-            <Button onClick={() => resetForm()} className="w-full sm:w-auto">
-              <Plus className="h-4 w-4 mr-2" />
-              Novo Morador
-            </Button>
-          </DialogTrigger>
+        <div className="flex flex-col sm:flex-row gap-2">
+          <Button 
+            onClick={() => setShowBulkUpload(true)} 
+            variant="outline" 
+            className="w-full sm:w-auto"
+          >
+            <Upload className="h-4 w-4 mr-2" />
+            Upload em Lote
+          </Button>
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <DialogTrigger asChild>
+              <Button onClick={() => resetForm()} className="w-full sm:w-auto">
+                <Plus className="h-4 w-4 mr-2" />
+                Novo Morador
+              </Button>
+            </DialogTrigger>
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
               <DialogTitle>
@@ -431,6 +457,7 @@ export const AdminResidents = () => {
             </form>
           </DialogContent>
         </Dialog>
+        </div>
       </div>
 
       {/* Search */}
@@ -615,4 +642,3 @@ export const AdminResidents = () => {
     </div>
   );
 };
-

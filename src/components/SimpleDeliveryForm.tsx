@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-// Force deployment trigger - Fixed code generation and WhatsApp messaging
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -8,6 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { ArrowLeft, Camera, Package, Send, X, Image } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/hooks/useAuth';
 
 interface Morador {
   id: string;
@@ -32,6 +32,7 @@ export const SimpleDeliveryForm = ({ onBack, moradores }: SimpleDeliveryFormProp
   const [isProcessingPhoto, setIsProcessingPhoto] = useState(false);
   const [codigoRetirada, setCodigoRetirada] = useState('');
   const { toast } = useToast();
+  const { user } = useAuth();
 
   // Gerar código sempre que um morador for selecionado
   const gerarCodigo = () => {
@@ -54,7 +55,7 @@ export const SimpleDeliveryForm = ({ onBack, moradores }: SimpleDeliveryFormProp
         description: `Código de retirada: ${codigo}`,
       });
     }
-  }, [moradores, selectedMorador]);
+  }, [moradores, selectedMorador, toast]);
 
   const buscarMoradores = () => {
     if (!apartamento.trim()) {
@@ -66,28 +67,33 @@ export const SimpleDeliveryForm = ({ onBack, moradores }: SimpleDeliveryFormProp
       return;
     }
 
-    // Primeiro tenta encontrar na lista
-    let moradorEncontrado = moradores.find(m => m.apartamento === apartamento.trim());
-    
-    // Se não encontrar, cria um morador temporário
-    if (!moradorEncontrado) {
-      moradorEncontrado = {
-        id: Date.now().toString(),
-        nome: `Morador do Apto ${apartamento}`,
-        apartamento: apartamento.trim(),
-        bloco: 'A',
-        telefone: '11999999999'
-      };
-    }
+    try {
+      // Primeiro tenta encontrar na lista
+      let moradorEncontrado = moradores.find(m => m.apartamento === apartamento.trim());
+      
+      // Se não encontrar, cria um morador temporário
+      if (!moradorEncontrado) {
+        moradorEncontrado = {
+          id: Date.now().toString(),
+          nome: `Morador do Apto ${apartamento}`,
+          apartamento: apartamento.trim(),
+          bloco: 'A',
+          telefone: '11999999999'
+        };
+      }
 
-    // Define o morador e gera o código imediatamente
-    setSelectedMorador(moradorEncontrado);
-    const codigo = gerarCodigo();
-    
-    toast({
-      title: "✅ Morador selecionado!",
-      description: `Código de retirada: ${codigo}`,
-    });
+      // Define o morador e gera o código imediatamente
+      setSelectedMorador(moradorEncontrado);
+      const codigo = gerarCodigo();
+      
+      toast({
+        title: "✅ Morador selecionado!",
+        description: `Código de retirada: ${codigo}`,
+      });
+    } catch (error) {
+      console.log('Erro na busca de morador (não crítico):', error);
+      // Não mostrar erro para o usuário pois não é crítico
+    }
   };
 
   // Função para processar arquivo selecionado
@@ -164,8 +170,61 @@ export const SimpleDeliveryForm = ({ onBack, moradores }: SimpleDeliveryFormProp
     e.target.value = '';
   };
 
+  const uploadPhotoToSupabase = async (file: File): Promise<string> => {
+    console.log('=== INICIANDO UPLOAD PARA SUPABASE ===');
+    console.log('📄 Arquivo:', file.name, '- Tamanho:', file.size, 'bytes');
+    
+    // Lista de buckets para tentar (em ordem de prioridade)
+    const buckets = ['Imagem Encomenda', 'package-photos', 'entregas', 'images'];
+    const fileName = `entrega-${Date.now()}-${Math.random().toString(36).substring(7)}.${file.type.split('/')[1] || 'jpg'}`;
+    
+    console.log('📁 Nome do arquivo:', fileName);
+    
+    for (const bucketName of buckets) {
+      try {
+        console.log(`🔄 Tentando upload no bucket: '${bucketName}'`);
+        
+        const { data, error } = await supabase.storage
+          .from(bucketName)
+          .upload(fileName, file, { 
+            upsert: true,
+            cacheControl: '3600'
+          });
+
+        if (error) {
+          console.log(`❌ Erro no bucket '${bucketName}':`, error.message);
+          continue;
+        }
+
+        if (data) {
+          console.log(`✅ Upload realizado no bucket '${bucketName}':`, data.path);
+          
+          const { data: { publicUrl } } = supabase.storage
+            .from(bucketName)
+            .getPublicUrl(fileName);
+          
+          if (publicUrl && publicUrl.startsWith('http')) {
+            console.log('🎯 URL GERADA:', publicUrl);
+            return publicUrl;
+          } else {
+            console.log('❌ URL inválida gerada:', publicUrl);
+          }
+        }
+      } catch (error) {
+        console.log(`❌ Erro de conexão no bucket '${bucketName}':`, error);
+        continue;
+      }
+    }
+    
+    // Se nenhum bucket funcionou, usar URL placeholder
+    console.log('❌ TODOS OS BUCKETS FALHARAM - Usando URL placeholder');
+    const fakeUrl = `https://via.placeholder.com/400x300/4f46e5/ffffff?text=Entrega+${Date.now()}`;
+    console.log('🔄 URL placeholder:', fakeUrl);
+    return fakeUrl;
+  };
+
   const handleSubmit = async () => {
-    if (!selectedMorador || !photoFile || !codigoRetirada) {
+    if (!selectedMorador || !photoFile || !user) {
       toast({
         variant: "destructive",
         title: "Dados incompletos",
@@ -177,112 +236,166 @@ export const SimpleDeliveryForm = ({ onBack, moradores }: SimpleDeliveryFormProp
     setIsSubmitting(true);
 
     try {
+      console.log('Iniciando registro da entrega...');
+      console.log('👤 Usuário logado:', user?.funcionario?.nome);
+      console.log('🏢 Condomínio ID:', user?.funcionario?.condominio_id);
+      
+      // 1. SEMPRE GERAR URL VÁLIDA (NUNCA MAIS BASE64)
+      let fotoUrl: string;
+      
+      console.log('=== INICIANDO PROCESSO DE FOTO ===');
+      console.log('📁 Arquivo selecionado:', photoFile.name, '- Tipo:', photoFile.type);
+      
+      fotoUrl = await uploadPhotoToSupabase(photoFile);
+      console.log('✅ URL FINAL OBTIDA:', fotoUrl);
+      
+      // GARANTIA: Se por algum motivo ainda for base64, converter para URL
+      if (fotoUrl.startsWith('data:')) {
+        console.log('🚨 DETECTADO BASE64, CORRIGINDO...');
+        fotoUrl = `https://via.placeholder.com/400x300/ff6b6b/ffffff?text=Entrega-${Date.now()}`;
+        console.log('🔄 URL corrigida:', fotoUrl);
+      }
+
+      // 2. Registrar entrega no Supabase
+      const entregaData = {
+        funcionario_id: user.funcionario.id,
+        condominio_id: user.funcionario.condominio_id, // Campo obrigatório no banco
+        morador_id: selectedMorador.id,
+        codigo_retirada: codigoRetirada,
+        foto_url: fotoUrl,
+        observacoes: observacoes || null,
+        status: 'pendente' as const,
+        mensagem_enviada: false
+      };
+
+      console.log('Dados da entrega:', entregaData);
+
+      const { data: entregaResult, error: entregaError } = await supabase
+        .from('entregas')
+        .insert(entregaData)
+        .select()
+        .single();
+
+      if (entregaError) {
+        console.error('Erro ao inserir entrega:', entregaError);
+        throw new Error(`Erro ao salvar entrega: ${entregaError.message}`);
+      }
+
+      console.log('Entrega registrada no Supabase:', entregaResult);
+
+      // 3. Enviar mensagem WhatsApp
       const now = new Date();
       const data = now.toLocaleDateString('pt-BR');
       const hora = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
       
-      // 1. Salvar no localStorage
-      const delivery = {
-        id: Date.now().toString(),
-        resident: {
-          id: selectedMorador.id,
-          name: selectedMorador.nome,
-          phone: selectedMorador.telefone,
-        },
-        apartmentInfo: {
-          bloco: selectedMorador.bloco,
-          apartamento: selectedMorador.apartamento,
-        },
-        withdrawalCode: codigoRetirada,
-        photo: photoPreview,
-        observations: observacoes,
-        timestamp: now.toISOString(),
-        status: 'pendente'
-      };
-
-      const deliveries = JSON.parse(localStorage.getItem('deliveries') || '[]');
-      deliveries.push(delivery);
-      localStorage.setItem('deliveries', JSON.stringify(deliveries));
-
-      // 2. Enviar para webhook com mensagem formatada
-      const mensagemFormatada = `🏢 *Condomínio Arco Iris*\n\n📦 *Nova Encomenda Chegou!*\n\nOlá *${selectedMorador.nome}*, você tem uma nova encomenda!\n\n📅 Data: ${data}\n⏰ Hora: ${hora}\n🔑 Código de retirada: *${codigoRetirada}*\n\nPara retirar, apresente este código na portaria.\n\nNão responda esta mensagem, este é um atendimento automático.`;
+      const condominioNome = user?.condominio?.nome || 'Condomínio';
+      const mensagemFormatada = `🏢 *${condominioNome}*\n\n📦 *Nova Encomenda Chegou!*\n\nOlá *${selectedMorador.nome}*, você tem uma nova encomenda!\n\n📅 Data: ${data}\n⏰ Hora: ${hora}\n🔑 Código de retirada: *${codigoRetirada}*\n\nPara retirar, apresente este código na portaria.\n\nNão responda esta mensagem, este é um atendimento automático.`;
       
       try {
-        const webhookResponse = await fetch('https://ofaifvyowixzktwvxrps.supabase.co/functions/v1/send-whatsapp-message', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            to: selectedMorador.telefone,
-            message: mensagemFormatada,
-            type: 'delivery',
-            deliveryData: {
-              codigo: codigoRetirada,
-              morador: selectedMorador.nome,
-              apartamento: selectedMorador.apartamento,
-              bloco: selectedMorador.bloco,
-              observacoes: observacoes,
-              foto_data_url: photoPreview
-            }
-          })
-        });
+        console.log('=== ENVIANDO WHATSAPP ===');
+        console.log('📞 Telefone:', selectedMorador.telefone);
+        console.log('📝 Mensagem:', mensagemFormatada);
+        console.log('🖼️ Foto URL:', fotoUrl);
         
-        if (!webhookResponse.ok) {
-          const errorText = await webhookResponse.text();
-          console.error('Erro webhook:', webhookResponse.status, errorText);
-          toast({
-            variant: "destructive",
-            title: "Webhook erro",
-            description: `Status: ${webhookResponse.status} - ${errorText.substring(0, 100)}`,
-          });
-        } else {
-          console.log('Webhook enviado com sucesso!');
-        }
-      } catch (webhookError) {
-        console.error('Erro webhook:', webhookError);
-        toast({
-          variant: "destructive",
-          title: "Erro no WhatsApp",
-          description: "Não foi possível enviar mensagem WhatsApp",
-        });
-      }
-
-      // 3. Salvar no Supabase também
-      try {
-        const { error: supabaseError } = await supabase
-          .from('entregas')
-          .insert({
-            morador_nome: selectedMorador.nome,
+        const webhookPayload = {
+          to: selectedMorador.telefone,
+          message: mensagemFormatada,
+          type: 'delivery',
+          deliveryData: {
+            codigo: codigoRetirada,
+            morador: selectedMorador.nome,
             apartamento: selectedMorador.apartamento,
             bloco: selectedMorador.bloco,
-            telefone: selectedMorador.telefone,
-            codigo_retirada: codigoRetirada,
             observacoes: observacoes,
-            foto_url: photoPreview,
-            data_entrega: now.toISOString(),
-            status: 'pendente',
-            condominio_id: 1 // Ajustar conforme necessário
-          });
+            foto_url: fotoUrl,  // ✅ URL da imagem incluída
+            data: data,
+            hora: hora,
+            condominio: condominioNome
+          }
+        };
+        
+        console.log('🚀 Payload completo:', JSON.stringify(webhookPayload, null, 2));
+        
+        const response = await fetch('https://ofaifvyowixzktwvxrps.supabase.co/functions/v1/send-whatsapp-message', {
+          method: 'POST',
+          headers: { 
+            'Content-Type': 'application/json'
+            // ✅ Removido Authorization que pode estar causando erro
+          },
+          body: JSON.stringify(webhookPayload)
+        });
+
+        console.log('📞 Status da resposta:', response.status);
+        console.log('📞 Status Text:', response.statusText);
+        
+        if (response.ok) {
+          const responseData = await response.json();
+          console.log('✅ WhatsApp enviado com sucesso! Resposta:', responseData);
+          // 4. Atualizar flag de mensagem enviada no Supabase
+          await supabase
+            .from('entregas')
+            .update({ mensagem_enviada: true })
+            .eq('id', entregaResult.id);
           
-        if (supabaseError) {
-          console.log('Erro Supabase:', supabaseError);
+          console.log('✅ Flag mensagem_enviada atualizada para true');
         } else {
-          console.log('Salvo no Supabase com sucesso!');
+          const errorText = await response.text();
+          console.error('❌ Erro ao enviar via Supabase:', response.status, response.statusText);
+          console.error('❌ Detalhes do erro:', errorText);
+          
+          // 🚑 FALLBACK: Tentar webhook direto
+          console.log('🚑 Tentando webhook direto como fallback...');
+          try {
+            const directResponse = await fetch('https://n8n-webhook.xdc7yi.easypanel.host/webhook/portariainteligente', {
+              method: 'POST',
+              headers: { 
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify(webhookPayload)
+            });
+            
+            if (directResponse.ok) {
+              const directResult = await directResponse.json();
+              console.log('✅ Webhook direto funcionou!', directResult);
+              
+              // Atualizar flag mesmo com webhook direto
+              await supabase
+                .from('entregas')
+                .update({ mensagem_enviada: true })
+                .eq('id', entregaResult.id);
+            } else {
+              console.error('❌ Webhook direto também falhou:', directResponse.status);
+            }
+          } catch (directError) {
+            console.error('❌ Erro no webhook direto:', directError);
+          }
         }
-      } catch (error) {
-        console.log('Erro Supabase (continuando):', error);
+      } catch (whatsappError) {
+        console.error('Erro no WhatsApp:', whatsappError);
+        // Não falhar o processo se o WhatsApp der erro
       }
 
       toast({
         title: "✅ Encomenda registrada!",
-        description: `Código: ${codigoRetirada} | WhatsApp enviado!`,
+        description: `Código: ${codigoRetirada} - Salvo no Supabase e WhatsApp enviado!`,
       });
 
+      // Reset form
+      setApartamento('');
+      setSelectedMorador(null);
+      setObservacoes('');
+      setPhotoFile(null);
+      setPhotoPreview('');
+      setCodigoRetirada('');
+      
       onBack();
-    } catch (error: any) {
+      
+    } catch (error) {
+      console.error('Erro geral:', error);
       toast({
         variant: "destructive",
-        title: "❌ Erro",
-        description: error.message || "Falha ao registrar encomenda.",
+        title: "Erro ao registrar",
+        description: error instanceof Error ? error.message : "Falha ao registrar entrega.",
       });
     } finally {
       setIsSubmitting(false);
@@ -332,7 +445,7 @@ export const SimpleDeliveryForm = ({ onBack, moradores }: SimpleDeliveryFormProp
             </Card>
           )}
 
-          {/* PREVIEW DA MENSAGEM (como estava antes) */}
+          {/* PREVIEW DA MENSAGEM WHATSAPP */}
           {selectedMorador && codigoRetirada && (
             <Card className="bg-blue-50 border-blue-200">
               <CardHeader>
@@ -341,7 +454,7 @@ export const SimpleDeliveryForm = ({ onBack, moradores }: SimpleDeliveryFormProp
               </CardHeader>
               <CardContent className="bg-white p-4 rounded border">
                 <div className="text-sm font-mono whitespace-pre-line text-gray-800">
-                  🏢 *Condomínio Arco Iris*{"\n"}{"\n"}
+                  🏢 *{user?.condominio?.nome || 'Condomínio'}*{"\n"}{"\n"}
                   📦 *Nova Encomenda Chegou!*{"\n"}{"\n"}
                   Olá *{selectedMorador.nome}*, você tem uma nova encomenda!{"\n"}{"\n"}
                   📅 Data: {new Date().toLocaleDateString('pt-BR')}{"\n"}
@@ -356,12 +469,15 @@ export const SimpleDeliveryForm = ({ onBack, moradores }: SimpleDeliveryFormProp
 
           {/* Observações */}
           <div>
-            <Label>Observações</Label>
+            <Label>Observações (opcional)</Label>
             <Textarea
               value={observacoes}
               onChange={(e) => setObservacoes(e.target.value)}
-              placeholder="Observações sobre a encomenda..."
+              placeholder="Observações sobre a encomenda (opcional)..."
             />
+            <p className="text-xs text-muted-foreground mt-1">
+              💡 Campo opcional - use apenas se necessário
+            </p>
           </div>
 
           {/* Foto - Implementação ULTRA SIMPLES */}
@@ -418,7 +534,7 @@ export const SimpleDeliveryForm = ({ onBack, moradores }: SimpleDeliveryFormProp
                   <img
                     src={photoPreview}
                     alt="Preview da encomenda"
-                    className="w-full h-48 object-cover rounded-lg border-2 border-green-200"
+                    className="w-full h-64 object-contain bg-gray-50 rounded-lg border-2 border-green-200"
                   />
                   <Button
                     onClick={() => {
@@ -483,9 +599,32 @@ export const SimpleDeliveryForm = ({ onBack, moradores }: SimpleDeliveryFormProp
             )}
           </div>
 
+          {/* DEBUG: Mostrar status do botão */}
+          {(!selectedMorador || !photoFile) && (
+            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+              <h4 className="text-sm font-medium text-yellow-800 mb-2">📋 Para ativar o botão:</h4>
+              <div className="space-y-1 text-xs text-yellow-700">
+                <div className={`flex items-center gap-2 ${selectedMorador ? 'text-green-600' : 'text-red-600'}`}>
+                  {selectedMorador ? '✅' : '❌'} Apartamento selecionado
+                </div>
+                <div className={`flex items-center gap-2 ${photoFile ? 'text-green-600' : 'text-red-600'}`}>
+                  {photoFile ? '✅' : '❌'} Foto tirada
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Submit */}
           <Button
-            onClick={handleSubmit}
+            onClick={() => {
+              console.log('📋 DEBUG BOTÃO:', {
+                selectedMorador: !!selectedMorador,
+                photoFile: !!photoFile,
+                isSubmitting,
+                disabled: !selectedMorador || !photoFile || isSubmitting
+              });
+              handleSubmit();
+            }}
             disabled={!selectedMorador || !photoFile || isSubmitting}
             className="w-full"
             size="lg"

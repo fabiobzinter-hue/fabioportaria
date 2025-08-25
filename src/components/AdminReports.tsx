@@ -100,14 +100,37 @@ export const AdminReports = () => {
   const loadData = async (condominioId: string) => {
     try {
       setIsLoading(true);
+      
+      // DEBUG: Log do condomínio que está sendo usado no filtro
+      console.log('🏢 AdminReports - Carregando dados para condomínio:', condominioId);
 
       // 1) Buscar entregas básicas do condomínio
       const { data: entregasRaw, error: entError } = await supabase
         .from('entregas')
-        .select('id, codigo_retirada, status, data_entrega, data_retirada, descricao_retirada, observacoes, foto_url, created_at, morador_id, funcionario_id')
+        .select('id, codigo_retirada, status, data_entrega, data_retirada, descricao_retirada, observacoes, foto_url, created_at, morador_id, funcionario_id, condominio_id')
+        .eq('condominio_id', condominioId)
         .order('created_at', { ascending: false });
 
       if (entError) throw entError;
+      
+      // DEBUG: Log das entregas encontradas
+      console.log('📦 Entregas encontradas:', entregasRaw?.length || 0);
+      console.log('🔍 Primeiras 3 entregas (debug):', entregasRaw?.slice(0, 3).map(e => ({
+        id: e.id,
+        codigo: e.codigo_retirada,
+        condominio_id: e.condominio_id
+      })));
+      
+      // DEBUG: Verificar se alguma entrega tem condominio_id diferente
+      const entregasOutrosConds = entregasRaw?.filter(e => e.condominio_id !== condominioId) || [];
+      if (entregasOutrosConds.length > 0) {
+        console.error('⚠️ ERRO: Encontradas entregas de outros condomínios!', entregasOutrosConds.map(e => ({
+          id: e.id,
+          codigo: e.codigo_retirada,
+          condominio_atual: condominioId,
+          condominio_entrega: e.condominio_id
+        })));
+      }
 
       // 2) Buscar funcionários do condomínio para filtros e mapeamento
       const funcionarioIds = Array.from(new Set((entregasRaw || []).map(e => e.funcionario_id).filter(Boolean)));
@@ -192,20 +215,45 @@ export const AdminReports = () => {
     // Filtro por data
     let matchesDate = true;
     if (filtros.dataInicio || filtros.dataFim) {
+      // Usar created_at para comparação de data
       const entregaDate = new Date(entrega.created_at);
+      
+      // DEBUG: Log da data da entrega para verificar formato
+      console.log('📅 DEBUG - Entrega:', entrega.codigo_retirada, 'Created at:', entrega.created_at, 'Date obj:', entregaDate);
+      
       if (filtros.dataInicio) {
-        const inicioDate = new Date(filtros.dataInicio);
-        matchesDate = matchesDate && entregaDate >= inicioDate;
+        const inicioDate = new Date(filtros.dataInicio + 'T00:00:00.000Z');
+        const match = entregaDate >= inicioDate;
+        console.log('🔍 Data início - Entrega:', entregaDate.toISOString(), 'Filtro:', inicioDate.toISOString(), 'Match:', match);
+        matchesDate = matchesDate && match;
       }
       if (filtros.dataFim) {
-        const fimDate = new Date(filtros.dataFim);
-        fimDate.setHours(23, 59, 59, 999);
-        matchesDate = matchesDate && entregaDate <= fimDate;
+        const fimDate = new Date(filtros.dataFim + 'T23:59:59.999Z');
+        const match = entregaDate <= fimDate;
+        console.log('🔍 Data fim - Entrega:', entregaDate.toISOString(), 'Filtro:', fimDate.toISOString(), 'Match:', match);
+        matchesDate = matchesDate && match;
       }
     }
 
-    return matchesSearch && matchesStatus && matchesFuncionario && matchesMorador && matchesDate;
+    const finalMatch = matchesSearch && matchesStatus && matchesFuncionario && matchesMorador && matchesDate;
+    
+    // DEBUG: Log resultado final se estiver usando filtro de data
+    if (filtros.dataInicio || filtros.dataFim) {
+      console.log('✅ Resultado final para', entrega.codigo_retirada, ':', {
+        matchesSearch,
+        matchesStatus,
+        matchesFuncionario, 
+        matchesMorador,
+        matchesDate,
+        finalMatch
+      });
+    }
+
+    return finalMatch;
   });
+
+  // DEBUG: Log total de resultados filtrados
+  console.log('📊 Total entregas:', entregas.length, 'Filtradas:', filteredEntregas.length, 'Filtros ativos:', filtros);
 
   const getStatusVariant = (status: string) => {
     switch (status) {
@@ -255,23 +303,58 @@ export const AdminReports = () => {
       'Observações'
     ];
 
-    const csvData = filteredEntregas.map(entrega => [
-      entrega.codigo_retirada,
-      entrega.morador.nome,
-      formatApartment(entrega.morador.apartamento, entrega.morador.bloco),
-      entrega.funcionario.nome,
-      getStatusText(entrega.status),
-      formatDate(entrega.data_entrega),
-      entrega.data_retirada ? formatDate(entrega.data_retirada) : '',
-      entrega.observacoes || ''
-    ]);
+    const csvData = filteredEntregas.map(entrega => {
+      // DEBUG: Log para verificar observações e descrição de retirada
+      console.log('📝 Exportando entrega:', entrega.codigo_retirada, {
+        observacoes: entrega.observacoes,
+        descricao_retirada: entrega.descricao_retirada
+      });
+      
+      // Combinar observações e descrição de retirada como no dashboard
+      let observacoesCompletas = '';
+      if (entrega.observacoes) {
+        observacoesCompletas += entrega.observacoes;
+      }
+      if (entrega.descricao_retirada) {
+        if (observacoesCompletas) {
+          observacoesCompletas += ' | ';
+        }
+        observacoesCompletas += `Retirada: ${entrega.descricao_retirada}`;
+      }
+      
+      return [
+        entrega.codigo_retirada || '',
+        entrega.morador.nome || '',
+        formatApartment(entrega.morador.apartamento, entrega.morador.bloco),
+        entrega.funcionario.nome || '',
+        getStatusText(entrega.status),
+        entrega.data_entrega ? formatDate(entrega.data_entrega) : '',
+        entrega.data_retirada ? formatDate(entrega.data_retirada) : '',
+        // Usar observações combinadas
+        observacoesCompletas || ''
+      ];
+    });
 
-    const escapeCell = (cell: any) => String(cell).replace(/"/g, '""');
+    // Função melhorada para escapar células
+    const escapeCell = (cell: any) => {
+      if (cell === null || cell === undefined) {
+        return '';
+      }
+      const cellStr = String(cell).replace(/"/g, '""');
+      // Se contém quebra de linha, vírgula ou ponto e vírgula, envolver em aspas
+      if (cellStr.includes('\n') || cellStr.includes(',') || cellStr.includes(';') || cellStr.includes('"')) {
+        return `"${cellStr}"`;
+      }
+      return cellStr;
+    };
+
     const csvContent = [headers, ...csvData]
-      .map(row => row.map(cell => `"${escapeCell(cell)}"`).join(separator))
+      .map(row => row.map(cell => escapeCell(cell)).join(separator))
       .join('\r\n');
 
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    // Adicionar BOM UTF-8 para melhor compatibilidade com Excel
+    const BOM = '\uFEFF';
+    const blob = new Blob([BOM + csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
     const url = URL.createObjectURL(blob);
     link.setAttribute('href', url);
@@ -280,6 +363,8 @@ export const AdminReports = () => {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+
+    console.log('✅ Exportação concluída com', filteredEntregas.length, 'registros');
   };
 
   const clearFilters = () => {
@@ -291,6 +376,79 @@ export const AdminReports = () => {
       dataInicio: '',
       dataFim: ''
     });
+  };
+
+  // Funções para filtros de data predefinidos
+  const setDateFilter = (type: string) => {
+    console.log('🗓️ Filtro de data acionado:', type);
+    
+    const hoje = new Date();
+    let dataInicio = '';
+    let dataFim = '';
+
+    switch (type) {
+      case 'hoje':
+        dataInicio = dataFim = hoje.toISOString().split('T')[0];
+        console.log('📅 Filtro HOJE - Data:', dataInicio);
+        break;
+      
+      case 'ontem':
+        const ontem = new Date(hoje);
+        ontem.setDate(hoje.getDate() - 1);
+        dataInicio = dataFim = ontem.toISOString().split('T')[0];
+        console.log('📅 Filtro ONTEM - Data:', dataInicio);
+        break;
+      
+      case 'ultimos7dias':
+        const seteDiasAtras = new Date(hoje);
+        seteDiasAtras.setDate(hoje.getDate() - 7);
+        dataInicio = seteDiasAtras.toISOString().split('T')[0];
+        dataFim = hoje.toISOString().split('T')[0];
+        console.log('📅 Filtro ÚLTIMOS 7 DIAS - De:', dataInicio, 'Até:', dataFim);
+        break;
+      
+      case 'estasemana':
+        const inicioSemana = new Date(hoje);
+        const diaSemana = hoje.getDay(); // 0 = domingo
+        const diasParaSegunda = diaSemana === 0 ? 6 : diaSemana - 1;
+        inicioSemana.setDate(hoje.getDate() - diasParaSegunda);
+        dataInicio = inicioSemana.toISOString().split('T')[0];
+        dataFim = hoje.toISOString().split('T')[0];
+        console.log('📅 Filtro ESTA SEMANA - De:', dataInicio, 'Até:', dataFim);
+        break;
+      
+      case 'estemes':
+        const inicioMes = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
+        dataInicio = inicioMes.toISOString().split('T')[0];
+        dataFim = hoje.toISOString().split('T')[0];
+        console.log('📅 Filtro ESTE MÊS - De:', dataInicio, 'Até:', dataFim);
+        break;
+      
+      case 'mespassado':
+        const inicioMesPassado = new Date(hoje.getFullYear(), hoje.getMonth() - 1, 1);
+        const fimMesPassado = new Date(hoje.getFullYear(), hoje.getMonth(), 0);
+        dataInicio = inicioMesPassado.toISOString().split('T')[0];
+        dataFim = fimMesPassado.toISOString().split('T')[0];
+        console.log('📅 Filtro MÊS PASSADO - De:', dataInicio, 'Até:', dataFim);
+        break;
+      
+      case 'ultimos30dias':
+        const trintaDiasAtras = new Date(hoje);
+        trintaDiasAtras.setDate(hoje.getDate() - 30);
+        dataInicio = trintaDiasAtras.toISOString().split('T')[0];
+        dataFim = hoje.toISOString().split('T')[0];
+        console.log('📅 Filtro ÚLTIMOS 30 DIAS - De:', dataInicio, 'Até:', dataFim);
+        break;
+      
+      default:
+        console.log('❌ Tipo de filtro inválido:', type);
+        return;
+    }
+
+    // Atualizar os filtros
+    const novosFiltros = { ...filtros, dataInicio, dataFim };
+    console.log('🔄 Atualizando filtros:', novosFiltros);
+    setFiltros(novosFiltros);
   };
 
   if (isLoading || !userCondominioId) {
@@ -339,6 +497,69 @@ export const AdminReports = () => {
           </CardTitle>
         </CardHeader>
         <CardContent>
+          {/* Filtros de Data Predefinidos */}
+          <div className="mb-6">
+            <Label className="text-sm font-medium mb-3 block">Filtros Rápidos de Data</Label>
+            <div className="flex flex-wrap gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setDateFilter('hoje')}
+                className="text-xs"
+              >
+                Hoje
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setDateFilter('ontem')}
+                className="text-xs"
+              >
+                Ontem
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setDateFilter('ultimos7dias')}
+                className="text-xs"
+              >
+                Últimos 7 dias
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setDateFilter('estasemana')}
+                className="text-xs"
+              >
+                Esta semana
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setDateFilter('estemes')}
+                className="text-xs"
+              >
+                Este mês
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setDateFilter('mespassado')}
+                className="text-xs"
+              >
+                Mês passado
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setDateFilter('ultimos30dias')}
+                className="text-xs"
+              >
+                Últimos 30 dias
+              </Button>
+            </div>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {/* Busca */}
             <div className="space-y-2">
@@ -417,7 +638,7 @@ export const AdminReports = () => {
 
             {/* Data Início */}
             <div className="space-y-2">
-              <Label>Data Início</Label>
+              <Label>Data Início (Personalizado)</Label>
               <Input
                 type="date"
                 value={filtros.dataInicio}
@@ -427,7 +648,7 @@ export const AdminReports = () => {
 
             {/* Data Fim */}
             <div className="space-y-2">
-              <Label>Data Fim</Label>
+              <Label>Data Fim (Personalizado)</Label>
               <Input
                 type="date"
                 value={filtros.dataFim}
