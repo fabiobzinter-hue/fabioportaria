@@ -5,11 +5,14 @@ import type { Tables } from '@/integrations/supabase/types';
 type Funcionario = Tables<'funcionarios'>;
 type Condominio = Tables<'condominios'> & { sindico_id?: string | null }; // Adicionar sindico_id ao tipo Condominio
 type Morador = Tables<'moradores'>;
+type SuperAdmin = Tables<'super_administradores'>;
 
 interface AuthUser {
   funcionario: Funcionario;
   condominio: Condominio | null; // Pode ser null se o condomínio não for encontrado
   moradores: Morador[];
+  isSuperAdmin?: boolean;
+  superAdmin?: SuperAdmin;
 }
 
 export const useAuth = () => {
@@ -71,163 +74,213 @@ export const useAuth = () => {
 
       let funcionario: Funcionario | null = null;
       let condominio: Condominio | null = null;
+      let isSuperAdmin = false;
+      let superAdminData: SuperAdmin | null = null;
 
-      // 1) Tenta autenticar como funcionário
-      console.log('🔍 Tentando autenticar como funcionário...');
-      console.log('CPF limpo:', cleanCpf);
-      console.log('CPF formatado:', formattedCpf);
-      console.log('Senha:', '***');
-      
-      // Primeiro, vamos verificar se existe funcionário com este CPF (independente de estar ativo)
-      const { data: funcionariosDebug, error: debugError } = await supabase
-        .from('funcionarios')
-        .select('id, nome, cpf, senha, cargo, ativo, condominio_id')
-        .or(`cpf.eq.${cleanCpf},cpf.eq.${formattedCpf}`);
-      
-      console.log('🔍 Debug - Funcionários encontrados com este CPF:', funcionariosDebug?.length || 0);
-      if (funcionariosDebug && funcionariosDebug.length > 0) {
-        funcionariosDebug.forEach((func, index) => {
-          console.log(`Funcionário ${index + 1}:`, {
-            nome: func.nome,
-            cpf: `"${func.cpf}"`,
-            cargo: func.cargo,
-            ativo: func.ativo,
-            senhaCorreta: func.senha === trimmedSenha
-          });
-        });
-      }
-      
-      // Agora a busca original com todos os filtros
-      const { data: funcionarios, error: funcError } = await supabase
-        .from('funcionarios')
+      // 0) Primeiro tenta autenticar como super administrador
+      console.log('🔍 Tentando autenticar como super administrador...');
+      const { data: superAdmins, error: superAdminError } = await supabase
+        .from('super_administradores')
         .select('*')
         .or(`cpf.eq.${cleanCpf},cpf.eq.${formattedCpf}`)
         .eq('senha', trimmedSenha)
         .eq('ativo', true);
 
-      if (funcError) {
-        console.error('Erro ao buscar funcionário:', funcError);
-        throw new Error('Erro ao buscar funcionário. Tente novamente.');
+      if (superAdminError) {
+        console.error('Erro ao buscar super administrador:', superAdminError);
       }
 
-      if (funcionarios && funcionarios.length > 0) {
-        funcionario = funcionarios[0];
-        const { data: condo, error: condError } = await supabase
-          .from('condominios')
-          .select('*')
-          .eq('id', funcionario.condominio_id)
-          .maybeSingle();
-
-        if (condError) {
-          console.error('Erro ao buscar condomínio:', condError);
-          throw new Error('Erro ao buscar dados do condomínio');
-        }
-        condominio = condo as Condominio | null;
+      if (superAdmins && superAdmins.length > 0) {
+        console.log('✅ Super administrador encontrado!');
+        const superAdmin = superAdmins[0];
+        isSuperAdmin = true;
+        superAdminData = superAdmin;
+        
+        // Criar um funcionario virtual para manter a compatibilidade
+        funcionario = {
+          id: `super-admin-${superAdmin.id}`,
+          nome: superAdmin.nome,
+          cpf: cleanCpf,
+          senha: senha,
+          cargo: 'super_administrador' as any,
+          ativo: true,
+          condominio_id: '', // Super admin não pertence a um condomínio específico
+          created_at: superAdmin.created_at,
+          updated_at: superAdmin.updated_at,
+        } as unknown as Funcionario;
+        
+        // Super admin não tem condomínio específico
+        condominio = null;
       } else {
-        console.log('❌ Nenhum funcionário ativo encontrado com CPF e senha corretos');
-        // 2) Se não achou funcionário, tenta síndico pelo CPF/senha do condomínio
-        console.log('🔍 Tentando autenticar como síndico...');
-        const cpfAsNumber = Number(cleanCpf);
+        console.log('❌ Nenhum super administrador encontrado');
         
-        // Debug: verificar todos os condomínios primeiro
-        const { data: todosCondominios, error: debugCondoError } = await supabase
-          .from('condominios')
-          .select('id, nome, sindico_cpf, sindico_senha, sindico_nome');
+        // 1) Tenta autenticar como funcionário
+        console.log('🔍 Tentando autenticar como funcionário...');
+        console.log('CPF limpo:', cleanCpf);
+        console.log('CPF formatado:', formattedCpf);
+        console.log('Senha:', '***');
         
-        console.log('🔍 Debug - Total de condomínios:', todosCondominios?.length || 0);
-        if (todosCondominios && todosCondominios.length > 0) {
-          todosCondominios.forEach((condo, index) => {
-            if (condo.sindico_cpf) {
-              console.log(`Condomínio ${index + 1}:`, {
-                nome: condo.nome,
-                sindico_nome: condo.sindico_nome,
-                sindico_cpf: `"${condo.sindico_cpf}"`,
-                cpf_match_limpo: condo.sindico_cpf === cleanCpf,
-                cpf_match_formatado: condo.sindico_cpf === formattedCpf,
-                cpf_match_numero: String(condo.sindico_cpf) === String(cpfAsNumber),
-                senhaCorreta: String(condo.sindico_senha) === trimmedSenha || Number(condo.sindico_senha) === Number(trimmedSenha)
-              });
-            }
-          });
-        }
+        // Primeiro, vamos verificar se existe funcionário com este CPF (independente de estar ativo)
+        const { data: funcionariosDebug, error: debugError } = await supabase
+          .from('funcionarios')
+          .select('id, nome, cpf, senha, cargo, ativo, condominio_id')
+          .or(`cpf.eq.${cleanCpf},cpf.eq.${formattedCpf}`);
         
-        const { data: condosByCpf, error: cpfSearchError } = await supabase
-          .from('condominios')
-          .select('id, nome, sindico_id, sindico_nome, sindico_cpf, sindico_senha')
-          .or(`sindico_cpf.eq.${cleanCpf},sindico_cpf.eq.${formattedCpf},sindico_cpf.eq.${isNaN(cpfAsNumber) ? '0' : cpfAsNumber}`);
-        
-        console.log('🔍 Condomínios encontrados na busca por CPF:', condosByCpf?.length || 0);
-        if (condosByCpf && condosByCpf.length > 0) {
-          condosByCpf.forEach((condo, index) => {
-            console.log(`Match ${index + 1}:`, {
-              nome: condo.nome,
-              sindico_nome: condo.sindico_nome,
-              sindico_cpf: `"${condo.sindico_cpf}"`,
-              sindico_senha_type: typeof condo.sindico_senha,
-              sindico_senha_value: condo.sindico_senha,
+        console.log('🔍 Debug - Funcionários encontrados com este CPF:', funcionariosDebug?.length || 0);
+        if (funcionariosDebug && funcionariosDebug.length > 0) {
+          funcionariosDebug.forEach((func, index) => {
+            console.log(`Funcionário ${index + 1}:`, {
+              nome: func.nome,
+              cpf: `"${func.cpf}"`,
+              cargo: func.cargo,
+              ativo: func.ativo,
+              senhaCorreta: func.senha === trimmedSenha
             });
           });
         }
+        
+        // Agora a busca original com todos os filtros
+        const { data: funcionarios, error: funcError } = await supabase
+          .from('funcionarios')
+          .select('*')
+          .or(`cpf.eq.${cleanCpf},cpf.eq.${formattedCpf}`)
+          .eq('senha', trimmedSenha)
+          .eq('ativo', true);
 
-        if (cpfSearchError) {
-          console.error('Erro ao buscar condomínio por CPF de síndico:', cpfSearchError);
-          throw new Error('Erro ao verificar dados do síndico');
+        if (funcError) {
+          console.error('Erro ao buscar funcionário:', funcError);
+          throw new Error('Erro ao buscar funcionário. Tente novamente.');
         }
 
-        const senhaAsNumber = Number(trimmedSenha);
-        const condo = (condosByCpf || []).find((c: any) => {
-          const stored = c.sindico_senha;
-          if (stored === null || stored === undefined) return false;
-          if (typeof stored === 'number') {
-            return stored === senhaAsNumber;
+        if (funcionarios && funcionarios.length > 0) {
+          funcionario = funcionarios[0];
+          const { data: condo, error: condError } = await supabase
+            .from('condominios')
+            .select('*')
+            .eq('id', funcionario.condominio_id)
+            .maybeSingle();
+
+          if (condError) {
+            console.error('Erro ao buscar condomínio:', condError);
+            throw new Error('Erro ao buscar dados do condomínio');
           }
-          // stored como texto
-          return String(stored) === trimmedSenha || String(stored).trim() === trimmedSenha;
-        }) || null;
+          condominio = condo as Condominio | null;
+        } else {
+          console.log('❌ Nenhum funcionário ativo encontrado com CPF e senha corretos');
+          // 2) Se não achou funcionário, tenta síndico pelo CPF/senha do condomínio
+          console.log('🔍 Tentando autenticar como síndico...');
+          const cpfAsNumber = Number(cleanCpf);
+          
+          // Debug: verificar todos os condomínios primeiro
+          const { data: todosCondominios, error: debugCondoError } = await supabase
+            .from('condominios')
+            .select('id, nome, sindico_cpf, sindico_senha, sindico_nome');
+          
+          console.log('🔍 Debug - Total de condomínios:', todosCondominios?.length || 0);
+          if (todosCondominios && todosCondominios.length > 0) {
+            todosCondominios.forEach((condo, index) => {
+              if (condo.sindico_cpf) {
+                console.log(`Condomínio ${index + 1}:`, {
+                  nome: condo.nome,
+                  sindico_nome: condo.sindico_nome,
+                  sindico_cpf: `"${condo.sindico_cpf}"`,
+                  cpf_match_limpo: condo.sindico_cpf === cleanCpf,
+                  cpf_match_formatado: condo.sindico_cpf === formattedCpf,
+                  cpf_match_numero: String(condo.sindico_cpf) === String(cpfAsNumber),
+                  senhaCorreta: String(condo.sindico_senha) === trimmedSenha || Number(condo.sindico_senha) === Number(trimmedSenha)
+                });
+              }
+            });
+          }
+          
+          const { data: condosByCpf, error: cpfSearchError } = await supabase
+            .from('condominios')
+            .select('id, nome, sindico_id, sindico_nome, sindico_cpf, sindico_senha')
+            .or(`sindico_cpf.eq.${cleanCpf},sindico_cpf.eq.${formattedCpf},sindico_cpf.eq.${isNaN(cpfAsNumber) ? '0' : cpfAsNumber}`);
+          
+          console.log('🔍 Condomínios encontrados na busca por CPF:', condosByCpf?.length || 0);
+          if (condosByCpf && condosByCpf.length > 0) {
+            condosByCpf.forEach((condo, index) => {
+              console.log(`Match ${index + 1}:`, {
+                nome: condo.nome,
+                sindico_nome: condo.sindico_nome,
+                sindico_cpf: `"${condo.sindico_cpf}"`,
+                sindico_senha_type: typeof condo.sindico_senha,
+                sindico_senha_value: condo.sindico_senha,
+              });
+            });
+          }
 
-        if (!condo) {
-          console.log('❌ Nenhum síndico encontrado com CPF e senha corretos');
-          console.log('💡 Dica: Verifique se:');
-          console.log('  1. O CPF foi cadastrado corretamente (com ou sem formatação)');
-          console.log('  2. A senha está correta');
-          console.log('  3. O funcionário está marcado como "ativo"');
-          console.log('  4. O condomínio foi associado corretamente');
-          throw new Error('CPF ou senha incorretos.');
+          if (cpfSearchError) {
+            console.error('Erro ao buscar condomínio por CPF de síndico:', cpfSearchError);
+            throw new Error('Erro ao verificar dados do síndico');
+          }
+
+          const senhaAsNumber = Number(trimmedSenha);
+          const condo = (condosByCpf || []).find((c: any) => {
+            const stored = c.sindico_senha;
+            if (stored === null || stored === undefined) return false;
+            if (typeof stored === 'number') {
+              return stored === senhaAsNumber;
+            }
+            // stored como texto
+            return String(stored) === trimmedSenha || String(stored).trim() === trimmedSenha;
+          }) || null;
+
+          if (condo) {
+            condominio = (function toCondo(c: any) {
+              const { id, nome, sindico_id, sindico_nome } = c;
+              return { id, nome, sindico_id, sindico_nome } as unknown as Condominio;
+            })(condo);
+
+            funcionario = {
+              id: condominio.sindico_id || `sindico-${condominio.id}`,
+              nome: (condo as any).sindico_nome || 'Síndico',
+              cpf: cleanCpf,
+              senha: senha,
+              cargo: 'sindico' as any,
+              ativo: true,
+              condominio_id: condominio.id,
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString(),
+            } as unknown as Funcionario;
+          }
         }
-
-        condominio = (function toCondo(c: any) {
-          const { id, nome, sindico_id, sindico_nome } = c;
-          return { id, nome, sindico_id, sindico_nome } as unknown as Condominio;
-        })(condo);
-
-        funcionario = {
-          id: condominio.sindico_id || `sindico-${condominio.id}`,
-          nome: (condo as any).sindico_nome || 'Síndico',
-          cpf: cleanCpf,
-          senha: senha,
-          cargo: 'sindico' as any,
-          ativo: true,
-          condominio_id: condominio.id,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        } as unknown as Funcionario;
       }
 
-      // Busca os moradores do condomínio
-      const { data: moradores, error: morError } = await supabase
-        .from('moradores')
-        .select('*')
-        .eq('condominio_id', funcionario!.condominio_id);
+      // Se chegou aqui e nenhum foi encontrado, erro de autenticação
+      if (!funcionario) {
+        console.log('❌ Nenhuma autenticação válida encontrada');
+        console.log('💡 Dica: Verifique se:');
+        console.log('  1. O CPF foi cadastrado corretamente (com ou sem formatação)');
+        console.log('  2. A senha está correta');
+        console.log('  3. O funcionário está marcado como "ativo"');
+        console.log('  4. O condomínio foi associado corretamente');
+        throw new Error('CPF ou senha incorretos.');
+      }
 
-      if (morError) {
-        console.error('Erro ao buscar moradores:', morError);
-        // Não falha se não conseguir buscar moradores
+      // Busca os moradores do condomínio (apenas se não for super admin)
+      let moradores: Morador[] = [];
+      if (!isSuperAdmin && funcionario.condominio_id) {
+        const { data: moradoresData, error: morError } = await supabase
+          .from('moradores')
+          .select('*')
+          .eq('condominio_id', funcionario.condominio_id);
+
+        if (morError) {
+          console.error('Erro ao buscar moradores:', morError);
+          // Não falha se não conseguir buscar moradores
+        } else {
+          moradores = moradoresData || [];
+        }
       }
 
       const authUser: AuthUser = {
         funcionario: funcionario!,
         condominio,
-        moradores: moradores || [],
+        moradores,
+        isSuperAdmin,
+        superAdmin: superAdminData || undefined,
       };
 
       localStorage.setItem('current_user_cpf', cleanCpf);

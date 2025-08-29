@@ -21,6 +21,7 @@ import { WithdrawalPanel } from "./WithdrawalPanel";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from '@/integrations/supabase/client';
 import { AdminPanel } from "./AdminPanel";
+import { SuperAdminDashboard } from "./SuperAdminDashboard";
 
 interface Resident {
   id: string;
@@ -34,6 +35,8 @@ interface AuthUser {
   funcionario: any;
   condominio: any;
   moradores: any[];
+  isSuperAdmin?: boolean;
+  superAdmin?: any;
 }
 
 interface DashboardProps {
@@ -43,7 +46,7 @@ interface DashboardProps {
 }
 
 
-type View = "search" | "residents" | "delivery" | "reports" | "withdrawal" | "admin";
+type View = "search" | "residents" | "delivery" | "reports" | "withdrawal" | "admin" | "superadmin";
 
 // Usar cliente Supabase centralizado
 
@@ -149,6 +152,8 @@ export const Dashboard = ({ authUser, onLogout, initialView }: DashboardProps) =
     return isSindico || isAdminAndCondoSindico;
   })();
 
+  const isSuperAdmin = authUser?.isSuperAdmin || authUser?.funcionario?.cargo === 'super_administrador';
+
   const renderCurrentView = () => {
     switch (currentView) {
       case "search":
@@ -181,6 +186,8 @@ export const Dashboard = ({ authUser, onLogout, initialView }: DashboardProps) =
         return <ReportsPanel onBack={() => setCurrentView("search")} condominioId={authUser.funcionario.condominio_id} />;
       case "admin":
         return <AdminPanel onBack={() => setCurrentView("search")} />;
+      case "superadmin":
+        return <SuperAdminDashboard onBack={() => setCurrentView("search")} />;
       default:
         return <SearchForm onSearch={handleSearch} />;
     }
@@ -267,6 +274,18 @@ export const Dashboard = ({ authUser, onLogout, initialView }: DashboardProps) =
               >
                 <Settings className="h-5 w-5" />
                 <span>Administração</span>
+              </Button>
+            )}
+
+            {isSuperAdmin && (
+              <Button
+                variant={currentView === "superadmin" ? "default" : "ghost"}
+                size="lg"
+                onClick={() => setCurrentView("superadmin")}
+                className="flex items-center gap-3 px-4 py-3 text-base font-medium bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white"
+              >
+                <Building2 className="h-5 w-5" />
+                <span>Super Admin</span>
               </Button>
             )}
           </div>

@@ -231,6 +231,36 @@ export type Database = {
           },
         ]
       }
+      super_administradores: {
+        Row: {
+          ativo: boolean
+          cpf: string
+          created_at: string
+          id: string
+          nome: string
+          senha: string
+          updated_at: string
+        }
+        Insert: {
+          ativo?: boolean
+          cpf: string
+          created_at?: string
+          id?: string
+          nome: string
+          senha: string
+          updated_at?: string
+        }
+        Update: {
+          ativo?: boolean
+          cpf?: string
+          created_at?: string
+          id?: string
+          nome?: string
+          senha?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

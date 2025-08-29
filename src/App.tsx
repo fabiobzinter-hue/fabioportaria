@@ -52,6 +52,11 @@ function App() {
   const getInitialDashboardView = () => {
     if (!user) return 'search' as const; // Should not happen if we are rendering Dashboard
 
+    // Se o usuário é super administrador, ir direto para o painel de super admin
+    if (user.isSuperAdmin || user.funcionario.cargo === 'super_administrador') {
+      return 'superadmin' as const;
+    }
+
     // Se o usuário é um administrador e o síndico do seu condomínio, ir para o painel de administração
     if (
       user.funcionario.cargo === 'administrador' &&
