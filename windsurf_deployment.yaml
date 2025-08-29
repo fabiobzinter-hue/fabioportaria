@@ -1,6 +1,6 @@
-# Windsurf Deploys Configuration (Beta)
-# This is an auto-generated file used to store your app deployment configuration. Do not modify.
-# The ID of the project (different from project name) on the provider's system. This is populated as a way to update existing deployments.
-project_id: 33a88c7d-e60d-494d-b56f-b1d9876731fb
-# The framework of the web application (examples: nextjs, react, vue, etc.)
-framework: nextjs
+# Portaria Express Smart Configuration
+# Configuration for deployment services
+framework: vite
+build_command: npm run build
+output_directory: dist
+node_version: 18
