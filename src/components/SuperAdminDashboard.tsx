@@ -471,12 +471,12 @@ export const SuperAdminDashboard = ({ onBack }: SuperAdminDashboardProps) => {
 
   const renderCondominios = () => (
     <div className="space-y-4">
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold">Gerenciar Condomínios</h2>
-        <div className="flex space-x-2">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 md:gap-0">
+        <h2 className="text-xl md:text-2xl font-bold">Gerenciar Condomínios</h2>
+        <div className="flex w-full md:w-auto space-x-2">
           <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
             <DialogTrigger asChild>
-              <Button>
+              <Button className="w-full md:w-auto">
                 <Plus className="h-4 w-4 mr-2" />
                 Novo Condomínio
               </Button>
@@ -728,14 +728,14 @@ export const SuperAdminDashboard = ({ onBack }: SuperAdminDashboardProps) => {
 
       <Card>
         <CardContent className="p-0 overflow-auto">
-          <Table>
+          <Table className="min-w-[600px]">
             <TableHeader>
               <TableRow>
                 <TableHead className="min-w-[120px]">Nome</TableHead>
                 <TableHead className="hidden md:table-cell">Cidade</TableHead>
                 <TableHead className="hidden md:table-cell">Síndico</TableHead>
                 <TableHead className="hidden md:table-cell">Telefone</TableHead>
-                <TableHead className="text-right">Ações</TableHead>
+                <TableHead className="text-right w-[100px]">Ações</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -751,16 +751,17 @@ export const SuperAdminDashboard = ({ onBack }: SuperAdminDashboardProps) => {
                   <TableCell className="hidden md:table-cell">{condo.sindico_nome || 'Não definido'}</TableCell>
                   <TableCell className="hidden md:table-cell">{condo.telefone || 'Não informado'}</TableCell>
                   <TableCell className="text-right">
-                    <div className="flex justify-end space-x-2">
-                      <Button variant="outline" size="sm" onClick={() => handleEditCondominio(condo)}>
-                        <Edit className="h-4 w-4" />
+                    <div className="flex justify-end space-x-1 md:space-x-2">
+                      <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => handleEditCondominio(condo)}>
+                        <Edit className="h-3.5 w-3.5" />
                       </Button>
                       <Button 
                         variant="destructive" 
-                        size="sm"
+                        size="icon"
+                        className="h-8 w-8"
                         onClick={() => handleDeleteCondominio(condo.id)}
                       >
-                        <Trash2 className="h-4 w-4" />
+                        <Trash2 className="h-3.5 w-3.5" />
                       </Button>
                     </div>
                   </TableCell>
@@ -775,10 +776,10 @@ export const SuperAdminDashboard = ({ onBack }: SuperAdminDashboardProps) => {
 
   const renderFuncionarios = () => (
     <div className="space-y-4">
-      <h2 className="text-2xl font-bold">Funcionários do Sistema</h2>
+      <h2 className="text-xl md:text-2xl font-bold">Funcionários do Sistema</h2>
       <Card>
         <CardContent className="p-0 overflow-auto">
-          <Table>
+          <Table className="min-w-[600px]">
             <TableHeader>
               <TableRow>
                 <TableHead className="min-w-[120px]">Nome</TableHead>
@@ -821,10 +822,10 @@ export const SuperAdminDashboard = ({ onBack }: SuperAdminDashboardProps) => {
 
   const renderEntregas = () => (
     <div className="space-y-4">
-      <h2 className="text-2xl font-bold">Entregas Recentes</h2>
+      <h2 className="text-xl md:text-2xl font-bold">Entregas Recentes</h2>
       <Card>
         <CardContent className="p-0 overflow-auto">
-          <Table>
+          <Table className="min-w-[600px]">
             <TableHeader>
               <TableRow>
                 <TableHead>Data</TableHead>
@@ -871,7 +872,7 @@ export const SuperAdminDashboard = ({ onBack }: SuperAdminDashboardProps) => {
     return (
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <h2 className="text-2xl font-bold">Relatórios Administrativos</h2>
+        <h2 className="text-xl md:text-2xl font-bold">Relatórios Administrativos</h2>
         
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 bg-card p-3 rounded-md border shadow-sm w-full sm:w-auto">
           <Label htmlFor="condominio-filter" className="whitespace-nowrap font-semibold">Filtrar por Condomínio:</Label>
@@ -985,18 +986,19 @@ export const SuperAdminDashboard = ({ onBack }: SuperAdminDashboardProps) => {
   }
 
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex justify-between items-center">
+    <div className="p-3 md:p-6 space-y-4 md:space-y-6">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 md:gap-0">
         <div>
-          <h1 className="text-3xl font-bold text-primary">Super Administração</h1>
-          <p className="text-muted-foreground">Controle total do sistema de portaria</p>
+          <h1 className="text-2xl md:text-3xl font-bold text-primary">Super Admin</h1>
+          <p className="text-sm text-muted-foreground">Controle total do sistema EntregasZap</p>
         </div>
-        <Button variant="outline" onClick={onBack}>
+        <Button variant="outline" size="sm" className="w-full md:w-auto" onClick={onBack}>
           Voltar ao Dashboard
         </Button>
       </div>
 
-      <div className="flex space-x-2 border-b">
+      <div className="w-full overflow-x-auto pb-2">
+        <div className="flex space-x-2 border-b min-w-max">
         {[
           { key: 'overview', label: 'Visão Geral' },
           { key: 'condominios', label: 'Condomínios' },
@@ -1008,14 +1010,15 @@ export const SuperAdminDashboard = ({ onBack }: SuperAdminDashboardProps) => {
             key={tab.key}
             variant={currentView === tab.key ? "default" : "ghost"}
             onClick={() => setCurrentView(tab.key as any)}
-            className="rounded-b-none"
+            className="rounded-b-none text-sm md:text-base px-2 md:px-4"
           >
             {tab.label}
           </Button>
         ))}
       </div>
+    </div>
 
-      <div className="mt-6">
+      <div className="mt-4 md:mt-6">
         {currentView === 'overview' && renderOverview()}
         {currentView === 'condominios' && renderCondominios()}
         {currentView === 'funcionarios' && renderFuncionarios()}
