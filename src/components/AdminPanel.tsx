@@ -64,7 +64,7 @@ export const AdminPanel = ({ onBack }: AdminPanelProps) => {
               </Button>
               <div className="flex items-center space-x-2">
                 <Settings className="h-6 w-6 text-blue-600" />
-                <h1 className="text-xl font-semibold text-gray-900">
+                <h1 className="text-lg sm:text-xl font-semibold text-gray-900">
                   Painel Administrativo
                 </h1>
               </div>
@@ -75,10 +75,10 @@ export const AdminPanel = ({ onBack }: AdminPanelProps) => {
 
       {/* Navigation */}
       <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 py-4">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-4 mb-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-4 mb-4 sm:mb-6">
           <Button
             variant={currentView === "dashboard" ? "default" : "outline"}
-            className="h-16 sm:h-20 flex flex-col items-center justify-center space-y-1 sm:space-y-2 text-xs sm:text-sm px-2"
+            className="h-16 sm:h-20 flex flex-col items-center justify-center space-y-1 sm:space-y-2 text-sm px-2"
             onClick={() => setCurrentView("dashboard")}
           >
             <BarChart3 className="h-4 w-4 sm:h-6 sm:w-6" />
@@ -87,7 +87,7 @@ export const AdminPanel = ({ onBack }: AdminPanelProps) => {
 
           <Button
             variant={currentView === "employees" ? "default" : "outline"}
-            className="h-16 sm:h-20 flex flex-col items-center justify-center space-y-1 sm:space-y-2 text-xs sm:text-sm px-2"
+            className="h-16 sm:h-20 flex flex-col items-center justify-center space-y-1 sm:space-y-2 text-sm px-2"
             onClick={() => setCurrentView("employees")}
           >
             <Users className="h-4 w-4 sm:h-6 sm:w-6" />
@@ -96,7 +96,7 @@ export const AdminPanel = ({ onBack }: AdminPanelProps) => {
 
           <Button
             variant={currentView === "residents" ? "default" : "outline"}
-            className="h-16 sm:h-20 flex flex-col items-center justify-center space-y-1 sm:space-y-2 text-xs sm:text-sm px-2"
+            className="h-16 sm:h-20 flex flex-col items-center justify-center space-y-1 sm:space-y-2 text-sm px-2"
             onClick={() => setCurrentView("residents")}
           >
             <Home className="h-4 w-4 sm:h-6 sm:w-6" />
@@ -105,7 +105,7 @@ export const AdminPanel = ({ onBack }: AdminPanelProps) => {
 
           <Button
             variant={currentView === "reports" ? "default" : "outline"}
-            className="h-16 sm:h-20 flex flex-col items-center justify-center space-y-1 sm:space-y-2 text-xs sm:text-sm px-2"
+            className="h-16 sm:h-20 flex flex-col items-center justify-center space-y-1 sm:space-y-2 text-sm px-2"
             onClick={() => setCurrentView("reports")}
           >
             <FileText className="h-4 w-4 sm:h-6 sm:w-6" />

@@ -139,8 +139,8 @@ export const AdminDashboard = () => {
             Visão geral do condomínio {stats.condominioInfo?.nome}
           </p>
         </div>
-        <Badge variant="outline" className="text-xs sm:text-sm w-fit">
-          <Building className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+        <Badge variant="outline" className="text-sm w-fit px-3 py-1">
+          <Building className="h-4 w-4 mr-1" />
           Administração
         </Badge>
       </div>
@@ -149,7 +149,7 @@ export const AdminDashboard = () => {
       {stats.condominioInfo && (
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center">
+            <CardTitle className="flex items-center text-base">
               <Building className="h-5 w-5 mr-2" />
               Informações do Condomínio
             </CardTitle>
@@ -157,17 +157,17 @@ export const AdminDashboard = () => {
           <CardContent>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
               <div>
-                <p className="text-xs sm:text-sm font-medium text-gray-500">Nome</p>
-                <p className="text-sm sm:text-lg font-semibold">{stats.condominioInfo.nome}</p>
+                <p className="text-sm font-medium text-gray-500">Nome</p>
+                <p className="text-base sm:text-lg font-semibold">{stats.condominioInfo.nome}</p>
               </div>
               <div>
-                <p className="text-xs sm:text-sm font-medium text-gray-500">Endereço</p>
-                <p className="text-sm sm:text-lg">{stats.condominioInfo.endereco}</p>
+                <p className="text-sm font-medium text-gray-500">Endereço</p>
+                <p className="text-base sm:text-lg">{stats.condominioInfo.endereco}</p>
               </div>
               <div>
-                <p className="text-xs sm:text-sm font-medium text-gray-500">Telefone</p>
-                <p className="text-sm sm:text-lg flex items-center">
-                  <Phone className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                <p className="text-sm font-medium text-gray-500">Telefone</p>
+                <p className="text-base sm:text-lg flex items-center">
+                  <Phone className="h-4 w-4 mr-1" />
                   {stats.condominioInfo.telefone}
                 </p>
               </div>
@@ -180,12 +180,12 @@ export const AdminDashboard = () => {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-xs sm:text-sm font-medium">Funcionários</CardTitle>
-            <Users className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium">Funcionários</CardTitle>
+            <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-lg sm:text-2xl font-bold">{stats.totalFuncionarios}</div>
-            <p className="text-xs text-muted-foreground">
+            <div className="text-xl sm:text-2xl font-bold">{stats.totalFuncionarios}</div>
+            <p className="text-xs sm:text-sm text-muted-foreground">
               Funcionários ativos
             </p>
           </CardContent>
@@ -193,12 +193,12 @@ export const AdminDashboard = () => {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-xs sm:text-sm font-medium">Moradores</CardTitle>
-            <Home className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium">Moradores</CardTitle>
+            <Home className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-lg sm:text-2xl font-bold">{stats.totalMoradores}</div>
-            <p className="text-xs text-muted-foreground">
+            <div className="text-xl sm:text-2xl font-bold">{stats.totalMoradores}</div>
+            <p className="text-xs sm:text-sm text-muted-foreground">
               Moradores cadastrados
             </p>
           </CardContent>
@@ -206,12 +206,12 @@ export const AdminDashboard = () => {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-xs sm:text-sm font-medium">Entregas Hoje</CardTitle>
-            <Package className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium">Entregas Hoje</CardTitle>
+            <Package className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-lg sm:text-2xl font-bold">{stats.entregasHoje}</div>
-            <p className="text-xs text-muted-foreground">
+            <div className="text-xl sm:text-2xl font-bold">{stats.entregasHoje}</div>
+            <p className="text-xs sm:text-sm text-muted-foreground">
               Entregas registradas hoje
             </p>
           </CardContent>
@@ -219,16 +219,16 @@ export const AdminDashboard = () => {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-xs sm:text-sm font-medium">Taxa de Retirada</CardTitle>
-            <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium">Taxa de Retirada</CardTitle>
+            <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-lg sm:text-2xl font-bold">
+            <div className="text-xl sm:text-2xl font-bold">
               {stats.entregasRetiradas + stats.entregasPendentes > 0 
                 ? Math.round((stats.entregasRetiradas / (stats.entregasRetiradas + stats.entregasPendentes)) * 100)
                 : 0}%
             </div>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs sm:text-sm text-muted-foreground">
               {stats.entregasRetiradas} de {stats.entregasRetiradas + stats.entregasPendentes} entregas
             </p>
           </CardContent>
@@ -239,14 +239,14 @@ export const AdminDashboard = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center text-base sm:text-lg">
-              <Clock className="h-4 w-4 sm:h-5 sm:w-5 mr-2 text-yellow-600" />
+            <CardTitle className="flex items-center text-lg">
+              <Clock className="h-5 w-5 mr-2 text-yellow-600" />
               Entregas Pendentes
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl sm:text-3xl font-bold text-yellow-600">{stats.entregasPendentes}</div>
-            <p className="text-xs sm:text-sm text-muted-foreground">
+            <p className="text-sm text-muted-foreground">
               Aguardando retirada pelos moradores
             </p>
           </CardContent>
@@ -254,14 +254,14 @@ export const AdminDashboard = () => {
 
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center text-base sm:text-lg">
-              <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 mr-2 text-green-600" />
+            <CardTitle className="flex items-center text-lg">
+              <CheckCircle className="h-5 w-5 mr-2 text-green-600" />
               Entregas Retiradas
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl sm:text-3xl font-bold text-green-600">{stats.entregasRetiradas}</div>
-            <p className="text-xs sm:text-sm text-muted-foreground">
+            <p className="text-sm text-muted-foreground">
               Entregas já retiradas pelos moradores
             </p>
           </CardContent>
