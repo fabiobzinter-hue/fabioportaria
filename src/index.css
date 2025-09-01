@@ -4,6 +4,19 @@
 
 /* Portaria Dashboard Design System - Professional & Intuitive */
 
+/* Classe para esconder a barra de rolagem */
+@layer utilities {
+  /* Ocultar barra de rolagem horizontal para navegação mobile */
+  .no-scrollbar {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+  }
+}
+
 @layer base {
   :root {
     /* Core Background Colors */

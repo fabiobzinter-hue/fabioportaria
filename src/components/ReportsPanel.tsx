@@ -202,18 +202,18 @@ export const ReportsPanel = ({ onBack, condominioId }: ReportsPanelProps) => {
     <div className="space-y-4 lg:space-y-6 w-full max-w-none">
       {/* Header */}
       <Card className="shadow-card bg-gradient-card">
-        <CardHeader>
-          <div className="flex items-center justify-between">
+        <CardHeader className="py-2 pb-3">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 mb-1">
             <Button
               variant="ghost"
               size="sm"
               onClick={onBack}
-              className="text-muted-foreground hover:text-foreground"
+              className="text-muted-foreground hover:text-foreground h-8 px-2"
             >
-              <ArrowLeft className="h-4 w-4 mr-2" />
+              <ArrowLeft className="h-4 w-4 mr-1" />
               Voltar
             </Button>
-            <div className="flex gap-2">
+            <div className="flex gap-1 w-full sm:w-auto">
               <Button 
                 variant="outline" 
                 size="sm"
@@ -291,73 +291,73 @@ export const ReportsPanel = ({ onBack, condominioId }: ReportsPanelProps) => {
                 <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
                 Atualizar
               </Button>
-              <Button variant="outline" size="sm">
-                <Download className="h-4 w-4 mr-2" />
+              <Button variant="outline" size="sm" className="h-8 px-2 text-xs">
+                <Download className="h-4 w-4 mr-1" />
                 Exportar
               </Button>
             </div>
           </div>
-          <CardTitle className="flex items-center gap-2 text-xl">
-            <Calendar className="h-5 w-5 text-primary" />
+          <CardTitle className="flex items-center gap-1 text-base sm:text-xl mt-0">
+            <Calendar className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
             Relatório de Entregas
           </CardTitle>
         </CardHeader>
       </Card>
 
       {/* Summary Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 xl:grid-cols-4 gap-3 lg:gap-6">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 lg:gap-6">
         <Card className="shadow-card bg-gradient-card">
-          <CardContent className="p-4">
+          <CardContent className="p-3 lg:p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-muted-foreground">
+                <p className="text-xs sm:text-sm font-medium text-muted-foreground">
                   Total de Entregas
                 </p>
-                <p className="text-xl lg:text-2xl font-bold text-foreground">{totalDeliveries}</p>
+                <p className="text-lg lg:text-2xl font-bold text-foreground">{totalDeliveries}</p>
               </div>
-              <Package className="h-6 w-6 lg:h-8 lg:w-8 text-primary" />
+              <Package className="h-5 w-5 lg:h-8 lg:w-8 text-primary" />
             </div>
           </CardContent>
         </Card>
 
         <Card className="shadow-card bg-gradient-card hover:shadow-lg transition-shadow">
-          <CardContent className="p-4 lg:p-6">
+          <CardContent className="p-3 lg:p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-muted-foreground">
+                <p className="text-xs sm:text-sm font-medium text-muted-foreground">
                   Pendentes
                 </p>
-                <p className="text-xl lg:text-2xl font-bold text-warning">{pendingDeliveries}</p>
+                <p className="text-lg lg:text-2xl font-bold text-warning">{pendingDeliveries}</p>
               </div>
-              <Clock className="h-6 w-6 lg:h-8 lg:w-8 text-warning" />
+              <Clock className="h-5 w-5 lg:h-8 lg:w-8 text-warning" />
             </div>
           </CardContent>
         </Card>
 
         <Card className="shadow-card bg-gradient-card hover:shadow-lg transition-shadow">
-          <CardContent className="p-4 lg:p-6">
+          <CardContent className="p-3 lg:p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-muted-foreground">
+                <p className="text-xs sm:text-sm font-medium text-muted-foreground">
                   Concluídas
                 </p>
-                <p className="text-xl lg:text-2xl font-bold text-success">{completedDeliveries}</p>
+                <p className="text-lg lg:text-2xl font-bold text-success">{completedDeliveries}</p>
               </div>
-              <CheckCircle className="h-6 w-6 lg:h-8 lg:w-8 text-success" />
+              <CheckCircle className="h-5 w-5 lg:h-8 lg:w-8 text-success" />
             </div>
           </CardContent>
         </Card>
 
         <Card className="shadow-card bg-gradient-card hover:shadow-lg transition-shadow">
-          <CardContent className="p-4 lg:p-6">
+          <CardContent className="p-3 lg:p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-muted-foreground">
-                  Lembretes Enviados
+                <p className="text-xs sm:text-sm font-medium text-muted-foreground">
+                  Lembretes
                 </p>
-                <p className="text-xl lg:text-2xl font-bold text-orange-500">{remindersSent}</p>
+                <p className="text-lg lg:text-2xl font-bold text-orange-500">{remindersSent}</p>
               </div>
-              <Bell className="h-6 w-6 lg:h-8 lg:w-8 text-orange-500" />
+              <Bell className="h-5 w-5 lg:h-8 lg:w-8 text-orange-500" />
             </div>
           </CardContent>
         </Card>
@@ -365,24 +365,25 @@ export const ReportsPanel = ({ onBack, condominioId }: ReportsPanelProps) => {
 
       {/* Filters */}
       <Card className="shadow-card bg-gradient-card">
-        <CardContent className="p-4">
-          <div className="flex flex-col sm:flex-row gap-4">
+        <CardContent className="p-3">
+          <div className="flex flex-col sm:flex-row gap-2">
             <div className="flex-1">
               <div className="relative">
-                <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input
-                  placeholder="Buscar por morador ou apartamento..."
+                  placeholder="Buscar..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
+                  className="pl-8 h-9 text-sm"
                 />
               </div>
             </div>
-            <div className="flex gap-2">
+            <div className="grid grid-cols-3 gap-1 w-full sm:w-auto sm:flex">
               <Button
                 variant={statusFilter === "todos" ? "default" : "outline"}
                 size="sm"
                 onClick={() => setStatusFilter("todos")}
+                className="h-9 px-2 text-xs whitespace-nowrap"
               >
                 Todos
               </Button>
@@ -390,6 +391,7 @@ export const ReportsPanel = ({ onBack, condominioId }: ReportsPanelProps) => {
                 variant={statusFilter === "pendente" ? "warning" : "outline"}
                 size="sm"
                 onClick={() => setStatusFilter("pendente")}
+                className="h-9 px-2 text-xs whitespace-nowrap"
               >
                 Pendentes
               </Button>
@@ -397,6 +399,7 @@ export const ReportsPanel = ({ onBack, condominioId }: ReportsPanelProps) => {
                 variant={statusFilter === "retirada" ? "success" : "outline"}
                 size="sm"
                 onClick={() => setStatusFilter("retirada")}
+                className="h-9 px-2 text-xs whitespace-nowrap"
               >
                 Entregues
               </Button>

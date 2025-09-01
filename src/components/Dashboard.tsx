@@ -202,7 +202,7 @@ export const Dashboard = ({ authUser, onLogout, initialView }: DashboardProps) =
       {/* Header */}
       <header className="bg-dashboard-sidebar border-b border-border shadow-card">
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-14 sm:h-16">
+          <div className="flex justify-between items-center h-16 sm:h-18 py-2">
             <div className="flex items-center gap-2 sm:gap-3">
               <div className="p-1.5 sm:p-2 bg-gradient-primary rounded-lg">
                 <Building2 className="h-5 w-5 sm:h-6 sm:w-6 text-primary-foreground" />
@@ -238,12 +238,12 @@ export const Dashboard = ({ authUser, onLogout, initialView }: DashboardProps) =
       {/* Navigation */}
       <nav className="bg-dashboard-sidebar border-b border-border">
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
-          <div className="flex flex-wrap gap-2 sm:gap-3 py-3 sm:py-4">
+          <div className="flex overflow-x-auto gap-1 sm:gap-3 py-3 sm:py-4 no-scrollbar whitespace-nowrap">
             <Button
               variant={currentView === "search" ? "default" : "ghost"}
               size="sm"
               onClick={() => setCurrentView("search")}
-              className="flex items-center gap-2 px-3 py-2 text-sm font-medium flex-1 sm:flex-none min-w-0"
+              className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-2 text-xs sm:text-sm font-medium whitespace-nowrap"
             >
               <Package className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
               <span className="truncate">Nova Entrega</span>
@@ -253,7 +253,7 @@ export const Dashboard = ({ authUser, onLogout, initialView }: DashboardProps) =
               variant={currentView === "withdrawal" ? "default" : "ghost"}
               size="sm"
               onClick={() => setCurrentView("withdrawal")}
-              className="flex items-center gap-2 px-3 py-2 text-sm font-medium flex-1 sm:flex-none min-w-0"
+              className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-2 text-xs sm:text-sm font-medium whitespace-nowrap"
             >
               <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
               <span className="truncate">Retiradas</span>
@@ -263,7 +263,7 @@ export const Dashboard = ({ authUser, onLogout, initialView }: DashboardProps) =
               variant={currentView === "reports" ? "default" : "ghost"}
               size="sm"
               onClick={() => setCurrentView("reports")}
-              className="flex items-center gap-2 px-3 py-2 text-sm font-medium flex-1 sm:flex-none min-w-0"
+              className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-2 text-xs sm:text-sm font-medium whitespace-nowrap"
             >
               <BarChart3 className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
               <span className="truncate">Relatórios</span>
@@ -273,7 +273,7 @@ export const Dashboard = ({ authUser, onLogout, initialView }: DashboardProps) =
               variant={currentView === "reminders" ? "default" : "ghost"}
               size="sm"
               onClick={() => setCurrentView("reminders")}
-              className="flex items-center gap-2 px-3 py-2 text-sm font-medium flex-1 sm:flex-none min-w-0"
+              className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-2 text-xs sm:text-sm font-medium whitespace-nowrap"
             >
               <Bell className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
               <span className="truncate">Lembretes</span>
@@ -284,10 +284,10 @@ export const Dashboard = ({ authUser, onLogout, initialView }: DashboardProps) =
                 variant={currentView === "admin" ? "default" : "ghost"}
                 size="sm"
                 onClick={() => setCurrentView("admin")}
-                className="flex items-center gap-2 px-3 py-2 text-sm font-medium flex-1 sm:flex-none min-w-0"
+                className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-2 text-xs sm:text-sm font-medium whitespace-nowrap"
               >
                 <Settings className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
-                <span className="truncate">Administração</span>
+                <span className="truncate">Admin</span>
               </Button>
             )}
 
@@ -296,10 +296,10 @@ export const Dashboard = ({ authUser, onLogout, initialView }: DashboardProps) =
                 variant={currentView === "superadmin" ? "default" : "ghost"}
                 size="sm"
                 onClick={() => setCurrentView("superadmin")}
-                className="flex items-center gap-2 px-3 py-2 text-sm font-medium bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white flex-1 sm:flex-none min-w-0"
+                className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-2 text-xs sm:text-sm font-medium bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white whitespace-nowrap"
               >
                 <Building2 className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
-                <span className="truncate">Super Admin</span>
+                <span className="truncate">Super</span>
               </Button>
             )}
           </div>

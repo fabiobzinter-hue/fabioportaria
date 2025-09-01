@@ -987,7 +987,7 @@ export const SuperAdminDashboard = ({ onBack }: SuperAdminDashboardProps) => {
 
   return (
     <div className="p-3 md:p-6 space-y-4 md:space-y-6">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 md:gap-0">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 md:gap-0 pb-2">
         <div>
           <h1 className="text-2xl md:text-3xl font-bold text-primary">Super Admin</h1>
           <p className="text-sm text-muted-foreground">Controle total do sistema EntregasZap</p>
@@ -997,7 +997,7 @@ export const SuperAdminDashboard = ({ onBack }: SuperAdminDashboardProps) => {
         </Button>
       </div>
 
-      <div className="w-full overflow-x-auto pb-2">
+      <div className="w-full overflow-x-auto pb-2 mb-2 no-scrollbar">
         <div className="flex space-x-2 border-b min-w-max">
         {[
           { key: 'overview', label: 'Visão Geral' },
@@ -1010,7 +1010,7 @@ export const SuperAdminDashboard = ({ onBack }: SuperAdminDashboardProps) => {
             key={tab.key}
             variant={currentView === tab.key ? "default" : "ghost"}
             onClick={() => setCurrentView(tab.key as any)}
-            className="rounded-b-none text-sm md:text-base px-2 md:px-4"
+            className="rounded-b-none text-xs md:text-base px-2 md:px-4 py-1.5 h-auto"
           >
             {tab.label}
           </Button>
