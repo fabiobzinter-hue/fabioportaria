@@ -324,39 +324,40 @@ export const RemindersPanel = ({ onBack, condominioNome }: RemindersPanelProps) 
   };
 
   return (
-    <div className="space-y-4 lg:space-y-6 w-full max-w-none">
+    <div className="space-y-4 sm:space-y-6 w-full max-w-none">
       {/* Header */}
       <Card className="shadow-card bg-gradient-card">
-        <CardHeader>
+        <CardHeader className="py-3 pb-4">
           <div className="flex items-center justify-between">
             <Button
               variant="ghost"
               size="sm"
               onClick={onBack}
-              className="text-muted-foreground hover:text-foreground"
+              className="text-muted-foreground hover:text-foreground h-9 px-2"
             >
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Voltar
+              <ArrowLeft className="h-5 w-5 mr-2" />
+              <span className="text-base">Voltar</span>
             </Button>
+            <div className="flex items-center gap-2">
+              <Bell className="h-6 w-6 text-primary" />
+              <h1 className="text-xl sm:text-2xl font-bold text-foreground">
+                Lembretes de Encomendas
+              </h1>
+            </div>
           </div>
-          <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
-            <Bell className="h-5 w-5 text-primary" />
-            Lembretes de Entregas
-          </CardTitle>
-          <p className="text-sm text-muted-foreground">
-            Envie lembretes para moradores com entregas pendentes
-          </p>
         </CardHeader>
       </Card>
 
-      {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-3 lg:gap-4">
+      {/* Summary Stats */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <Card className="shadow-card bg-gradient-card">
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Total Pendentes</p>
-                <p className="text-xl font-bold text-foreground">{deliveries.length}</p>
+                <p className="text-sm font-medium text-muted-foreground">
+                  Total Pendentes
+                </p>
+                <p className="text-xl sm:text-2xl font-bold text-foreground">{deliveries.length}</p>
               </div>
               <Bell className="h-6 w-6 text-primary" />
             </div>
@@ -367,38 +368,26 @@ export const RemindersPanel = ({ onBack, condominioNome }: RemindersPanelProps) 
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Há 2+ dias</p>
-                <p className="text-xl font-bold text-orange-600">
-                  {deliveries.filter(d => d.diasPendente >= 2).length}
+                <p className="text-sm font-medium text-muted-foreground">
+                  Selecionadas
                 </p>
-              </div>
-              <Clock className="h-6 w-6 text-orange-600" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="shadow-card bg-gradient-card">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">Há 5+ dias</p>
-                <p className="text-xl font-bold text-red-600">
-                  {deliveries.filter(d => d.diasPendente >= 5).length}
-                </p>
-              </div>
-              <Calendar className="h-6 w-6 text-red-600" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="shadow-card bg-gradient-card">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">Selecionadas</p>
-                <p className="text-xl font-bold text-primary">{selectedDeliveries.length}</p>
+                <p className="text-xl sm:text-2xl font-bold text-primary">{selectedDeliveries.length}</p>
               </div>
               <Users className="h-6 w-6 text-primary" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="shadow-card bg-gradient-card">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">
+                  Para Enviar
+                </p>
+                <p className="text-xl sm:text-2xl font-bold text-success">{selectedDeliveries.length}</p>
+              </div>
+              <Send className="h-6 w-6 text-success" />
             </div>
           </CardContent>
         </Card>
@@ -411,18 +400,18 @@ export const RemindersPanel = ({ onBack, condominioNome }: RemindersPanelProps) 
             <div className="flex-1 space-y-4 lg:space-y-0 lg:flex lg:gap-4">
               <div className="flex-1">
                 <div className="relative">
-                  <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Search className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
                   <Input
                     placeholder="Buscar por morador, apartamento ou código..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10"
+                    className="pl-10 h-10 text-base"
                   />
                 </div>
               </div>
               
               <Select value={filterDays} onValueChange={setFilterDays}>
-                <SelectTrigger className="w-full lg:w-[200px]">
+                <SelectTrigger className="w-full lg:w-[200px] h-10 text-base">
                   <SelectValue placeholder="Filtrar por dias" />
                 </SelectTrigger>
                 <SelectContent>
@@ -440,9 +429,9 @@ export const RemindersPanel = ({ onBack, condominioNome }: RemindersPanelProps) 
                 variant="outline"
                 size="sm"
                 onClick={handleSelectAll}
-                className="flex items-center gap-2"
+                className="flex items-center gap-2 h-10 text-base"
               >
-                <Filter className="h-4 w-4" />
+                <Filter className="h-5 w-5" />
                 {selectedDeliveries.length === filteredDeliveries.length ? 'Desmarcar' : 'Selecionar'} Todas
               </Button>
               
@@ -451,25 +440,25 @@ export const RemindersPanel = ({ onBack, condominioNome }: RemindersPanelProps) 
                   <Button
                     size="sm"
                     disabled={selectedDeliveries.length === 0}
-                    className="flex items-center gap-2"
+                    className="flex items-center gap-2 h-10 text-base"
                   >
-                    <Send className="h-4 w-4" />
+                    <Send className="h-5 w-5" />
                     Enviar Lembretes ({selectedDeliveries.length})
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="max-w-2xl">
                   <DialogHeader>
-                    <DialogTitle>Configurar Lembrete</DialogTitle>
-                    <DialogDescription>
+                    <DialogTitle className="text-xl">Configurar Lembrete</DialogTitle>
+                    <DialogDescription className="text-base">
                       Configure a mensagem que será enviada para {selectedDeliveries.length} {selectedDeliveries.length === 1 ? 'entrega selecionada' : 'entregas selecionadas'}
                     </DialogDescription>
                   </DialogHeader>
                   
                   <div className="space-y-4">
                     <div className="space-y-2">
-                      <Label>Modelo de Mensagem</Label>
+                      <Label className="text-base">Modelo de Mensagem</Label>
                       <Select value={messageTemplate} onValueChange={setMessageTemplate}>
-                        <SelectTrigger>
+                        <SelectTrigger className="h-10 text-base">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -482,22 +471,23 @@ export const RemindersPanel = ({ onBack, condominioNome }: RemindersPanelProps) 
                     
                     {messageTemplate === "personalizado" && (
                       <div className="space-y-2">
-                        <Label>Mensagem Personalizada</Label>
+                        <Label className="text-base">Mensagem Personalizada</Label>
                         <Textarea
                           placeholder="Digite sua mensagem... Use [NOME], [CODIGO], [APARTAMENTO], [DIAS], [DATA], [CONDOMINIO] para substituições automáticas"
                           value={customMessage}
                           onChange={(e) => setCustomMessage(e.target.value)}
                           rows={6}
+                          className="text-base"
                         />
-                        <p className="text-xs text-muted-foreground">
+                        <p className="text-sm text-muted-foreground">
                           Variáveis disponíveis: [NOME], [CODIGO], [APARTAMENTO], [DIAS], [DATA], [CONDOMINIO]
                         </p>
                       </div>
                     )}
                     
                     <div className="space-y-2">
-                      <Label>Prévia da Mensagem</Label>
-                      <div className="bg-muted p-3 rounded-lg text-sm max-h-40 overflow-y-auto">
+                      <Label className="text-base">Prévia da Mensagem</Label>
+                      <div className="bg-muted p-4 rounded-lg text-base max-h-40 overflow-y-auto">
                         {selectedDeliveries.length > 0 && (
                           <pre className="whitespace-pre-wrap">
                             {getMessageTemplate(deliveries.find(d => d.id === selectedDeliveries[0])!)}
@@ -508,17 +498,17 @@ export const RemindersPanel = ({ onBack, condominioNome }: RemindersPanelProps) 
                     
                     <div className="flex justify-end gap-2">
                       <DialogTrigger asChild>
-                        <Button variant="outline">Cancelar</Button>
+                        <Button variant="outline" className="text-base h-10">Cancelar</Button>
                       </DialogTrigger>
-                      <Button onClick={sendReminders} disabled={isLoading}>
+                      <Button onClick={sendReminders} disabled={isLoading} className="text-base h-10">
                         {isLoading ? (
                           <>
-                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
                             Enviando...
                           </>
                         ) : (
                           <>
-                            <Send className="h-4 w-4 mr-2" />
+                            <Send className="h-5 w-5 mr-2" />
                             Enviar Lembretes
                           </>
                         )}
@@ -570,7 +560,7 @@ export const RemindersPanel = ({ onBack, condominioNome }: RemindersPanelProps) 
                     <Checkbox
                       checked={selectedDeliveries.includes(delivery.id)}
                       onCheckedChange={() => handleSelectDelivery(delivery.id)}
-                      className="mt-1 flex-shrink-0"
+                      className="mt-1 flex-shrink-0 h-5 w-5"
                     />
                     
                     <Avatar className="h-12 w-12 flex-shrink-0">
@@ -586,33 +576,33 @@ export const RemindersPanel = ({ onBack, condominioNome }: RemindersPanelProps) 
                         </h3>
                         <Badge 
                           variant="outline"
-                          className={`flex items-center gap-1 text-xs py-1 px-2 flex-shrink-0 ${getDaysColor(delivery.diasPendente)}`}
+                          className={`flex items-center gap-1 text-sm py-1 px-2 flex-shrink-0 ${getDaysColor(delivery.diasPendente)}`}
                         >
-                          <Clock className="h-3 w-3" />
+                          <Clock className="h-4 w-4" />
                           {delivery.diasPendente} {delivery.diasPendente === 1 ? 'dia' : 'dias'}
                         </Badge>
                       </div>
                       
                       <div className="space-y-1 mb-3">
                         <div className="flex items-center gap-2">
-                          <Badge variant="secondary" className="text-xs">
+                          <Badge variant="secondary" className="text-sm">
                             {delivery.morador.bloco ? 
                               `${delivery.morador.bloco}-${delivery.morador.apartamento}` : 
                               delivery.morador.apartamento
                             }
                           </Badge>
-                          <Badge variant="outline" className="text-xs font-mono">
+                          <Badge variant="outline" className="text-sm font-mono">
                             {delivery.codigo_retirada}
                           </Badge>
                         </div>
-                        <p className="text-xs text-muted-foreground truncate">
+                        <p className="text-sm text-muted-foreground truncate">
                           📱 {delivery.morador.telefone}
                         </p>
-                        <p className="text-xs text-muted-foreground truncate">
+                        <p className="text-sm text-muted-foreground truncate">
                           📅 Recebida: {new Date(delivery.data_entrega).toLocaleDateString('pt-BR')}
                         </p>
                         {delivery.ultimoLembrete && (
-                          <p className="text-xs text-green-600 truncate">
+                          <p className="text-sm text-green-600 truncate">
                             🔔 Último lembrete: {new Date(delivery.ultimoLembrete).toLocaleDateString('pt-BR')}
                           </p>
                         )}
@@ -621,7 +611,7 @@ export const RemindersPanel = ({ onBack, condominioNome }: RemindersPanelProps) 
                       <Button
                         variant="outline"
                         size="sm"
-                        className="w-full h-8 text-xs"
+                        className="w-full h-9 text-sm"
                         onClick={() => handleSelectDelivery(delivery.id)}
                       >
                         {selectedDeliveries.includes(delivery.id) ? 'Remover' : 'Selecionar'} para Lembrete
@@ -643,7 +633,7 @@ export const RemindersPanel = ({ onBack, condominioNome }: RemindersPanelProps) 
                   <Checkbox
                     checked={selectedDeliveries.includes(delivery.id)}
                     onCheckedChange={() => handleSelectDelivery(delivery.id)}
-                    className="flex-shrink-0"
+                    className="flex-shrink-0 h-5 w-5"
                   />
                   
                   <Avatar className="h-10 w-10 flex-shrink-0">
@@ -654,7 +644,7 @@ export const RemindersPanel = ({ onBack, condominioNome }: RemindersPanelProps) 
                   
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
-                      <h3 className="font-semibold text-foreground text-sm truncate">
+                      <h3 className="font-semibold text-foreground text-base truncate">
                         {delivery.morador.nome}
                       </h3>
                       <Badge variant="secondary" className="text-xs flex-shrink-0">
@@ -664,21 +654,35 @@ export const RemindersPanel = ({ onBack, condominioNome }: RemindersPanelProps) 
                         }
                       </Badge>
                     </div>
-                    <p className="text-xs text-muted-foreground mb-1">
+                    <p className="text-sm text-muted-foreground mb-1">
                       {delivery.morador.telefone} • {delivery.codigo_retirada}
                     </p>
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-sm text-muted-foreground">
                       Há {delivery.diasPendente} {delivery.diasPendente === 1 ? 'dia' : 'dias'}
                     </p>
+                    {delivery.ultimoLembrete && (
+                      <p className="text-sm text-green-600 truncate mt-1">
+                        🔔 Último: {new Date(delivery.ultimoLembrete).toLocaleDateString('pt-BR')}
+                      </p>
+                    )}
                   </div>
                   
                   <Badge 
                     variant="outline"
-                    className={`${getDaysColor(delivery.diasPendente)} text-xs`}
+                    className={`${getDaysColor(delivery.diasPendente)} text-sm`}
                   >
                     {delivery.diasPendente}d
                   </Badge>
                 </div>
+                
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full h-8 mt-3 text-sm"
+                  onClick={() => handleSelectDelivery(delivery.id)}
+                >
+                  {selectedDeliveries.includes(delivery.id) ? 'Remover' : 'Selecionar'}
+                </Button>
               </CardContent>
             </Card>
           ))}

@@ -43,17 +43,17 @@ export const ResidentList = ({
               variant="ghost"
               size="sm"
               onClick={onBack}
-              className="text-muted-foreground hover:text-foreground"
+              className="text-muted-foreground hover:text-foreground h-9 px-2"
             >
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Voltar
+              <ArrowLeft className="h-5 w-5 mr-2" />
+              <span className="text-base">Voltar</span>
             </Button>
-            <Badge variant="secondary" className="text-sm">
+            <Badge variant="secondary" className="text-base py-1">
               {apartmentInfo.bloco} - {apartmentInfo.apartamento}
             </Badge>
           </div>
-          <CardTitle className="flex items-center gap-2 text-xl">
-            <User className="h-5 w-5 text-primary" />
+          <CardTitle className="flex items-center gap-2 text-xl sm:text-2xl">
+            <User className="h-6 w-6 text-primary" />
             Moradores Encontrados ({residents.length})
           </CardTitle>
         </CardHeader>
@@ -69,21 +69,21 @@ export const ResidentList = ({
             <CardContent className="p-6">
               <div className="flex flex-col gap-4">
                 <div className="flex items-center gap-4">
-                  <Avatar className="h-12 w-12">
-                    <AvatarFallback className="bg-primary text-primary-foreground font-semibold">
+                  <Avatar className="h-14 w-14">
+                    <AvatarFallback className="bg-primary text-primary-foreground font-semibold text-lg">
                       {getInitials(resident.name)}
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-lg text-foreground truncate">
+                    <h3 className="font-semibold text-xl text-foreground truncate">
                       {resident.name}
                     </h3>
-                    <div className="flex items-center gap-2 text-muted-foreground">
-                      <Phone className="h-4 w-4" />
-                      <span className="text-sm">{resident.phone}</span>
+                    <div className="flex items-center gap-2 text-muted-foreground mt-1">
+                      <Phone className="h-5 w-5" />
+                      <span className="text-base">{resident.phone}</span>
                     </div>
                     {resident.role && (
-                      <Badge variant="outline" className="mt-2 text-xs">
+                      <Badge variant="outline" className="mt-2 text-sm py-1">
                         {resident.role}
                       </Badge>
                     )}
@@ -92,9 +92,9 @@ export const ResidentList = ({
                 <Button
                   variant="default"
                   size="sm"
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 text-sm"
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 text-base h-12"
                 >
-                  <Package className="h-4 w-4 mr-2" />
+                  <Package className="h-5 w-5 mr-2" />
                   Registrar Entrega
                 </Button>
               </div>
@@ -107,10 +107,10 @@ export const ResidentList = ({
         <Card className="shadow-card bg-gradient-card">
           <CardContent className="p-8 text-center">
             <User className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-foreground mb-2">
+            <h3 className="text-xl font-semibold text-foreground mb-2">
               Nenhum morador encontrado
             </h3>
-            <p className="text-muted-foreground">
+            <p className="text-base text-muted-foreground">
               Verifique se o bloco e apartamento estão corretos.
             </p>
           </CardContent>

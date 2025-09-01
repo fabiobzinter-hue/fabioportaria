@@ -461,66 +461,77 @@ export const WithdrawalPanel = ({ onBack, onChange, condominioNome }: Withdrawal
   };
 
   return (
-    <div className="space-y-4 sm:space-y-6 p-3 sm:p-4 md:p-6">
+    <div className="space-y-4 sm:space-y-6 w-full max-w-none">
       {/* Header */}
       <Card className="shadow-card bg-gradient-card">
-        <CardHeader>
+        <CardHeader className="py-3 pb-4">
           <div className="flex items-center justify-between">
             <Button
               variant="ghost"
               size="sm"
               onClick={onBack}
-              className="text-muted-foreground hover:text-foreground"
+              className="text-muted-foreground hover:text-foreground h-9 px-2"
             >
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Voltar
+              <ArrowLeft className="h-5 w-5 mr-2" />
+              <span className="text-base">Voltar</span>
             </Button>
+            <div className="flex items-center gap-2">
+              <Package className="h-6 w-6 text-primary" />
+              <h1 className="text-xl sm:text-2xl font-bold text-foreground">
+                Retirada de Encomendas
+              </h1>
+            </div>
           </div>
-          <CardTitle className="flex items-center gap-2 text-xl">
-            <CheckCircle className="h-5 w-5 text-success" />
-            Retirada de Encomendas
-          </CardTitle>
         </CardHeader>
       </Card>
 
-      {/* Search by Code */}
+      {/* Search Section */}
       <Card className="shadow-card bg-gradient-card">
         <CardHeader>
-          <CardTitle className="text-lg">Buscar por Código</CardTitle>
+          <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
+            <Search className="h-5 w-5 text-primary" />
+            Buscar Encomenda
+          </CardTitle>
+          <p className="text-sm text-muted-foreground">
+            Digite o código de retirada da encomenda ou selecione uma da lista abaixo
+          </p>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="code" className="text-sm font-medium">
-              Código de Retirada
-            </Label>
+        <CardContent>
+          <div className="space-y-4">
             <div className="flex flex-col sm:flex-row gap-3">
               <Input
-                id="code"
-                type="text"
-                placeholder="Digite o código (5 dígitos)"
+                placeholder="Digite o código de 5 dígitos"
                 value={withdrawalCode}
                 onChange={(e) => setWithdrawalCode(e.target.value.replace(/\D/g, '').slice(0, 5))}
-                className="h-12 text-base sm:text-lg text-center font-mono tracking-wider flex-1"
+                className="h-12 text-lg sm:text-xl text-center font-mono tracking-wider flex-1"
                 maxLength={5}
               />
               <Button
                 onClick={searchByCode}
                 size="lg"
                 disabled={isSearching || withdrawalCode.length !== 5}
-                className="w-full sm:w-auto px-6"
+                className="w-full sm:w-auto px-6 h-12"
               >
                 {isSearching ? (
                   <>
-                    <Search className="h-4 w-4 sm:h-5 sm:w-5 mr-2 animate-spin" />
-                    <span className="text-sm sm:text-base">Buscando...</span>
+                    <Search className="h-5 w-5 mr-2 animate-spin" />
+                    <span className="text-base">Buscando...</span>
                   </>
                 ) : (
                   <>
-                    <Search className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
-                    <span className="text-sm sm:text-base">Buscar</span>
+                    <Search className="h-5 w-5 mr-2" />
+                    <span className="text-base">Buscar</span>
                   </>
                 )}
               </Button>
+            </div>
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+              <p className="text-sm text-blue-800 flex items-start gap-2">
+                <AlertCircle className="h-5 w-5 flex-shrink-0 mt-0.5" />
+                <span>
+                  <strong>Dica:</strong> O código de retirada é composto por 5 dígitos e foi enviado ao morador via WhatsApp.
+                </span>
+              </p>
             </div>
           </div>
         </CardContent>
@@ -530,26 +541,26 @@ export const WithdrawalPanel = ({ onBack, onChange, condominioNome }: Withdrawal
       {foundDelivery && (
         <Card className="shadow-elevated bg-gradient-card border-2 border-success/20">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-lg text-success">
-              <Package className="h-5 w-5" />
+            <CardTitle className="flex items-center gap-2 text-xl text-success">
+              <Package className="h-6 w-6" />
               Encomenda Encontrada
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
-              <Avatar className="h-12 w-12 sm:h-16 sm:w-16 flex-shrink-0">
-                <AvatarFallback className="bg-primary text-primary-foreground font-semibold text-sm sm:text-lg">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+              <Avatar className="h-16 w-16 sm:h-20 sm:w-20 flex-shrink-0">
+                <AvatarFallback className="bg-primary text-primary-foreground font-semibold text-lg sm:text-xl">
                   {getInitials(foundDelivery.resident.name)}
                 </AvatarFallback>
               </Avatar>
               
               <div className="flex-1 min-w-0">
-                <h3 className="text-lg sm:text-xl font-semibold text-foreground break-words">
+                <h3 className="text-xl sm:text-2xl font-semibold text-foreground break-words">
                   {foundDelivery.resident.name}
                 </h3>
-                <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 text-muted-foreground">
-                  <span className="text-sm break-all">{foundDelivery.resident.phone}</span>
-                  <Badge variant="secondary" className="text-xs self-start">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-2 text-muted-foreground mt-1">
+                  <span className="text-base break-all">{foundDelivery.resident.phone}</span>
+                  <Badge variant="secondary" className="text-base py-1">
                     {foundDelivery.apartmentInfo.bloco ? 
                       `${foundDelivery.apartmentInfo.bloco}-${foundDelivery.apartmentInfo.apartamento}` :
                       foundDelivery.apartmentInfo.apartamento
@@ -557,7 +568,7 @@ export const WithdrawalPanel = ({ onBack, onChange, condominioNome }: Withdrawal
                   </Badge>
                 </div>
                 {foundDelivery.resident.role && (
-                  <Badge variant="outline" className="mt-1 text-xs self-start">
+                  <Badge variant="outline" className="mt-2 text-base py-1">
                     {foundDelivery.resident.role}
                   </Badge>
                 )}
@@ -565,21 +576,21 @@ export const WithdrawalPanel = ({ onBack, onChange, condominioNome }: Withdrawal
             </div>
 
             {/* Delivery Info */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <Label className="text-sm font-medium text-muted-foreground">
+                <Label className="text-base font-medium text-muted-foreground">
                   Código de Retirada
                 </Label>
-                <p className="text-xl sm:text-2xl font-bold font-mono text-primary break-all">
+                <p className="text-2xl sm:text-3xl font-bold font-mono text-primary break-all mt-1">
                   {foundDelivery.withdrawalCode}
                 </p>
               </div>
               
               <div>
-                <Label className="text-sm font-medium text-muted-foreground">
+                <Label className="text-base font-medium text-muted-foreground">
                   Data/Hora Chegada
                 </Label>
-                <p className="text-sm text-foreground">
+                <p className="text-base text-foreground mt-1">
                   {new Date(foundDelivery.timestamp).toLocaleString('pt-BR')}
                 </p>
               </div>
@@ -588,15 +599,15 @@ export const WithdrawalPanel = ({ onBack, onChange, condominioNome }: Withdrawal
             {/* Photo */}
             {foundDelivery.photo && (
               <div>
-                <Label className="text-sm font-medium text-muted-foreground">
+                <Label className="text-base font-medium text-muted-foreground">
                   Foto da Encomenda
                 </Label>
-                <div className="mt-2 bg-gray-50 rounded-lg p-2">
+                <div className="mt-2 bg-gray-50 rounded-lg p-3">
                   <img
                     src={foundDelivery.photo}
                     alt="Encomenda"
-                    className="w-full h-48 sm:h-64 object-contain rounded-lg shadow-md"
-                    style={{ maxHeight: '250px' }}
+                    className="w-full h-56 sm:h-72 object-contain rounded-lg shadow-md"
+                    style={{ maxHeight: '300px' }}
                   />
                 </div>
               </div>
@@ -605,10 +616,10 @@ export const WithdrawalPanel = ({ onBack, onChange, condominioNome }: Withdrawal
             {/* Observations */}
             {foundDelivery.observations && (
               <div>
-                <Label className="text-sm font-medium text-muted-foreground">
+                <Label className="text-base font-medium text-muted-foreground">
                   Observações
                 </Label>
-                <p className="text-sm text-foreground bg-muted p-3 rounded-lg mt-1">
+                <p className="text-base text-foreground bg-muted p-4 rounded-lg mt-1">
                   {foundDelivery.observations}
                 </p>
               </div>
@@ -616,17 +627,17 @@ export const WithdrawalPanel = ({ onBack, onChange, condominioNome }: Withdrawal
 
             {/* Withdrawal Description */}
             <div>
-              <Label className="text-sm font-medium text-muted-foreground">
+              <Label className="text-base font-medium text-muted-foreground">
                 Descrição da Retirada (opcional)
               </Label>
               <Textarea
                 placeholder="Ex: Retirado pelo filho, Esposa retirou, etc... (opcional)"
                 value={withdrawalDescription}
                 onChange={(e) => setWithdrawalDescription(e.target.value)}
-                className="mt-1"
+                className="mt-2 text-base"
                 rows={3}
               />
-              <p className="text-xs text-muted-foreground mt-1">
+              <p className="text-sm text-muted-foreground mt-2">
                 💡 Campo opcional - use apenas se necessário especificar quem retirou
               </p>
             </div>
@@ -636,9 +647,9 @@ export const WithdrawalPanel = ({ onBack, onChange, condominioNome }: Withdrawal
               onClick={confirmWithdrawal}
               size="lg"
               variant="success"
-              className="w-full h-12 text-base sm:text-lg"
+              className="w-full h-14 text-lg sm:text-xl"
             >
-              <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
+              <CheckCircle className="h-6 w-6 mr-2" />
               Confirmar Retirada
             </Button>
           </CardContent>
@@ -648,11 +659,11 @@ export const WithdrawalPanel = ({ onBack, onChange, condominioNome }: Withdrawal
       {/* Pending Deliveries List */}
       <Card className="shadow-card bg-gradient-card">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-lg">
-            <Clock className="h-5 w-5 text-warning" />
+          <CardTitle className="flex items-center gap-2 text-xl">
+            <Clock className="h-6 w-6 text-warning" />
             Encomendas Pendentes ({deliveries.length})
           </CardTitle>
-          <p className="text-sm text-muted-foreground mt-2">
+          <p className="text-base text-muted-foreground mt-2">
             💡 Clique em qualquer encomenda abaixo para selecioná-la automaticamente, ou digite o código manualmente acima.
           </p>
         </CardHeader>
@@ -660,14 +671,14 @@ export const WithdrawalPanel = ({ onBack, onChange, condominioNome }: Withdrawal
           {deliveries.length === 0 ? (
             <div className="text-center py-8">
               <Package className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-              <p className="text-muted-foreground">Nenhuma encomenda pendente</p>
+              <p className="text-muted-foreground text-lg">Nenhuma encomenda pendente</p>
             </div>
           ) : (
             <div className="space-y-3">
               {deliveries.map((delivery) => (
                 <div 
                   key={delivery.id} 
-                  className="flex items-center gap-2 sm:gap-4 p-3 sm:p-4 bg-muted/50 rounded-lg cursor-pointer hover:bg-muted/70 transition-colors duration-200 border-2 border-transparent hover:border-primary/30 overflow-hidden"
+                  className="flex items-center gap-4 p-4 bg-muted/50 rounded-lg cursor-pointer hover:bg-muted/70 transition-colors duration-200 border-2 border-transparent hover:border-primary/30 overflow-hidden"
                   onClick={() => {
                     // Auto-fill the withdrawal code and search directly
                     setWithdrawalCode(delivery.withdrawalCode);
@@ -676,17 +687,17 @@ export const WithdrawalPanel = ({ onBack, onChange, condominioNome }: Withdrawal
                   }}
                   title="Clique para selecionar esta encomenda"
                 >
-                  <Avatar className="h-10 w-10 sm:h-12 sm:w-12 flex-shrink-0">
-                    <AvatarFallback className="bg-primary text-primary-foreground font-semibold text-xs sm:text-sm">
+                  <Avatar className="h-12 w-12 sm:h-14 sm:w-14 flex-shrink-0">
+                    <AvatarFallback className="bg-primary text-primary-foreground font-semibold text-base">
                       {getInitials(delivery.resident.name)}
                     </AvatarFallback>
                   </Avatar>
                   
                   <div className="flex-1 min-w-0 overflow-hidden">
-                    <p className="font-medium text-foreground text-sm sm:text-base truncate">
+                    <p className="font-medium text-foreground text-base sm:text-lg truncate">
                       {delivery.resident.name}
                     </p>
-                    <p className="text-xs sm:text-sm text-muted-foreground truncate">
+                    <p className="text-sm sm:text-base text-muted-foreground truncate mt-1">
                       {delivery.apartmentInfo.bloco ? 
                         `${delivery.apartmentInfo.bloco}-${delivery.apartmentInfo.apartamento}` :
                         delivery.apartmentInfo.apartamento
@@ -695,19 +706,19 @@ export const WithdrawalPanel = ({ onBack, onChange, condominioNome }: Withdrawal
                   </div>
                   
                   <div className="text-right flex-shrink-0 min-w-0">
-                    <p className="text-sm sm:text-base font-mono font-bold text-primary">
+                    <p className="text-lg sm:text-xl font-mono font-bold text-primary">
                       {delivery.withdrawalCode}
                     </p>
-                    <p className="text-xs text-muted-foreground truncate">
+                    <p className="text-sm text-muted-foreground truncate mt-1">
                       {new Date(delivery.timestamp).toLocaleDateString('pt-BR')}
                     </p>
                   </div>
                   
                   <div className="flex flex-col items-center gap-1 flex-shrink-0">
-                    <Badge variant="warning" className="shrink-0 text-xs px-2 py-1">
+                    <Badge variant="warning" className="shrink-0 text-base px-3 py-1">
                       Pendente
                     </Badge>
-                    <span className="text-xs text-muted-foreground hidden md:block text-center">
+                    <span className="text-sm text-muted-foreground hidden md:block text-center">
                       Toque
                     </span>
                   </div>

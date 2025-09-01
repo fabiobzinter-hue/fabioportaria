@@ -404,19 +404,19 @@ export const SimpleDeliveryForm = ({ onBack, moradores }: SimpleDeliveryFormProp
 
   return (
     <div className="space-y-4 p-4">
-      <Button onClick={onBack} variant="ghost">
-        <ArrowLeft className="h-4 w-4 mr-2" />
-        Voltar
+      <Button onClick={onBack} variant="ghost" className="h-9 px-2">
+        <ArrowLeft className="h-5 w-5 mr-2" />
+        <span className="text-base">Voltar</span>
       </Button>
 
       <Card>
         <CardHeader>
-          <CardTitle>Nova Encomenda</CardTitle>
+          <CardTitle className="text-xl sm:text-2xl">Nova Encomenda</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           {/* Buscar Apartamento */}
           <div>
-            <Label>Apartamento</Label>
+            <Label className="text-base font-medium">Apartamento</Label>
             <div className="flex gap-2">
               <Input
                 value={apartamento}
@@ -427,9 +427,11 @@ export const SimpleDeliveryForm = ({ onBack, moradores }: SimpleDeliveryFormProp
                   }
                 }}
                 placeholder="Ex: 1905"
-                className="text-lg"
+                className="text-lg h-12"
               />
-              <Button onClick={buscarMoradores}>Buscar</Button>
+              <Button onClick={buscarMoradores} className="h-12 px-4 text-base">
+                Buscar
+              </Button>
             </div>
           </div>
 
@@ -437,10 +439,10 @@ export const SimpleDeliveryForm = ({ onBack, moradores }: SimpleDeliveryFormProp
           {selectedMorador && (
             <Card className="bg-green-50 border-green-200">
               <CardContent className="p-4">
-                <h3 className="font-bold">{selectedMorador.nome}</h3>
-                <p>Apartamento: {selectedMorador.apartamento}</p>
-                <p>Telefone: {selectedMorador.telefone}</p>
-                <p className="text-lg font-bold text-blue-600">🔑 Código: {codigoRetirada}</p>
+                <h3 className="font-bold text-lg">{selectedMorador.nome}</h3>
+                <p className="text-base">Apartamento: {selectedMorador.apartamento}</p>
+                <p className="text-base">Telefone: {selectedMorador.telefone}</p>
+                <p className="text-xl font-bold text-blue-600 mt-2">🔑 Código: {codigoRetirada}</p>
               </CardContent>
             </Card>
           )}
@@ -449,11 +451,11 @@ export const SimpleDeliveryForm = ({ onBack, moradores }: SimpleDeliveryFormProp
           {selectedMorador && codigoRetirada && (
             <Card className="bg-blue-50 border-blue-200">
               <CardHeader>
-                <CardTitle className="text-lg text-blue-800">📱 Mensagem WhatsApp</CardTitle>
-                <p className="text-sm text-blue-600">Esta mensagem será enviada para o morador:</p>
+                <CardTitle className="text-lg sm:text-xl text-blue-800">📱 Mensagem WhatsApp</CardTitle>
+                <p className="text-base text-blue-600">Esta mensagem será enviada para o morador:</p>
               </CardHeader>
               <CardContent className="bg-white p-4 rounded border">
-                <div className="text-sm font-mono whitespace-pre-line text-gray-800">
+                <div className="text-base font-mono whitespace-pre-line text-gray-800">
                   🏢 *{user?.condominio?.nome || 'Condomínio'}*{"\n"}{"\n"}
                   📦 *Nova Encomenda Chegou!*{"\n"}{"\n"}
                   Olá *{selectedMorador.nome}*, você tem uma nova encomenda!{"\n"}{"\n"}
@@ -469,21 +471,22 @@ export const SimpleDeliveryForm = ({ onBack, moradores }: SimpleDeliveryFormProp
 
           {/* Observações */}
           <div>
-            <Label>Observações (opcional)</Label>
+            <Label className="text-base font-medium">Observações (opcional)</Label>
             <Textarea
               value={observacoes}
               onChange={(e) => setObservacoes(e.target.value)}
               placeholder="Observações sobre a encomenda (opcional)..."
+              className="text-base"
             />
-            <p className="text-xs text-muted-foreground mt-1">
+            <p className="text-sm text-muted-foreground mt-1">
               💡 Campo opcional - use apenas se necessário
             </p>
           </div>
 
           {/* Foto - Implementação ULTRA SIMPLES */}
           <div>
-            <Label>📷 Foto da Encomenda *</Label>
-            <p className="text-sm text-muted-foreground mb-3">
+            <Label className="text-base font-medium">📷 Foto da Encomenda *</Label>
+            <p className="text-base text-muted-foreground mb-3">
               💡 Escolha uma opção para adicionar a foto:
             </p>
             
@@ -498,9 +501,9 @@ export const SimpleDeliveryForm = ({ onBack, moradores }: SimpleDeliveryFormProp
                     onChange={handleCameraInput}
                     className="hidden"
                   />
-                  <div className="w-full h-16 bg-blue-600 hover:bg-blue-700 text-white rounded-lg flex items-center justify-center cursor-pointer transition-colors">
+                  <div className="w-full h-16 bg-blue-600 hover:bg-blue-700 text-white rounded-lg flex items-center justify-center cursor-pointer transition-colors text-base font-medium">
                     <Camera className="h-6 w-6 mr-2" />
-                    <span className="font-medium">
+                    <span>
                       {isProcessingPhoto ? 'Processando...' : 'TIRAR FOTO'}
                     </span>
                   </div>
@@ -513,16 +516,16 @@ export const SimpleDeliveryForm = ({ onBack, moradores }: SimpleDeliveryFormProp
                     onChange={handleGalleryInput}
                     className="hidden"
                   />
-                  <div className="w-full h-16 border-2 border-dashed border-gray-300 hover:border-gray-400 rounded-lg flex items-center justify-center cursor-pointer transition-colors">
+                  <div className="w-full h-16 border-2 border-dashed border-gray-300 hover:border-gray-400 rounded-lg flex items-center justify-center cursor-pointer transition-colors text-base font-medium">
                     <Image className="h-6 w-6 mr-2 text-gray-600" />
-                    <span className="font-medium text-gray-700">
+                    <span className="text-gray-700">
                       {isProcessingPhoto ? 'Processando...' : 'GALERIA'}
                     </span>
                   </div>
                 </label>
                 
                 <div className="bg-green-50 p-3 rounded-lg border border-green-200">
-                  <p className="text-xs text-green-700 text-center">
+                  <p className="text-sm text-green-700 text-center">
                     <strong>TIRAR FOTO:</strong> Abre câmera do celular<br/>
                     <strong>GALERIA:</strong> Escolhe foto existente
                   </p>
@@ -564,12 +567,12 @@ export const SimpleDeliveryForm = ({ onBack, moradores }: SimpleDeliveryFormProp
                     />
                     <Button
                       variant="outline"
-                      className="w-full"
+                      className="w-full h-10 text-base"
                       disabled={isProcessingPhoto}
                       asChild
                     >
                       <div>
-                        <Camera className="h-4 w-4 mr-2" />
+                        <Camera className="h-5 w-5 mr-2" />
                         Nova Foto
                       </div>
                     </Button>
@@ -584,12 +587,12 @@ export const SimpleDeliveryForm = ({ onBack, moradores }: SimpleDeliveryFormProp
                     />
                     <Button
                       variant="outline"
-                      className="w-full"
+                      className="w-full h-10 text-base"
                       disabled={isProcessingPhoto}
                       asChild
                     >
                       <div>
-                        <Image className="h-4 w-4 mr-2" />
+                        <Image className="h-5 w-5 mr-2" />
                         Trocar
                       </div>
                     </Button>
@@ -602,8 +605,8 @@ export const SimpleDeliveryForm = ({ onBack, moradores }: SimpleDeliveryFormProp
           {/* DEBUG: Mostrar status do botão */}
           {(!selectedMorador || !photoFile) && (
             <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
-              <h4 className="text-sm font-medium text-yellow-800 mb-2">📋 Para ativar o botão:</h4>
-              <div className="space-y-1 text-xs text-yellow-700">
+              <h4 className="text-base font-medium text-yellow-800 mb-2">📋 Para ativar o botão:</h4>
+              <div className="space-y-1 text-sm text-yellow-700">
                 <div className={`flex items-center gap-2 ${selectedMorador ? 'text-green-600' : 'text-red-600'}`}>
                   {selectedMorador ? '✅' : '❌'} Apartamento selecionado
                 </div>
@@ -626,14 +629,17 @@ export const SimpleDeliveryForm = ({ onBack, moradores }: SimpleDeliveryFormProp
               handleSubmit();
             }}
             disabled={!selectedMorador || !photoFile || isSubmitting}
-            className="w-full"
+            className="w-full h-12 text-lg"
             size="lg"
           >
             {isSubmitting ? (
-              <>Salvando...</>
+              <>
+                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                Salvando...
+              </>
             ) : (
               <>
-                <Send className="h-4 w-4 mr-2" />
+                <Send className="h-5 w-5 mr-2" />
                 Registrar Encomenda
               </>
             )}

@@ -316,139 +316,35 @@ export const AdminEmployees = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Gestão de Funcionários</h2>
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Gerenciamento de Funcionários</h2>
           <p className="text-sm sm:text-base text-gray-600">
             Cadastre e gerencie os funcionários do condomínio
           </p>
         </div>
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogTrigger asChild>
-            <Button onClick={() => resetForm()} className="w-full sm:w-auto">
-              <Plus className="h-4 w-4 mr-2" />
-              Novo Funcionário
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-[425px]">
-            <DialogHeader>
-              <DialogTitle>
-                {editingFuncionario ? 'Editar Funcionário' : 'Novo Funcionário'}
-              </DialogTitle>
-            </DialogHeader>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="cpf">CPF</Label>
-                  <Input
-                    id="cpf"
-                    value={formData.cpf}
-                    onChange={(e) => setFormData({ ...formData, cpf: e.target.value })}
-                    placeholder="000.000.000-00"
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="cargo">Cargo</Label>
-                  <Select
-                    value={formData.cargo}
-                    onValueChange={(value) => setFormData({ ...formData, cargo: value })}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="porteiro">Porteiro</SelectItem>
-                      <SelectItem value="zelador">Zelador</SelectItem>
-                      <SelectItem value="administrador">Administrador</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="nome">Nome Completo</Label>
-                <Input
-                  id="nome"
-                  value={formData.nome}
-                  onChange={(e) => setFormData({ ...formData, nome: e.target.value })}
-                  placeholder="Nome do funcionário"
-                  required
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="senha">Senha</Label>
-                <Input
-                  id="senha"
-                  type="password"
-                  value={formData.senha}
-                  onChange={(e) => setFormData({ ...formData, senha: e.target.value })}
-                  placeholder="Senha de acesso"
-                  required
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="condominio">Condomínio</Label>
-                <Select
-                  value={formData.condominio_id}
-                  onValueChange={(value) => setFormData({ ...formData, condominio_id: value })}
-                  disabled={!!userCondominioId} // Desabilitar se já tiver um condominioId do usuário
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecione o condomínio" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {condominios.map((condominio) => (
-                      <SelectItem key={condominio.id} value={condominio.id}>
-                        {condominio.nome}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  id="ativo"
-                  checked={formData.ativo}
-                  onChange={(e) => setFormData({ ...formData, ativo: e.target.checked })}
-                  className="rounded"
-                />
-                <Label htmlFor="ativo">Funcionário Ativo</Label>
-              </div>
-
-              <div className="flex justify-end space-x-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setIsDialogOpen(false)}
-                >
-                  Cancelar
-                </Button>
-                <Button type="submit">
-                  {editingFuncionario ? 'Atualizar' : 'Cadastrar'}
-                </Button>
-              </div>
-            </form>
-          </DialogContent>
-        </Dialog>
+        <Button onClick={() => {
+          resetForm();
+          setEditingFuncionario(null);
+          setIsDialogOpen(true);
+        }} className="w-full sm:w-auto">
+          <Plus className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
+          <span className="text-sm sm:text-base">Novo Funcionário</span>
+        </Button>
       </div>
 
       {/* Search */}
       <div className="flex items-center space-x-2">
-        <Search className="h-4 w-4 text-gray-400" />
+        <Search className="h-5 w-5 text-gray-400" />
         <Input
           placeholder="Buscar funcionários..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full sm:max-w-sm"
+          className="w-full sm:max-w-sm h-10 text-base"
         />
       </div>
 
       {/* Instruction */}
       <div className="bg-blue-50 p-3 rounded-lg">
-        <p className="text-sm text-blue-700">
+        <p className="text-base text-blue-700">
           💡 Clique em qualquer funcionário para editar suas informações diretamente.
         </p>
       </div>
@@ -456,12 +352,12 @@ export const AdminEmployees = () => {
       {/* Mobile Cards / Desktop Table */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center text-base sm:text-lg">
-            <Users className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
+          <CardTitle className="flex items-center text-lg sm:text-xl">
+            <Users className="h-5 w-5 sm:h-6 sm:w-6 mr-2" />
             Funcionários ({filteredFuncionarios.length})
           </CardTitle>
         </CardHeader>
-        <CardContent className="p-2 sm:p-6">
+        <CardContent className="p-3 sm:p-6">
           {/* Mobile View - Cards */}
           <div className="block md:hidden space-y-3">
             {filteredFuncionarios.map((funcionario) => (
@@ -473,21 +369,21 @@ export const AdminEmployees = () => {
               >
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex-1">
-                    <h3 className="font-semibold text-base text-gray-900">{funcionario.nome}</h3>
-                    <div className="flex items-center gap-2 mt-1">
-                      <Badge variant="outline" className="text-xs">
+                    <h3 className="font-semibold text-base sm:text-lg text-gray-900">{funcionario.nome}</h3>
+                    <div className="flex items-center gap-2 mt-2">
+                      <Badge variant="outline" className="text-sm">
                         {funcionario.cargo}
                       </Badge>
-                      <Badge variant={funcionario.ativo ? "default" : "secondary"} className="text-xs">
+                      <Badge variant={funcionario.ativo ? "default" : "secondary"} className="text-sm">
                         {funcionario.ativo ? "Ativo" : "Inativo"}
                       </Badge>
                     </div>
                   </div>
-                  <span className="text-xs text-gray-500">Toque para editar</span>
+                  <span className="text-sm text-gray-500">Toque para editar</span>
                 </div>
                 
                 <div className="flex items-center justify-between">
-                  <div className="text-sm text-gray-600 font-mono">
+                  <div className="text-base text-gray-600 font-mono">
                     {funcionario.cpf}
                   </div>
                   
@@ -502,9 +398,9 @@ export const AdminEmployees = () => {
                       }}
                     >
                       {funcionario.ativo ? (
-                        <UserX className="h-3 w-3 text-red-600" />
+                        <UserX className="h-4 w-4 text-red-600" />
                       ) : (
-                        <UserCheck className="h-3 w-3 text-green-600" />
+                        <UserCheck className="h-4 w-4 text-green-600" />
                       )}
                     </Button>
                     <Button
@@ -516,7 +412,7 @@ export const AdminEmployees = () => {
                         handleDelete(funcionario.id);
                       }}
                     >
-                      <Trash2 className="h-3 w-3 text-red-600" />
+                      <Trash2 className="h-4 w-4 text-red-600" />
                     </Button>
                   </div>
                 </div>
@@ -529,12 +425,12 @@ export const AdminEmployees = () => {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Nome</TableHead>
-                  <TableHead>CPF</TableHead>
-                  <TableHead>Cargo</TableHead>
-                  <TableHead>Condomínio</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Ações</TableHead>
+                  <TableHead className="text-base">Nome</TableHead>
+                  <TableHead className="text-base">CPF</TableHead>
+                  <TableHead className="text-base">Cargo</TableHead>
+                  <TableHead className="text-base">Condomínio</TableHead>
+                  <TableHead className="text-base">Status</TableHead>
+                  <TableHead className="text-base">Ações</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -545,16 +441,16 @@ export const AdminEmployees = () => {
                     onClick={() => handleEdit(funcionario)}
                     title="Clique para editar este funcionário"
                   >
-                    <TableCell className="font-medium">{funcionario.nome}</TableCell>
-                    <TableCell className="font-mono">{funcionario.cpf}</TableCell>
+                    <TableCell className="font-medium text-base">{funcionario.nome}</TableCell>
+                    <TableCell className="font-mono text-base">{funcionario.cpf}</TableCell>
                     <TableCell>
-                      <Badge variant="outline">
+                      <Badge variant="outline" className="text-base">
                         {funcionario.cargo}
                       </Badge>
                     </TableCell>
-                    <TableCell>{getCondominioNome(funcionario.condominio_id)}</TableCell>
+                    <TableCell className="text-base">{getCondominioNome(funcionario.condominio_id)}</TableCell>
                     <TableCell>
-                      <Badge variant={funcionario.ativo ? "default" : "secondary"}>
+                      <Badge variant={funcionario.ativo ? "default" : "secondary"} className="text-base">
                         {funcionario.ativo ? "Ativo" : "Inativo"}
                       </Badge>
                     </TableCell>
@@ -605,11 +501,119 @@ export const AdminEmployees = () => {
           {filteredFuncionarios.length === 0 && (
             <div className="text-center py-8">
               <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-500">Nenhum funcionário encontrado</p>
+              <p className="text-base text-gray-500">Nenhum funcionário encontrado</p>
             </div>
           )}
         </CardContent>
       </Card>
+
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle className="text-xl">
+              {editingFuncionario ? 'Editar Funcionário' : 'Novo Funcionário'}
+            </DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="cpf" className="text-base">CPF</Label>
+              <Input
+                id="cpf"
+                value={formData.cpf}
+                onChange={(e) => setFormData({ ...formData, cpf: e.target.value })}
+                placeholder="000.000.000-00"
+                required
+                className="text-base h-10"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="nome" className="text-base">Nome Completo</Label>
+              <Input
+                id="nome"
+                value={formData.nome}
+                onChange={(e) => setFormData({ ...formData, nome: e.target.value })}
+                placeholder="Nome completo do funcionário"
+                required
+                className="text-base h-10"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="senha" className="text-base">Senha</Label>
+              <Input
+                id="senha"
+                type="password"
+                value={formData.senha}
+                onChange={(e) => setFormData({ ...formData, senha: e.target.value })}
+                placeholder="Senha de acesso"
+                required
+                className="text-base h-10"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="cargo" className="text-base">Cargo</Label>
+              <Select value={formData.cargo} onValueChange={(value) => setFormData({ ...formData, cargo: value })}>
+                <SelectTrigger id="cargo" className="text-base h-10">
+                  <SelectValue placeholder="Selecione um cargo" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="porteiro">Porteiro</SelectItem>
+                  <SelectItem value="zelador">Zelador</SelectItem>
+                  <SelectItem value="administrador">Administrador</SelectItem>
+                  <SelectItem value="sindico">Síndico</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="condominio_id" className="text-base">Condomínio</Label>
+              <Select 
+                value={formData.condominio_id} 
+                onValueChange={(value) => setFormData({ ...formData, condominio_id: value })}
+                disabled={!!userCondominioId} // Desabilitar se usuário já tem condomínio
+              >
+                <SelectTrigger id="condominio_id" className="text-base h-10">
+                  <SelectValue placeholder="Selecione um condomínio" />
+                </SelectTrigger>
+                <SelectContent>
+                  {condominios.map((condominio) => (
+                    <SelectItem key={condominio.id} value={condominio.id}>
+                      {condominio.nome}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                id="ativo"
+                checked={formData.ativo}
+                onChange={(e) => setFormData({ ...formData, ativo: e.target.checked })}
+                className="rounded h-5 w-5"
+              />
+              <Label htmlFor="ativo" className="text-base">Funcionário Ativo</Label>
+            </div>
+
+            <div className="flex justify-end space-x-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsDialogOpen(false)}
+                className="text-base h-10"
+              >
+                Cancelar
+              </Button>
+              <Button type="submit" className="text-base h-10">
+                {editingFuncionario ? 'Atualizar' : 'Cadastrar'}
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

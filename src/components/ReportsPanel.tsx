@@ -289,75 +289,75 @@ export const ReportsPanel = ({ onBack, condominioId }: ReportsPanelProps) => {
                 disabled={isLoading}
               >
                 <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
-                Atualizar
+                <span className="text-sm">Atualizar</span>
               </Button>
-              <Button variant="outline" size="sm" className="h-8 px-2 text-xs">
+              <Button variant="outline" size="sm" className="h-8 px-2 text-sm">
                 <Download className="h-4 w-4 mr-1" />
-                Exportar
+                <span className="hidden sm:inline">Exportar</span>
               </Button>
             </div>
           </div>
-          <CardTitle className="flex items-center gap-1 text-base sm:text-xl mt-0">
-            <Calendar className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
+          <CardTitle className="flex items-center gap-2 text-lg sm:text-xl mt-0">
+            <Calendar className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
             Relatório de Entregas
           </CardTitle>
         </CardHeader>
       </Card>
 
       {/* Summary Stats */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 lg:gap-6">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 lg:gap-4">
         <Card className="shadow-card bg-gradient-card">
-          <CardContent className="p-3 lg:p-6">
+          <CardContent className="p-3 lg:p-4">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-xs sm:text-sm font-medium text-muted-foreground">
                   Total de Entregas
                 </p>
-                <p className="text-lg lg:text-2xl font-bold text-foreground">{totalDeliveries}</p>
+                <p className="text-lg sm:text-xl lg:text-2xl font-bold text-foreground">{totalDeliveries}</p>
               </div>
-              <Package className="h-5 w-5 lg:h-8 lg:w-8 text-primary" />
+              <Package className="h-6 w-6 lg:h-8 lg:w-8 text-primary" />
             </div>
           </CardContent>
         </Card>
 
         <Card className="shadow-card bg-gradient-card hover:shadow-lg transition-shadow">
-          <CardContent className="p-3 lg:p-6">
+          <CardContent className="p-3 lg:p-4">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-xs sm:text-sm font-medium text-muted-foreground">
                   Pendentes
                 </p>
-                <p className="text-lg lg:text-2xl font-bold text-warning">{pendingDeliveries}</p>
+                <p className="text-lg sm:text-xl lg:text-2xl font-bold text-warning">{pendingDeliveries}</p>
               </div>
-              <Clock className="h-5 w-5 lg:h-8 lg:w-8 text-warning" />
+              <Clock className="h-6 w-6 lg:h-8 lg:w-8 text-warning" />
             </div>
           </CardContent>
         </Card>
 
         <Card className="shadow-card bg-gradient-card hover:shadow-lg transition-shadow">
-          <CardContent className="p-3 lg:p-6">
+          <CardContent className="p-3 lg:p-4">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-xs sm:text-sm font-medium text-muted-foreground">
                   Concluídas
                 </p>
-                <p className="text-lg lg:text-2xl font-bold text-success">{completedDeliveries}</p>
+                <p className="text-lg sm:text-xl lg:text-2xl font-bold text-success">{completedDeliveries}</p>
               </div>
-              <CheckCircle className="h-5 w-5 lg:h-8 lg:w-8 text-success" />
+              <CheckCircle className="h-6 w-6 lg:h-8 lg:w-8 text-success" />
             </div>
           </CardContent>
         </Card>
 
         <Card className="shadow-card bg-gradient-card hover:shadow-lg transition-shadow">
-          <CardContent className="p-3 lg:p-6">
+          <CardContent className="p-3 lg:p-4">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-xs sm:text-sm font-medium text-muted-foreground">
                   Lembretes
                 </p>
-                <p className="text-lg lg:text-2xl font-bold text-orange-500">{remindersSent}</p>
+                <p className="text-lg sm:text-xl lg:text-2xl font-bold text-orange-500">{remindersSent}</p>
               </div>
-              <Bell className="h-5 w-5 lg:h-8 lg:w-8 text-orange-500" />
+              <Bell className="h-6 w-6 lg:h-8 lg:w-8 text-orange-500" />
             </div>
           </CardContent>
         </Card>
@@ -366,12 +366,12 @@ export const ReportsPanel = ({ onBack, condominioId }: ReportsPanelProps) => {
       {/* Filters */}
       <Card className="shadow-card bg-gradient-card">
         <CardContent className="p-3">
-          <div className="flex flex-col sm:flex-row gap-2">
+          <div className="flex flex-col sm:flex-row gap-3">
             <div className="flex-1">
               <div className="relative">
                 <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input
-                  placeholder="Buscar..."
+                  placeholder="Buscar morador ou apartamento..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-8 h-9 text-sm"
@@ -383,7 +383,7 @@ export const ReportsPanel = ({ onBack, condominioId }: ReportsPanelProps) => {
                 variant={statusFilter === "todos" ? "default" : "outline"}
                 size="sm"
                 onClick={() => setStatusFilter("todos")}
-                className="h-9 px-2 text-xs whitespace-nowrap"
+                className="h-9 px-2 text-sm whitespace-nowrap"
               >
                 Todos
               </Button>
@@ -391,7 +391,7 @@ export const ReportsPanel = ({ onBack, condominioId }: ReportsPanelProps) => {
                 variant={statusFilter === "pendente" ? "warning" : "outline"}
                 size="sm"
                 onClick={() => setStatusFilter("pendente")}
-                className="h-9 px-2 text-xs whitespace-nowrap"
+                className="h-9 px-2 text-sm whitespace-nowrap"
               >
                 Pendentes
               </Button>
@@ -399,7 +399,7 @@ export const ReportsPanel = ({ onBack, condominioId }: ReportsPanelProps) => {
                 variant={statusFilter === "retirada" ? "success" : "outline"}
                 size="sm"
                 onClick={() => setStatusFilter("retirada")}
-                className="h-9 px-2 text-xs whitespace-nowrap"
+                className="h-9 px-2 text-sm whitespace-nowrap"
               >
                 Entregues
               </Button>
@@ -410,17 +410,18 @@ export const ReportsPanel = ({ onBack, condominioId }: ReportsPanelProps) => {
 
       {/* Lembretes Filter */}
       <Card className="shadow-card bg-gradient-card">
-        <CardContent className="p-4">
-          <div className="flex flex-col sm:flex-row gap-4">
+        <CardContent className="p-3">
+          <div className="flex flex-col sm:flex-row gap-3">
             <div className="text-sm font-medium text-muted-foreground flex items-center">
               <Bell className="h-4 w-4 mr-2 text-orange-500" />
               Filtrar por Lembretes:
             </div>
-            <div className="flex gap-2">
+            <div className="flex gap-2 flex-wrap">
               <Button
                 variant={lembretesFilter === "todos" ? "default" : "outline"}
                 size="sm"
                 onClick={() => setLembretesFilter("todos")}
+                className="text-sm"
               >
                 Todos
               </Button>
@@ -428,7 +429,7 @@ export const ReportsPanel = ({ onBack, condominioId }: ReportsPanelProps) => {
                 variant={lembretesFilter === "enviado" ? "default" : "outline"}
                 size="sm"
                 onClick={() => setLembretesFilter("enviado")}
-                className="text-green-600"
+                className="text-green-600 text-sm"
               >
                 Lembretes Enviados
               </Button>
@@ -436,7 +437,7 @@ export const ReportsPanel = ({ onBack, condominioId }: ReportsPanelProps) => {
                 variant={lembretesFilter === "nao_enviado" ? "default" : "outline"}
                 size="sm"
                 onClick={() => setLembretesFilter("nao_enviado")}
-                className="text-orange-500"
+                className="text-orange-500 text-sm"
               >
                 Sem Lembrete
               </Button>
@@ -480,32 +481,32 @@ export const ReportsPanel = ({ onBack, condominioId }: ReportsPanelProps) => {
                           </h3>
                           <Badge 
                             variant={getStatusVariant(delivery.status)}
-                            className="flex items-center gap-1 text-xs py-1 px-2 flex-shrink-0"
+                            className="flex items-center gap-1 text-sm py-1 px-2 flex-shrink-0"
                           >
-                            <StatusIcon className="h-3 w-3" />
+                            <StatusIcon className="h-4 w-4" />
                             {delivery.status === "retirada" ? "Entregue" : "Pendente"}
                           </Badge>
                         </div>
                         
                         <div className="space-y-1 mb-3">
                           <div className="flex items-center gap-2">
-                            <Badge variant="secondary" className="text-xs">
+                            <Badge variant="secondary" className="text-sm">
                               {delivery.apartment}
                             </Badge>
                             {delivery.status === "pendente" && (
                               <Badge 
                                 variant={getReminderStatusVariant(delivery)}
-                                className="text-xs flex items-center gap-1"
+                                className="text-sm flex items-center gap-1"
                               >
-                                <Bell className="h-3 w-3" />
+                                <Bell className="h-4 w-4" />
                                 {getReminderStatus(delivery)}
                               </Badge>
                             )}
                           </div>
-                          <p className="text-xs text-muted-foreground truncate">
+                          <p className="text-sm text-muted-foreground truncate">
                             📱 {delivery.phone}
                           </p>
-                          <p className="text-xs text-muted-foreground truncate">
+                          <p className="text-sm text-muted-foreground truncate">
                             {delivery.status === 'retirada' ? '🔄 Retirado em: ' : '📥 Registrado em: '}
                             {delivery.status === 'retirada' && delivery.data_retirada
                               ? new Date(delivery.data_retirada).toLocaleString('pt-BR')
@@ -513,7 +514,7 @@ export const ReportsPanel = ({ onBack, condominioId }: ReportsPanelProps) => {
                             }
                           </p>
                           {delivery.codigo_retirada && (
-                            <p className="text-xs text-muted-foreground truncate">
+                            <p className="text-sm text-muted-foreground truncate">
                               🔑 Código: {delivery.codigo_retirada}
                             </p>
                           )}
@@ -521,15 +522,15 @@ export const ReportsPanel = ({ onBack, condominioId }: ReportsPanelProps) => {
                         
                         <Dialog>
                           <DialogTrigger asChild>
-                            <Button variant="outline" size="sm" className="w-full h-8 text-xs">
+                            <Button variant="outline" size="sm" className="w-full h-9 text-sm">
                               Ver Detalhes
                             </Button>
                           </DialogTrigger>
                           <DialogContent className="max-h-[80vh] overflow-y-auto">
                             <DialogHeader>
-                              <DialogTitle>Detalhes da Entrega</DialogTitle>
+                              <DialogTitle className="text-lg">Detalhes da Entrega</DialogTitle>
                             </DialogHeader>
-                            <div className="space-y-2 text-sm">
+                            <div className="space-y-3 text-base">
                               <div><strong>Morador:</strong> {delivery.residentName}</div>
                               <div><strong>Apartamento:</strong> {delivery.apartment}</div>
                               <div><strong>Telefone:</strong> {delivery.phone}</div>
@@ -542,7 +543,10 @@ export const ReportsPanel = ({ onBack, condominioId }: ReportsPanelProps) => {
                               <div><strong>Lembrete:</strong> {delivery.ultimo_lembrete_enviado ? 
                                 new Date(delivery.ultimo_lembrete_enviado).toLocaleString('pt-BR') : 'Não enviado'}</div>
                               {delivery.photo && (
-                                <img src={delivery.photo} alt="Foto" className="w-full h-48 object-cover rounded" />
+                                <div>
+                                  <strong>Foto:</strong>
+                                  <img src={delivery.photo} alt="Foto da entrega" className="w-full h-48 object-cover rounded mt-2" />
+                                </div>
                               )}
                             </div>
                           </DialogContent>
@@ -579,10 +583,10 @@ export const ReportsPanel = ({ onBack, condominioId }: ReportsPanelProps) => {
                           {delivery.apartment}
                         </Badge>
                       </div>
-                      <p className="text-xs text-muted-foreground mb-1 truncate">
+                      <p className="text-sm text-muted-foreground mb-1 truncate">
                         {delivery.phone}
                       </p>
-                      <p className="text-xs text-muted-foreground truncate">
+                      <p className="text-sm text-muted-foreground truncate">
                         {delivery.status === 'retirada' ? 'Retirado em: ' : 'Registrado em: '}
                         {delivery.status === 'retirada' && delivery.data_retirada
                           ? new Date(delivery.data_retirada).toLocaleString('pt-BR')
@@ -590,7 +594,7 @@ export const ReportsPanel = ({ onBack, condominioId }: ReportsPanelProps) => {
                         }
                       </p>
                       {delivery.codigo_retirada && (
-                        <p className="text-xs text-muted-foreground truncate">
+                        <p className="text-sm text-muted-foreground truncate">
                           Código: {delivery.codigo_retirada}
                         </p>
                       )}
@@ -603,52 +607,49 @@ export const ReportsPanel = ({ onBack, condominioId }: ReportsPanelProps) => {
                           {getReminderStatus(delivery)}
                         </Badge>
                       )}
-                    </div>
-                    
-                    <div className="flex flex-col items-end gap-2">
-                      <Badge 
-                        variant={getStatusVariant(delivery.status)}
-                        className="flex items-center gap-1 text-xs py-1 px-2"
-                      >
-                        <StatusIcon className="h-3 w-3" />
-                        <span className="hidden xs:inline">
+                      <div className="flex items-center gap-2 mt-2">
+                        <Badge 
+                          variant={getStatusVariant(delivery.status)}
+                          className="flex items-center gap-1 text-xs py-1 px-2"
+                        >
+                          <StatusIcon className="h-3 w-3" />
                           {delivery.status === "retirada" ? "Entregue" : "Pendente"}
-                        </span>
-                        <span className="xs:hidden">
-                          {delivery.status === "retirada" ? "E" : "P"}
-                        </span>
-                      </Badge>
-                      
-                      <Dialog>
-                        <DialogTrigger asChild>
-                          <Button variant="outline" size="sm" className="h-8 px-2 text-xs">
-                            Detalhes
-                          </Button>
-                        </DialogTrigger>
-                        <DialogContent className="max-h-[80vh] overflow-y-auto">
-                          <DialogHeader>
-                            <DialogTitle>Detalhes da Entrega</DialogTitle>
-                          </DialogHeader>
-                          <div className="space-y-2 text-sm">
-                            <div><strong>Morador:</strong> {delivery.residentName}</div>
-                            <div><strong>Apartamento:</strong> {delivery.apartment}</div>
-                            <div><strong>Telefone:</strong> {delivery.phone}</div>
-                            <div><strong>Código:</strong> {delivery.codigo_retirada || '-'}</div>
-                            <div><strong>Data de Registro:</strong> {delivery.data_entrega ? new Date(delivery.data_entrega).toLocaleString('pt-BR') : '-'}</div>
-                            {delivery.status === 'retirada' && (
-                              <div><strong>Data de Retirada:</strong> {delivery.data_retirada ? new Date(delivery.data_retirada).toLocaleString('pt-BR') : '-'}</div>
-                            )}
-                            <div><strong>Status:</strong> {delivery.status === 'retirada' ? 'Entregue' : 'Pendente'}</div>
-                            <div><strong>Lembrete:</strong> {delivery.ultimo_lembrete_enviado ? 
-                              new Date(delivery.ultimo_lembrete_enviado).toLocaleString('pt-BR') : 'Não enviado'}</div>
-                            {delivery.photo && (
-                              <img src={delivery.photo} alt="Foto" className="w-full h-48 object-cover rounded" />
-                            )}
-                          </div>
-                        </DialogContent>
-                      </Dialog>
+                        </Badge>
+                      </div>
                     </div>
                   </div>
+                  
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button variant="outline" size="sm" className="w-full h-8 mt-3 text-sm">
+                        Ver Detalhes
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="max-h-[80vh] overflow-y-auto">
+                      <DialogHeader>
+                        <DialogTitle className="text-lg">Detalhes da Entrega</DialogTitle>
+                      </DialogHeader>
+                      <div className="space-y-3 text-base">
+                        <div><strong>Morador:</strong> {delivery.residentName}</div>
+                        <div><strong>Apartamento:</strong> {delivery.apartment}</div>
+                        <div><strong>Telefone:</strong> {delivery.phone}</div>
+                        <div><strong>Código:</strong> {delivery.codigo_retirada || '-'}</div>
+                        <div><strong>Data de Registro:</strong> {delivery.data_entrega ? new Date(delivery.data_entrega).toLocaleString('pt-BR') : '-'}</div>
+                        {delivery.status === 'retirada' && (
+                          <div><strong>Data de Retirada:</strong> {delivery.data_retirada ? new Date(delivery.data_retirada).toLocaleString('pt-BR') : '-'}</div>
+                        )}
+                        <div><strong>Status:</strong> {delivery.status === 'retirada' ? 'Entregue' : 'Pendente'}</div>
+                        <div><strong>Lembrete:</strong> {delivery.ultimo_lembrete_enviado ? 
+                          new Date(delivery.ultimo_lembrete_enviado).toLocaleString('pt-BR') : 'Não enviado'}</div>
+                        {delivery.photo && (
+                          <div>
+                            <strong>Foto:</strong>
+                            <img src={delivery.photo} alt="Foto da entrega" className="w-full h-48 object-cover rounded mt-2" />
+                          </div>
+                        )}
+                      </div>
+                    </DialogContent>
+                  </Dialog>
                 </CardContent>
               </Card>
             );

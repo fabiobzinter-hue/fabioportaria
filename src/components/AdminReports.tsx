@@ -555,7 +555,7 @@ export const AdminReports = ({ superAdminMode = false, condominioId: propCondomi
     if (!userCondominioId) {
       console.log('⚠️ AdminReports - Sem userCondominioId, mostrando mensagem de seleção');
       return (
-        <div className="text-center py-8 text-muted-foreground">
+        <div className="text-center py-8 text-muted-foreground text-base">
           Selecione um condomínio para ver os relatórios
         </div>
       );
@@ -567,41 +567,41 @@ export const AdminReports = ({ superAdminMode = false, condominioId: propCondomi
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="text-xs sm:text-sm">Código</TableHead>
-                <TableHead className="text-xs sm:text-sm">Morador</TableHead>
-                <TableHead className="text-xs sm:text-sm">Apto</TableHead>
-                <TableHead className="text-xs sm:text-sm">Funcionário</TableHead>
-                <TableHead className="text-xs sm:text-sm">Status</TableHead>
-                <TableHead className="text-xs sm:text-sm">Data</TableHead>
+                <TableHead className="text-sm">Código</TableHead>
+                <TableHead className="text-sm">Morador</TableHead>
+                <TableHead className="text-sm">Apto</TableHead>
+                <TableHead className="text-sm">Funcionário</TableHead>
+                <TableHead className="text-sm">Status</TableHead>
+                <TableHead className="text-sm">Data</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filteredEntregas.slice(0, 10).map((entrega) => (
                 <TableRow key={entrega.id}>
-                  <TableCell className="font-medium text-xs sm:text-sm">
+                  <TableCell className="font-medium text-sm">
                     {entrega.codigo_retirada}
                   </TableCell>
-                  <TableCell className="text-xs sm:text-sm">
+                  <TableCell className="text-sm">
                     <div className="truncate max-w-[100px] sm:max-w-[150px]" title={entrega.morador.nome}>
                       {entrega.morador.nome}
                     </div>
                   </TableCell>
-                  <TableCell className="text-xs sm:text-sm">
+                  <TableCell className="text-sm">
                     <div className="truncate max-w-[60px] sm:max-w-[80px]" title={formatApartment(entrega.morador.apartamento, entrega.morador.bloco)}>
                       {formatApartment(entrega.morador.apartamento, entrega.morador.bloco)}
                     </div>
                   </TableCell>
-                  <TableCell className="text-xs sm:text-sm">
+                  <TableCell className="text-sm">
                     <div className="truncate max-w-[100px] sm:max-w-[150px]" title={entrega.funcionario.nome}>
                       {entrega.funcionario.nome}
                     </div>
                   </TableCell>
                   <TableCell>
-                    <Badge variant={getStatusVariant(entrega.status)} className="text-xs">
+                    <Badge variant={getStatusVariant(entrega.status)} className="text-sm">
                       {getStatusText(entrega.status)}
                     </Badge>
                   </TableCell>
-                  <TableCell className="text-xs sm:text-sm">
+                  <TableCell className="text-sm">
                     <div className="truncate max-w-[100px]" title={formatDate(entrega.created_at)}>
                       {formatDate(entrega.created_at)}
                     </div>
@@ -612,7 +612,7 @@ export const AdminReports = ({ superAdminMode = false, condominioId: propCondomi
           </Table>
         </div>
         {filteredEntregas.length > 10 && (
-          <div className="text-center text-sm text-muted-foreground">
+          <div className="text-center text-base text-muted-foreground">
             Mostrando 10 de {filteredEntregas.length} registros
           </div>
         )}
@@ -682,13 +682,13 @@ export const AdminReports = ({ superAdminMode = false, condominioId: propCondomi
             <CardContent>
               {/* Filtros de Data Predefinidos */}
               <div className="mb-6">
-                <Label className="text-sm font-medium mb-3 block">Filtros Rápidos de Data</Label>
+                <Label className="text-base font-medium mb-3 block">Filtros Rápidos de Data</Label>
                 <div className="flex flex-wrap gap-2">
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={() => setDateFilter('hoje')}
-                    className="text-xs"
+                    className="text-sm h-9"
                   >
                     Hoje
                   </Button>
@@ -696,7 +696,7 @@ export const AdminReports = ({ superAdminMode = false, condominioId: propCondomi
                     variant="outline"
                     size="sm"
                     onClick={() => setDateFilter('ontem')}
-                    className="text-xs"
+                    className="text-sm h-9"
                   >
                     Ontem
                   </Button>
@@ -704,7 +704,7 @@ export const AdminReports = ({ superAdminMode = false, condominioId: propCondomi
                     variant="outline"
                     size="sm"
                     onClick={() => setDateFilter('ultimos7dias')}
-                    className="text-xs"
+                    className="text-sm h-9"
                   >
                     Últimos 7 dias
                   </Button>
@@ -712,7 +712,7 @@ export const AdminReports = ({ superAdminMode = false, condominioId: propCondomi
                     variant="outline"
                     size="sm"
                     onClick={() => setDateFilter('estasemana')}
-                    className="text-xs"
+                    className="text-sm h-9"
                   >
                     Esta semana
                   </Button>
@@ -720,7 +720,7 @@ export const AdminReports = ({ superAdminMode = false, condominioId: propCondomi
                     variant="outline"
                     size="sm"
                     onClick={() => setDateFilter('estemes')}
-                    className="text-xs"
+                    className="text-sm h-9"
                   >
                     Este mês
                   </Button>
@@ -730,26 +730,26 @@ export const AdminReports = ({ superAdminMode = false, condominioId: propCondomi
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 {/* Busca */}
                 <div className="space-y-2">
-                  <Label>Buscar</Label>
+                  <Label className="text-base font-medium">Buscar</Label>
                   <div className="relative">
-                    <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                    <Search className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
                     <Input
                       placeholder="Código, morador, funcionário..."
                       value={filtros.searchTerm}
                       onChange={(e) => setFiltros({ ...filtros, searchTerm: e.target.value })}
-                      className="pl-10"
+                      className="pl-10 h-10 text-base"
                     />
                   </div>
                 </div>
 
                 {/* Status */}
                 <div className="space-y-2">
-                  <Label>Status</Label>
+                  <Label className="text-base font-medium">Status</Label>
                   <Select
                     value={filtros.status}
                     onValueChange={(value) => setFiltros({ ...filtros, status: value })}
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className="h-10 text-base">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -763,12 +763,12 @@ export const AdminReports = ({ superAdminMode = false, condominioId: propCondomi
 
                 {/* Lembretes */}
                 <div className="space-y-2">
-                  <Label>Lembretes</Label>
+                  <Label className="text-base font-medium">Lembretes</Label>
                   <Select
                     value={filtros.lembrete}
                     onValueChange={(value) => setFiltros({ ...filtros, lembrete: value })}
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className="h-10 text-base">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -781,24 +781,79 @@ export const AdminReports = ({ superAdminMode = false, condominioId: propCondomi
 
                 {/* Funcionário */}
                 <div className="space-y-2">
-                  <Label>Funcionário</Label>
+                  <Label className="text-base font-medium">Funcionário</Label>
                   <Select
                     value={filtros.funcionarioId}
                     onValueChange={(value) => setFiltros({ ...filtros, funcionarioId: value })}
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className="h-10 text-base">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="todos">Todos os Funcionários</SelectItem>
                       {funcionarios.map((funcionario) => (
-                        <SelectItem key={funcionario.id} value={funcionario.id}>
+                        <SelectItem key={funcionario.id} value={funcionario.id} className="text-base">
                           {funcionario.nome}
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                 </div>
+
+                {/* Morador */}
+                <div className="space-y-2">
+                  <Label className="text-base font-medium">Morador</Label>
+                  <Select
+                    value={filtros.moradorId}
+                    onValueChange={(value) => setFiltros({ ...filtros, moradorId: value })}
+                  >
+                    <SelectTrigger className="h-10 text-base">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="todos">Todos os Moradores</SelectItem>
+                      {moradores.map((morador) => (
+                        <SelectItem key={morador.id} value={morador.id} className="text-base">
+                          {morador.nome}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Data Início */}
+                <div className="space-y-2">
+                  <Label className="text-base font-medium">Data Início</Label>
+                  <Input
+                    type="date"
+                    value={filtros.dataInicio}
+                    onChange={(e) => setFiltros({ ...filtros, dataInicio: e.target.value })}
+                    className="h-10 text-base"
+                  />
+                </div>
+
+                {/* Data Fim */}
+                <div className="space-y-2">
+                  <Label className="text-base font-medium">Data Fim</Label>
+                  <Input
+                    type="date"
+                    value={filtros.dataFim}
+                    onChange={(e) => setFiltros({ ...filtros, dataFim: e.target.value })}
+                    className="h-10 text-base"
+                  />
+                </div>
+              </div>
+
+              {/* Botões de Ação */}
+              <div className="flex flex-wrap gap-3 pt-4">
+                <Button onClick={clearFilters} variant="outline" className="text-base h-10">
+                  <Filter className="h-5 w-5 mr-2" />
+                  Limpar Filtros
+                </Button>
+                <Button onClick={exportToCSV} className="text-base h-10">
+                  <Download className="h-5 w-5 mr-2" />
+                  Exportar CSV
+                </Button>
               </div>
             </CardContent>
           </Card>
@@ -808,7 +863,7 @@ export const AdminReports = ({ superAdminMode = false, condominioId: propCondomi
             <Card>
               <CardContent className="p-4">
                 <div className="flex items-center space-x-2">
-                  <Package className="h-5 w-5 text-blue-600" />
+                  <Package className="h-6 w-6 text-blue-600" />
                   <div>
                     <p className="text-sm font-medium text-gray-600">Total</p>
                     <p className="text-2xl font-bold">{filteredEntregas.length}</p>
@@ -820,7 +875,7 @@ export const AdminReports = ({ superAdminMode = false, condominioId: propCondomi
             <Card>
               <CardContent className="p-4">
                 <div className="flex items-center space-x-2">
-                  <Package className="h-5 w-5 text-yellow-600" />
+                  <Package className="h-6 w-6 text-yellow-600" />
                   <div>
                     <p className="text-sm font-medium text-gray-600">Pendentes</p>
                     <p className="text-2xl font-bold">
@@ -834,7 +889,7 @@ export const AdminReports = ({ superAdminMode = false, condominioId: propCondomi
             <Card>
               <CardContent className="p-4">
                 <div className="flex items-center space-x-2">
-                  <Package className="h-5 w-5 text-green-600" />
+                  <Package className="h-6 w-6 text-green-600" />
                   <div>
                     <p className="text-sm font-medium text-gray-600">Retiradas</p>
                     <p className="text-2xl font-bold">
@@ -848,7 +903,7 @@ export const AdminReports = ({ superAdminMode = false, condominioId: propCondomi
             <Card>
               <CardContent className="p-4">
                 <div className="flex items-center space-x-2">
-                  <User className="h-5 w-5 text-purple-600" />
+                  <User className="h-6 w-6 text-purple-600" />
                   <div>
                     <p className="text-sm font-medium text-gray-600">Funcionários</p>
                     <p className="text-2xl font-bold">
@@ -862,7 +917,7 @@ export const AdminReports = ({ superAdminMode = false, condominioId: propCondomi
             <Card>
               <CardContent className="p-4">
                 <div className="flex items-center space-x-2">
-                  <Bell className="h-5 w-5 text-orange-600" />
+                  <Bell className="h-6 w-6 text-orange-600" />
                   <div>
                     <p className="text-sm font-medium text-gray-600">Lembretes Enviados</p>
                     <p className="text-2xl font-bold">
@@ -877,8 +932,8 @@ export const AdminReports = ({ superAdminMode = false, condominioId: propCondomi
           {/* Tabela */}
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center">
-                <FileText className="h-5 w-5 mr-2" />
+              <CardTitle className="flex items-center text-xl">
+                <FileText className="h-6 w-6 mr-2" />
                 Entregas ({filteredEntregas.length})
               </CardTitle>
             </CardHeader>
@@ -886,85 +941,125 @@ export const AdminReports = ({ superAdminMode = false, condominioId: propCondomi
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Código</TableHead>
-                    <TableHead>Morador</TableHead>
-                    <TableHead>Apartamento</TableHead>
-                    <TableHead>Funcionário</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Data Entrega</TableHead>
-                    <TableHead>Data Retirada</TableHead>
-                    <TableHead>Lembretes</TableHead>
-                    <TableHead>Observações</TableHead>
+                    <TableHead className="text-base">Código</TableHead>
+                    <TableHead className="text-base">Morador</TableHead>
+                    <TableHead className="text-base">Apto/Bloco</TableHead>
+                    <TableHead className="text-base">Funcionário</TableHead>
+                    <TableHead className="text-base">Status</TableHead>
+                    <TableHead className="text-base">Data Entrega</TableHead>
+                    <TableHead className="text-base">Data Retirada</TableHead>
+                    <TableHead className="text-base">Lembretes</TableHead>
+                    <TableHead className="text-base">Ações</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredEntregas.map((entrega) => (
-                    <TableRow key={entrega.id}>
-                      <TableCell className="font-mono font-medium">
-                        {entrega.codigo_retirada}
-                      </TableCell>
-                      <TableCell>
-                        <div>
-                          <p className="font-medium">{entrega.morador.nome}</p>
-                          <p className="text-sm text-gray-500">{entrega.morador.telefone}</p>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant="outline">
-                          {formatApartment(entrega.morador.apartamento, entrega.morador.bloco)}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <div>
-                          <p className="font-medium">{entrega.funcionario.nome}</p>
-                          <p className="text-sm text-gray-500">{entrega.funcionario.cargo}</p>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant={getStatusVariant(entrega.status)}>
-                          {getStatusText(entrega.status)}
-                        </Badge>
-                      </TableCell>
-                  <TableCell>
-                    {formatDate(entrega.data_entrega) !== '-' ? (
-                      <div className="text-sm">
-                        <p>{formatDate(entrega.data_entrega).split(' ')[0]}</p>
-                        <p className="text-gray-500">{formatDate(entrega.data_entrega).split(' ')[1]}</p>
-                      </div>
-                    ) : (
-                      <span className="text-gray-400">-</span>
-                    )}
-                  </TableCell>
-                      <TableCell>
-                        {entrega.data_retirada ? (
-                          formatDate(entrega.data_retirada) !== '-' ? (
-                            <div className="text-sm">
-                              <p>{formatDate(entrega.data_retirada).split(' ')[0]}</p>
-                              <p className="text-gray-500">{formatDate(entrega.data_retirada).split(' ')[1]}</p>
-                            </div>
-                          ) : (
-                            <span className="text-gray-400">-</span>
-                          )
-                        ) : (
-                          <span className="text-gray-400">-</span>
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        <div className="max-w-xs">
-                          {entrega.observacoes && (
-                            <p className="text-sm text-gray-600 truncate" title={entrega.observacoes}>
-                              {entrega.observacoes}
-                            </p>
-                          )}
-                          {entrega.descricao_retirada && (
-                            <p className="text-sm text-green-600 truncate" title={entrega.descricao_retirada}>
-                              Retirada: {entrega.descricao_retirada}
-                            </p>
-                          )}
-                        </div>
+                  {filteredEntregas.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={9} className="text-center py-8 text-muted-foreground text-base">
+                        Nenhuma entrega encontrada com os filtros aplicados
                       </TableCell>
                     </TableRow>
-                  ))}
+                  ) : (
+                    filteredEntregas.map((entrega) => (
+                      <TableRow key={entrega.id}>
+                        <TableCell className="font-medium text-base">
+                          <div className="truncate max-w-[100px] sm:max-w-[120px]" title={entrega.codigo_retirada}>
+                            {entrega.codigo_retirada}
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-base">
+                          <div className="truncate max-w-[120px] sm:max-w-[180px]" title={entrega.morador.nome}>
+                            {entrega.morador.nome}
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-base">
+                          <div className="truncate max-w-[100px] sm:max-w-[120px]" title={formatApartment(entrega.morador.apartamento, entrega.morador.bloco)}>
+                            {formatApartment(entrega.morador.apartamento, entrega.morador.bloco)}
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-base">
+                          <div className="truncate max-w-[120px] sm:max-w-[180px]" title={entrega.funcionario.nome}>
+                            {entrega.funcionario.nome}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant={getStatusVariant(entrega.status)} className="text-base">
+                            {getStatusText(entrega.status)}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-base">
+                          <div className="truncate max-w-[120px] sm:max-w-[140px]" title={entrega.data_entrega ? formatDate(entrega.data_entrega) : ''}>
+                            {entrega.data_entrega ? formatDate(entrega.data_entrega) : '-'}
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-base">
+                          <div className="truncate max-w-[120px] sm:max-w-[140px]" title={entrega.data_retirada ? formatDate(entrega.data_retirada) : ''}>
+                            {entrega.data_retirada ? formatDate(entrega.data_retirada) : '-'}
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-base">
+                          <div className="flex items-center gap-1">
+                            <Badge variant={getReminderStatusBadge(entrega)} className="text-base">
+                              {entrega.status !== 'pendente' ? 'N/A' : 
+                               entrega.ultimo_lembrete_enviado ? 'Enviado' : 'Pendente'}
+                            </Badge>
+                            {entrega.ultimo_lembrete_enviado && (
+                              <span className="text-base text-muted-foreground" title={formatDate(entrega.ultimo_lembrete_enviado)}>
+                                🔔
+                              </span>
+                            )}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <Dialog>
+                            <DialogTrigger asChild>
+                              <Button variant="outline" size="sm" className="h-9 px-3 text-base">
+                                <Eye className="h-4 w-4 mr-1" />
+                                <span>Ver</span>
+                              </Button>
+                            </DialogTrigger>
+                            <DialogContent className="max-h-[80vh] overflow-y-auto">
+                              <DialogHeader>
+                                <DialogTitle className="text-xl">Detalhes da Entrega</DialogTitle>
+                                <DialogDescription className="text-base">
+                                  Código: {entrega.codigo_retirada}
+                                </DialogDescription>
+                              </DialogHeader>
+                              <div className="space-y-2 text-base">
+                                <div><strong>Morador:</strong> {entrega.morador.nome}</div>
+                                <div><strong>Apartamento:</strong> {formatApartment(entrega.morador.apartamento, entrega.morador.bloco)}</div>
+                                <div><strong>Telefone:</strong> {entrega.morador.telefone}</div>
+                                <div><strong>Funcionário:</strong> {entrega.funcionario.nome}</div>
+                                <div><strong>Status:</strong> {getStatusText(entrega.status)}</div>
+                                <div><strong>Data Entrega:</strong> {entrega.data_entrega ? formatDate(entrega.data_entrega) : '-'}</div>
+                                <div><strong>Data Retirada:</strong> {entrega.data_retirada ? formatDate(entrega.data_retirada) : '-'}</div>
+                                <div><strong>Status do Lembrete:</strong> 
+                                  <Badge variant={getReminderStatusBadge(entrega)} className="ml-2 text-base">
+                                    {getReminderStatus(entrega)}
+                                  </Badge>
+                                </div>
+                                {entrega.ultimo_lembrete_enviado && (
+                                  <div><strong>Último Lembrete Enviado:</strong> {formatDate(entrega.ultimo_lembrete_enviado)}</div>
+                                )}
+                                {entrega.observacoes && (
+                                  <div><strong>Observações:</strong> {entrega.observacoes}</div>
+                                )}
+                                {entrega.descricao_retirada && (
+                                  <div><strong>Descrição Retirada:</strong> {entrega.descricao_retirada}</div>
+                                )}
+                                {entrega.foto_url && (
+                                  <div>
+                                    <strong>Foto:</strong>
+                                    <img src={entrega.foto_url} alt="Foto da entrega" className="w-full h-48 object-cover rounded mt-2" />
+                                  </div>
+                                )}
+                              </div>
+                            </DialogContent>
+                          </Dialog>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
                 </TableBody>
               </Table>
             </CardContent>
@@ -979,17 +1074,17 @@ export const AdminReports = ({ superAdminMode = false, condominioId: propCondomi
         {/* Estatísticas Simples */}
         <div className="grid grid-cols-3 gap-2">
           <div className="bg-primary/10 p-2 rounded text-center">
-            <p className="text-xs text-muted-foreground">Total</p>
+            <p className="text-sm text-muted-foreground">Total</p>
             <p className="text-xl font-bold">{filteredEntregas.length}</p>
           </div>
           <div className="bg-yellow-100 p-2 rounded text-center">
-            <p className="text-xs text-muted-foreground">Pendentes</p>
+            <p className="text-sm text-muted-foreground">Pendentes</p>
             <p className="text-xl font-bold">
               {filteredEntregas.filter(e => e.status === 'pendente').length}
             </p>
           </div>
           <div className="bg-green-100 p-2 rounded text-center">
-            <p className="text-xs text-muted-foreground">Retiradas</p>
+            <p className="text-sm text-muted-foreground">Retiradas</p>
             <p className="text-xl font-bold">
               {filteredEntregas.filter(e => e.status === 'retirada').length}
             </p>
@@ -1056,7 +1151,7 @@ export const AdminReports = ({ superAdminMode = false, condominioId: propCondomi
           {/* Search and Main Filters */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="relative">
-              <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+              <Search className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
               <Input
                 placeholder="Buscar por código, morador ou funcionário..."
                 value={filtros.searchTerm}
@@ -1083,8 +1178,8 @@ export const AdminReports = ({ superAdminMode = false, condominioId: propCondomi
                 onClick={clearFilters}
                 className="flex items-center gap-2"
               >
-                <Filter className="h-4 w-4" />
-                Limpar
+                <Filter className="h-5 w-5" />
+                <span className="text-sm">Limpar</span>
               </Button>
               
               <Button 
@@ -1092,8 +1187,8 @@ export const AdminReports = ({ superAdminMode = false, condominioId: propCondomi
                 onClick={exportToCSV}
                 className="flex items-center gap-2"
               >
-                <Download className="h-4 w-4" />
-                <span className="hidden sm:inline">Exportar</span>
+                <Download className="h-5 w-5" />
+                <span className="text-sm">Exportar</span>
               </Button>
             </div>
           </div>
@@ -1101,7 +1196,7 @@ export const AdminReports = ({ superAdminMode = false, condominioId: propCondomi
           {/* Advanced Filters */}
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4">
             <div>
-              <Label className="text-xs mb-1 block">Funcionário</Label>
+              <Label className="text-sm mb-1 block">Funcionário</Label>
               <Select 
                 value={filtros.funcionarioId} 
                 onValueChange={(value) => setFiltros({...filtros, funcionarioId: value})}
@@ -1121,7 +1216,7 @@ export const AdminReports = ({ superAdminMode = false, condominioId: propCondomi
             </div>
             
             <div>
-              <Label className="text-xs mb-1 block">Morador</Label>
+              <Label className="text-sm mb-1 block">Morador</Label>
               <Select 
                 value={filtros.moradorId} 
                 onValueChange={(value) => setFiltros({...filtros, moradorId: value})}
@@ -1141,7 +1236,7 @@ export const AdminReports = ({ superAdminMode = false, condominioId: propCondomi
             </div>
             
             <div>
-              <Label className="text-xs mb-1 block">Lembretes</Label>
+              <Label className="text-sm mb-1 block">Lembretes</Label>
               <Select 
                 value={filtros.lembrete} 
                 onValueChange={(value) => setFiltros({...filtros, lembrete: value})}
@@ -1158,9 +1253,9 @@ export const AdminReports = ({ superAdminMode = false, condominioId: propCondomi
             </div>
             
             <div>
-              <Label className="text-xs mb-1 block">Data Início</Label>
+              <Label className="text-sm mb-1 block">Data Início</Label>
               <div className="relative">
-                <Calendar className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Calendar className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
                 <Input
                   type="date"
                   value={filtros.dataInicio}
@@ -1171,35 +1266,9 @@ export const AdminReports = ({ superAdminMode = false, condominioId: propCondomi
             </div>
             
             <div>
-              <Label className="text-xs mb-1 block">Data Fim</Label>
+              <Label className="text-sm mb-1 block">Data Fim</Label>
               <div className="relative">
-                <Calendar className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                <Input
-                  type="date"
-                  value={filtros.dataFim}
-                  onChange={(e) => setFiltros({...filtros, dataFim: e.target.value})}
-                  className="pl-10 w-full"
-                />
-              </div>
-            </div>
-            
-            <div>
-              <Label className="text-xs mb-1 block">Data Início</Label>
-              <div className="relative">
-                <Calendar className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                <Input
-                  type="date"
-                  value={filtros.dataInicio}
-                  onChange={(e) => setFiltros({...filtros, dataInicio: e.target.value})}
-                  className="pl-10 w-full"
-                />
-              </div>
-            </div>
-            
-            <div>
-              <Label className="text-xs mb-1 block">Data Fim</Label>
-              <div className="relative">
-                <Calendar className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Calendar className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
                 <Input
                   type="date"
                   value={filtros.dataFim}
@@ -1216,7 +1285,7 @@ export const AdminReports = ({ superAdminMode = false, condominioId: propCondomi
               variant="outline" 
               size="sm" 
               onClick={() => setDateFilter('hoje')}
-              className="text-xs"
+              className="text-sm"
             >
               Hoje
             </Button>
@@ -1224,7 +1293,7 @@ export const AdminReports = ({ superAdminMode = false, condominioId: propCondomi
               variant="outline" 
               size="sm" 
               onClick={() => setDateFilter('ontem')}
-              className="text-xs"
+              className="text-sm"
             >
               Ontem
             </Button>
@@ -1232,7 +1301,7 @@ export const AdminReports = ({ superAdminMode = false, condominioId: propCondomi
               variant="outline" 
               size="sm" 
               onClick={() => setDateFilter('ultimos7dias')}
-              className="text-xs"
+              className="text-sm"
             >
               Últimos 7 dias
             </Button>
@@ -1240,7 +1309,7 @@ export const AdminReports = ({ superAdminMode = false, condominioId: propCondomi
               variant="outline" 
               size="sm" 
               onClick={() => setDateFilter('estasemana')}
-              className="text-xs"
+              className="text-sm"
             >
               Esta semana
             </Button>
@@ -1248,7 +1317,7 @@ export const AdminReports = ({ superAdminMode = false, condominioId: propCondomi
               variant="outline" 
               size="sm" 
               onClick={() => setDateFilter('estemes')}
-              className="text-xs"
+              className="text-sm"
             >
               Este mês
             </Button>
@@ -1266,17 +1335,17 @@ export const AdminReports = ({ superAdminMode = false, condominioId: propCondomi
         {/* Results Summary */}
         {!isLoading && (
           <div className="mb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-            <div className="text-sm text-muted-foreground">
+            <div className="text-base text-muted-foreground">
               Mostrando {filteredEntregas.length} de {entregas.length} entregas
             </div>
             <div className="flex gap-2">
-              <Badge variant="secondary" className="text-xs">
+              <Badge variant="secondary" className="text-base">
                 Pendentes: {filteredEntregas.filter(e => e.status === 'pendente').length}
               </Badge>
-              <Badge variant="success" className="text-xs">
+              <Badge variant="success" className="text-base">
                 Retiradas: {filteredEntregas.filter(e => e.status === 'retirada').length}
               </Badge>
-              <Badge variant="destructive" className="text-xs">
+              <Badge variant="destructive" className="text-base">
                 Canceladas: {filteredEntregas.filter(e => e.status === 'cancelada').length}
               </Badge>
             </div>
@@ -1290,15 +1359,15 @@ export const AdminReports = ({ superAdminMode = false, condominioId: propCondomi
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="text-xs sm:text-sm">Código</TableHead>
-                    <TableHead className="text-xs sm:text-sm">Morador</TableHead>
-                    <TableHead className="text-xs sm:text-sm">Apto/Bloco</TableHead>
-                    <TableHead className="text-xs sm:text-sm">Funcionário</TableHead>
-                    <TableHead className="text-xs sm:text-sm">Status</TableHead>
-                    <TableHead className="text-xs sm:text-sm">Data Entrega</TableHead>
-                    <TableHead className="text-xs sm:text-sm">Data Retirada</TableHead>
-                    <TableHead className="text-xs sm:text-sm">Lembretes</TableHead>
-                    <TableHead className="text-xs sm:text-sm">Ações</TableHead>
+                    <TableHead className="text-sm">Código</TableHead>
+                    <TableHead className="text-sm">Morador</TableHead>
+                    <TableHead className="text-sm">Apto/Bloco</TableHead>
+                    <TableHead className="text-sm">Funcionário</TableHead>
+                    <TableHead className="text-sm">Status</TableHead>
+                    <TableHead className="text-sm">Data Entrega</TableHead>
+                    <TableHead className="text-sm">Data Retirada</TableHead>
+                    <TableHead className="text-sm">Lembretes</TableHead>
+                    <TableHead className="text-sm">Ações</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -1311,49 +1380,49 @@ export const AdminReports = ({ superAdminMode = false, condominioId: propCondomi
                   ) : (
                     filteredEntregas.map((entrega) => (
                       <TableRow key={entrega.id}>
-                        <TableCell className="font-medium text-xs sm:text-sm">
-                          <div className="truncate max-w-[80px] sm:max-w-[100px]" title={entrega.codigo_retirada}>
+                        <TableCell className="font-medium text-sm">
+                          <div className="truncate max-w-[100px] sm:max-w-[120px]" title={entrega.codigo_retirada}>
                             {entrega.codigo_retirada}
                           </div>
                         </TableCell>
-                        <TableCell className="text-xs sm:text-sm">
-                          <div className="truncate max-w-[100px] sm:max-w-[150px]" title={entrega.morador.nome}>
+                        <TableCell className="text-sm">
+                          <div className="truncate max-w-[120px] sm:max-w-[180px]" title={entrega.morador.nome}>
                             {entrega.morador.nome}
                           </div>
                         </TableCell>
-                        <TableCell className="text-xs sm:text-sm">
-                          <div className="truncate max-w-[80px] sm:max-w-[100px]" title={formatApartment(entrega.morador.apartamento, entrega.morador.bloco)}>
+                        <TableCell className="text-sm">
+                          <div className="truncate max-w-[100px] sm:max-w-[120px]" title={formatApartment(entrega.morador.apartamento, entrega.morador.bloco)}>
                             {formatApartment(entrega.morador.apartamento, entrega.morador.bloco)}
                           </div>
                         </TableCell>
-                        <TableCell className="text-xs sm:text-sm">
-                          <div className="truncate max-w-[100px] sm:max-w-[150px]" title={entrega.funcionario.nome}>
+                        <TableCell className="text-sm">
+                          <div className="truncate max-w-[120px] sm:max-w-[180px]" title={entrega.funcionario.nome}>
                             {entrega.funcionario.nome}
                           </div>
                         </TableCell>
                         <TableCell>
-                          <Badge variant={getStatusVariant(entrega.status)} className="text-xs">
+                          <Badge variant={getStatusVariant(entrega.status)} className="text-sm">
                             {getStatusText(entrega.status)}
                           </Badge>
                         </TableCell>
-                        <TableCell className="text-xs sm:text-sm">
-                          <div className="truncate max-w-[100px] sm:max-w-[120px]" title={entrega.data_entrega ? formatDate(entrega.data_entrega) : ''}>
+                        <TableCell className="text-sm">
+                          <div className="truncate max-w-[120px] sm:max-w-[140px]" title={entrega.data_entrega ? formatDate(entrega.data_entrega) : ''}>
                             {entrega.data_entrega ? formatDate(entrega.data_entrega) : '-'}
                           </div>
                         </TableCell>
-                        <TableCell className="text-xs sm:text-sm">
-                          <div className="truncate max-w-[100px] sm:max-w-[120px]" title={entrega.data_retirada ? formatDate(entrega.data_retirada) : ''}>
+                        <TableCell className="text-sm">
+                          <div className="truncate max-w-[120px] sm:max-w-[140px]" title={entrega.data_retirada ? formatDate(entrega.data_retirada) : ''}>
                             {entrega.data_retirada ? formatDate(entrega.data_retirada) : '-'}
                           </div>
                         </TableCell>
-                        <TableCell className="text-xs sm:text-sm">
+                        <TableCell className="text-sm">
                           <div className="flex items-center gap-1">
-                            <Badge variant={getReminderStatusBadge(entrega)} className="text-xs">
+                            <Badge variant={getReminderStatusBadge(entrega)} className="text-sm">
                               {entrega.status !== 'pendente' ? 'N/A' : 
                                entrega.ultimo_lembrete_enviado ? 'Enviado' : 'Pendente'}
                             </Badge>
                             {entrega.ultimo_lembrete_enviado && (
-                              <span className="text-xs text-muted-foreground" title={formatDate(entrega.ultimo_lembrete_enviado)}>
+                              <span className="text-sm text-muted-foreground" title={formatDate(entrega.ultimo_lembrete_enviado)}>
                                 🔔
                               </span>
                             )}
@@ -1362,9 +1431,9 @@ export const AdminReports = ({ superAdminMode = false, condominioId: propCondomi
                         <TableCell>
                           <Dialog>
                             <DialogTrigger asChild>
-                              <Button variant="outline" size="sm" className="h-8 px-2 text-xs">
-                                <Eye className="h-3 w-3" />
-                                <span className="hidden sm:inline ml-1">Ver</span>
+                              <Button variant="outline" size="sm" className="h-8 px-2 text-sm">
+                                <Eye className="h-4 w-4" />
+                                <span className="ml-1">Ver</span>
                               </Button>
                             </DialogTrigger>
                             <DialogContent className="max-h-[80vh] overflow-y-auto">
@@ -1374,7 +1443,7 @@ export const AdminReports = ({ superAdminMode = false, condominioId: propCondomi
                                   Código: {entrega.codigo_retirada}
                                 </DialogDescription>
                               </DialogHeader>
-                              <div className="space-y-2 text-sm">
+                              <div className="space-y-2 text-base">
                                 <div><strong>Morador:</strong> {entrega.morador.nome}</div>
                                 <div><strong>Apartamento:</strong> {formatApartment(entrega.morador.apartamento, entrega.morador.bloco)}</div>
                                 <div><strong>Telefone:</strong> {entrega.morador.telefone}</div>
@@ -1383,7 +1452,7 @@ export const AdminReports = ({ superAdminMode = false, condominioId: propCondomi
                                 <div><strong>Data Entrega:</strong> {entrega.data_entrega ? formatDate(entrega.data_entrega) : '-'}</div>
                                 <div><strong>Data Retirada:</strong> {entrega.data_retirada ? formatDate(entrega.data_retirada) : '-'}</div>
                                 <div><strong>Status do Lembrete:</strong> 
-                                  <Badge variant={getReminderStatusBadge(entrega)} className="ml-2 text-xs">
+                                  <Badge variant={getReminderStatusBadge(entrega)} className="ml-2 text-sm">
                                     {getReminderStatus(entrega)}
                                   </Badge>
                                 </div>

@@ -397,73 +397,78 @@ export const SuperAdminDashboard = ({ onBack }: SuperAdminDashboardProps) => {
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Total Condomínios</CardTitle>
-          <Building2 className="h-4 w-4 text-muted-foreground" />
+          <CardTitle className="text-base font-medium">Total Condomínios</CardTitle>
+          <Building2 className="h-5 w-5 text-muted-foreground" />
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">{condominios.length}</div>
-          <p className="text-xs text-muted-foreground">
-            Condomínios cadastrados no sistema
+          <p className="text-sm text-muted-foreground">
+            Condomínios registrados
           </p>
         </CardContent>
       </Card>
-
+      
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Total Funcionários</CardTitle>
-          <Users className="h-4 w-4 text-muted-foreground" />
+          <CardTitle className="text-base font-medium">Total Funcionários</CardTitle>
+          <Users className="h-5 w-5 text-muted-foreground" />
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">{funcionarios.length}</div>
-          <p className="text-xs text-muted-foreground">
-            Funcionários ativos: {funcionarios.filter(f => f.ativo).length}
+          <p className="text-sm text-muted-foreground">
+            Funcionários ativos
           </p>
         </CardContent>
       </Card>
-
+      
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Total Entregas</CardTitle>
-          <Package className="h-4 w-4 text-muted-foreground" />
+          <CardTitle className="text-base font-medium">Total Entregas</CardTitle>
+          <Package className="h-5 w-5 text-muted-foreground" />
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">{entregas.length}</div>
-          <p className="text-xs text-muted-foreground">
-            Últimas 100 entregas
+          <p className="text-sm text-muted-foreground">
+            Entregas registradas
           </p>
         </CardContent>
       </Card>
-
+      
       <Card className="md:col-span-3">
         <CardHeader>
-          <CardTitle>Últimas Atividades</CardTitle>
-          <CardDescription>Resumo das atividades recentes do sistema</CardDescription>
+          <CardTitle className="text-lg">Condomínios Recentes</CardTitle>
+          <CardDescription>
+            Lista dos condomínios mais recentes cadastrados no sistema
+          </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <h4 className="font-medium mb-2">Condomínios Recentes</h4>
-                <div className="space-y-1">
-                  {condominios.slice(0, 5).map(condo => (
-                    <div key={condo.id} className="text-sm text-muted-foreground">
-                      {condo.nome} - {condo.cidade}
-                    </div>
-                  ))}
-                </div>
-              </div>
-              <div>
-                <h4 className="font-medium mb-2">Entregas Recentes</h4>
-                <div className="space-y-1">
-                  {entregas.slice(0, 5).map(entrega => (
-                    <div key={entrega.id} className="text-sm text-muted-foreground">
-                      {new Date(entrega.created_at).toLocaleDateString()} - {entrega.status}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="text-sm">Nome</TableHead>
+                <TableHead className="text-sm">Cidade</TableHead>
+                <TableHead className="text-sm">Telefone</TableHead>
+                <TableHead className="text-sm">Síndico</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {condominios.slice(0, 5).map((condominio) => (
+                <TableRow key={condominio.id}>
+                  <TableCell className="font-medium text-sm">{condominio.nome}</TableCell>
+                  <TableCell className="text-sm">{condominio.cidade}</TableCell>
+                  <TableCell className="text-sm">{condominio.telefone || '-'}</TableCell>
+                  <TableCell className="text-sm">{condominio.sindico_nome || '-'}</TableCell>
+                </TableRow>
+              ))}
+              {condominios.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={4} className="text-center text-muted-foreground">
+                    Nenhum condomínio cadastrado
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
         </CardContent>
       </Card>
     </div>
@@ -471,302 +476,80 @@ export const SuperAdminDashboard = ({ onBack }: SuperAdminDashboardProps) => {
 
   const renderCondominios = () => (
     <div className="space-y-4">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 md:gap-0">
-        <h2 className="text-xl md:text-2xl font-bold">Gerenciar Condomínios</h2>
-        <div className="flex w-full md:w-auto space-x-2">
-          <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
-            <DialogTrigger asChild>
-              <Button className="w-full md:w-auto">
-                <Plus className="h-4 w-4 mr-2" />
-                Novo Condomínio
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-2xl">
-              <DialogHeader>
-                <DialogTitle>Criar Novo Condomínio</DialogTitle>
-                <DialogDescription>
-                  Preencha os dados do novo condomínio e do síndico responsável.
-                </DialogDescription>
-              </DialogHeader>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="nome">Nome do Condomínio</Label>
-                  <Input
-                    id="nome"
-                    value={formData.nome}
-                    onChange={(e) => setFormData({...formData, nome: e.target.value})}
-                    placeholder="Ex: Residencial Vila Bela"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="endereco">Endereço</Label>
-                  <Input
-                    id="endereco"
-                    value={formData.endereco}
-                    onChange={(e) => setFormData({...formData, endereco: e.target.value})}
-                    placeholder="Rua, número, bairro"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="cep">CEP</Label>
-                  <Input
-                    id="cep"
-                    value={formData.cep}
-                    onChange={(e) => setFormData({...formData, cep: e.target.value})}
-                    placeholder="00000-000"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="cidade">Cidade</Label>
-                  <Input
-                    id="cidade"
-                    value={formData.cidade}
-                    onChange={(e) => setFormData({...formData, cidade: e.target.value})}
-                    placeholder="Nome da cidade"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="telefone">Telefone do Condomínio</Label>
-                  <Input
-                    id="telefone"
-                    value={formData.telefone}
-                    onChange={(e) => setFormData({...formData, telefone: e.target.value})}
-                    placeholder="(11) 99999-9999"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="sindico_nome">Nome do Síndico</Label>
-                  <Input
-                    id="sindico_nome"
-                    value={formData.sindico_nome}
-                    onChange={(e) => setFormData({...formData, sindico_nome: e.target.value})}
-                    placeholder="Nome completo"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="sindico_cpf">CPF do Síndico</Label>
-                  <Input
-                    id="sindico_cpf"
-                    value={formData.sindico_cpf}
-                    onChange={(e) => setFormData({...formData, sindico_cpf: e.target.value})}
-                    placeholder="000.000.000-00"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="sindico_senha">Senha do Síndico</Label>
-                  <Input
-                    id="sindico_senha"
-                    type="password"
-                    value={formData.sindico_senha}
-                    onChange={(e) => setFormData({...formData, sindico_senha: e.target.value})}
-                    placeholder="Senha de acesso"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="sindico_telefone">Telefone do Síndico</Label>
-                  <Input
-                    id="sindico_telefone"
-                    value={formData.sindico_telefone}
-                    onChange={(e) => setFormData({...formData, sindico_telefone: e.target.value})}
-                    placeholder="(11) 99999-9999"
-                  />
-                </div>
-              </div>
-              <DialogFooter>
-                <Button variant="outline" onClick={() => setShowCreateDialog(false)}>
-                  Cancelar
-                </Button>
-                <Button 
-                  onClick={handleCreateCondominio}
-                  disabled={!formData.nome.trim() || !formData.endereco.trim() || !formData.cep.trim() || !formData.cidade.trim()}
-                >
-                  Criar Condomínio
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
-          
-          <Dialog open={showEditDialog} onOpenChange={(open) => {
-            setShowEditDialog(open);
-            if (!open) {
-              setEditingCondominio(null);
-              setFormData({
-                id: '',
-                nome: '',
-                endereco: '',
-                cep: '',
-                cidade: '',
-                telefone: '',
-                sindico_nome: '',
-                sindico_cpf: '',
-                sindico_senha: '',
-                sindico_telefone: ''
-              });
-            }
-          }}>
-            <DialogContent className="max-w-2xl">
-              <DialogHeader>
-                <DialogTitle>Editar Condomínio</DialogTitle>
-                <DialogDescription>
-                  Edite os dados do condomínio e do síndico responsável.
-                </DialogDescription>
-              </DialogHeader>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="edit-nome">Nome do Condomínio</Label>
-                  <Input
-                    id="edit-nome"
-                    value={formData.nome}
-                    onChange={(e) => setFormData({...formData, nome: e.target.value})}
-                    placeholder="Ex: Residencial Vila Bela"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="edit-endereco">Endereço</Label>
-                  <Input
-                    id="edit-endereco"
-                    value={formData.endereco}
-                    onChange={(e) => setFormData({...formData, endereco: e.target.value})}
-                    placeholder="Rua, número, bairro"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="edit-cep">CEP</Label>
-                  <Input
-                    id="edit-cep"
-                    value={formData.cep}
-                    onChange={(e) => setFormData({...formData, cep: e.target.value})}
-                    placeholder="00000-000"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="edit-cidade">Cidade</Label>
-                  <Input
-                    id="edit-cidade"
-                    value={formData.cidade}
-                    onChange={(e) => setFormData({...formData, cidade: e.target.value})}
-                    placeholder="Nome da cidade"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="edit-telefone">Telefone do Condomínio</Label>
-                  <Input
-                    id="edit-telefone"
-                    value={formData.telefone}
-                    onChange={(e) => setFormData({...formData, telefone: e.target.value})}
-                    placeholder="(11) 99999-9999"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="edit-sindico_nome">Nome do Síndico</Label>
-                  <Input
-                    id="edit-sindico_nome"
-                    value={formData.sindico_nome}
-                    onChange={(e) => setFormData({...formData, sindico_nome: e.target.value})}
-                    placeholder="Nome completo"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="edit-sindico_cpf">CPF do Síndico</Label>
-                  <Input
-                    id="edit-sindico_cpf"
-                    value={formData.sindico_cpf}
-                    onChange={(e) => setFormData({...formData, sindico_cpf: e.target.value})}
-                    placeholder="000.000.000-00"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="edit-sindico_senha">Senha do Síndico</Label>
-                  <Input
-                    id="edit-sindico_senha"
-                    type="password"
-                    value={formData.sindico_senha}
-                    onChange={(e) => setFormData({...formData, sindico_senha: e.target.value})}
-                    placeholder="Senha de acesso"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="edit-sindico_telefone">Telefone do Síndico</Label>
-                  <Input
-                    id="edit-sindico_telefone"
-                    value={formData.sindico_telefone}
-                    onChange={(e) => setFormData({...formData, sindico_telefone: e.target.value})}
-                    placeholder="(11) 99999-9999"
-                  />
-                </div>
-              </div>
-              <DialogFooter>
-                <Button variant="outline" onClick={() => {
-                  setShowEditDialog(false);
-                  setEditingCondominio(null);
-                  setFormData({
-                    id: '',
-                    nome: '',
-                    endereco: '',
-                    cep: '',
-                    cidade: '',
-                    telefone: '',
-                    sindico_nome: '',
-                    sindico_cpf: '',
-                    sindico_senha: '',
-                    sindico_telefone: ''
-                  });
-                }}>
-                  Cancelar
-                </Button>
-                <Button 
-                  onClick={handleUpdateCondominio}
-                  disabled={!formData.nome.trim() || !formData.endereco.trim() || !formData.cep.trim() || !formData.cidade.trim()}
-                >
-                  Atualizar Condomínio
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
-        </div>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <h2 className="text-xl md:text-2xl font-bold">Gerenciamento de Condomínios</h2>
+        <Button onClick={() => setShowCreateDialog(true)} className="w-full sm:w-auto">
+          <Plus className="mr-2 h-4 w-4" /> Adicionar Condomínio
+        </Button>
       </div>
-
+      
       <Card>
-        <CardContent className="p-0 overflow-auto">
-          <Table className="min-w-[600px]">
+        <CardContent className="p-0">
+          <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="min-w-[120px]">Nome</TableHead>
-                <TableHead className="hidden md:table-cell">Cidade</TableHead>
-                <TableHead className="hidden md:table-cell">Síndico</TableHead>
-                <TableHead className="hidden md:table-cell">Telefone</TableHead>
-                <TableHead className="text-right w-[100px]">Ações</TableHead>
+                <TableHead className="text-sm">Nome</TableHead>
+                <TableHead className="text-sm">Endereço</TableHead>
+                <TableHead className="text-sm">Cidade</TableHead>
+                <TableHead className="text-sm">Telefone</TableHead>
+                <TableHead className="text-sm">Síndico</TableHead>
+                <TableHead className="text-sm">Ações</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {condominios.map((condo) => (
-                <TableRow key={condo.id}>
-                  <TableCell className="font-medium">
-                    <div>
-                      <p className="truncate max-w-[150px]">{condo.nome}</p>
-                      <p className="text-xs text-muted-foreground md:hidden">{condo.cidade}</p>
-                    </div>
-                  </TableCell>
-                  <TableCell className="hidden md:table-cell">{condo.cidade}</TableCell>
-                  <TableCell className="hidden md:table-cell">{condo.sindico_nome || 'Não definido'}</TableCell>
-                  <TableCell className="hidden md:table-cell">{condo.telefone || 'Não informado'}</TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end space-x-1 md:space-x-2">
-                      <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => handleEditCondominio(condo)}>
-                        <Edit className="h-3.5 w-3.5" />
-                      </Button>
-                      <Button 
-                        variant="destructive" 
-                        size="icon"
-                        className="h-8 w-8"
-                        onClick={() => handleDeleteCondominio(condo.id)}
-                      >
-                        <Trash2 className="h-3.5 w-3.5" />
-                      </Button>
-                    </div>
+              {condominios.map((condominio) => {
+                // Encontrar funcionários associados a este condomínio
+                const funcs = funcionarios.filter(f => f.condominio_id === condominio.id);
+                const sindico = funcs.find(f => f.cargo === 'sindico');
+                
+                return (
+                  <TableRow key={condominio.id}>
+                    <TableCell className="font-medium text-sm">{condominio.nome}</TableCell>
+                    <TableCell className="text-sm">
+                      <div className="max-w-[150px] truncate" title={condominio.endereco}>
+                        {condominio.endereco}
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-sm">{condominio.cidade}</TableCell>
+                    <TableCell className="text-sm">{condominio.telefone || '-'}</TableCell>
+                    <TableCell className="text-sm">
+                      {sindico ? (
+                        <div>
+                          <p>{sindico.nome}</p>
+                          <p className="text-xs text-muted-foreground">{sindico.telefone || '-'}</p>
+                        </div>
+                      ) : (
+                        <span className="text-muted-foreground">-</span>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex space-x-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleEditCondominio(condominio)}
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleDeleteCondominio(condominio.id)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+              {condominios.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                    Nenhum condomínio cadastrado
                   </TableCell>
                 </TableRow>
-              ))}
+              )}
             </TableBody>
           </Table>
         </CardContent>
@@ -776,17 +559,17 @@ export const SuperAdminDashboard = ({ onBack }: SuperAdminDashboardProps) => {
 
   const renderFuncionarios = () => (
     <div className="space-y-4">
-      <h2 className="text-xl md:text-2xl font-bold">Funcionários do Sistema</h2>
+      <h2 className="text-xl md:text-2xl font-bold">Gerenciamento de Funcionários</h2>
       <Card>
-        <CardContent className="p-0 overflow-auto">
-          <Table className="min-w-[600px]">
+        <CardContent className="p-0">
+          <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="min-w-[120px]">Nome</TableHead>
-                <TableHead className="hidden md:table-cell">CPF</TableHead>
-                <TableHead>Cargo</TableHead>
-                <TableHead className="hidden md:table-cell">Condomínio</TableHead>
-                <TableHead>Status</TableHead>
+                <TableHead className="text-sm">Nome</TableHead>
+                <TableHead className="text-sm">CPF</TableHead>
+                <TableHead className="text-sm">Cargo</TableHead>
+                <TableHead className="text-sm">Condomínio</TableHead>
+                <TableHead className="text-sm">Status</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -794,25 +577,27 @@ export const SuperAdminDashboard = ({ onBack }: SuperAdminDashboardProps) => {
                 const condo = condominios.find(c => c.id === func.condominio_id);
                 return (
                   <TableRow key={func.id}>
-                    <TableCell className="font-medium">
-                      <div>
-                        <p className="truncate max-w-[150px]">{func.nome}</p>
-                        <p className="text-xs text-muted-foreground md:hidden truncate max-w-[150px]">{condo?.nome || 'Não encontrado'}</p>
-                      </div>
-                    </TableCell>
-                    <TableCell className="hidden md:table-cell">{func.cpf}</TableCell>
+                    <TableCell className="font-medium text-sm">{func.nome}</TableCell>
+                    <TableCell className="text-sm">{func.cpf}</TableCell>
                     <TableCell>
-                      <Badge variant="outline">{func.cargo}</Badge>
+                      <Badge variant="outline" className="text-sm">{func.cargo}</Badge>
                     </TableCell>
-                    <TableCell className="hidden md:table-cell">{condo?.nome || 'Não encontrado'}</TableCell>
+                    <TableCell className="text-sm">{condo?.nome || 'Não encontrado'}</TableCell>
                     <TableCell>
-                      <Badge variant={func.ativo ? "default" : "destructive"}>
+                      <Badge variant={func.ativo ? "default" : "destructive"} className="text-sm">
                         {func.ativo ? 'Ativo' : 'Inativo'}
                       </Badge>
                     </TableCell>
                   </TableRow>
                 );
               })}
+              {funcionarios.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
+                    Nenhum funcionário cadastrado
+                  </TableCell>
+                </TableRow>
+              )}
             </TableBody>
           </Table>
         </CardContent>
@@ -828,11 +613,11 @@ export const SuperAdminDashboard = ({ onBack }: SuperAdminDashboardProps) => {
           <Table className="min-w-[600px]">
             <TableHeader>
               <TableRow>
-                <TableHead>Data</TableHead>
-                <TableHead>Código</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="hidden md:table-cell">Condomínio</TableHead>
-                <TableHead className="hidden md:table-cell">Observações</TableHead>
+                <TableHead className="text-sm">Data</TableHead>
+                <TableHead className="text-sm">Código</TableHead>
+                <TableHead className="text-sm">Status</TableHead>
+                <TableHead className="text-sm hidden md:table-cell">Condomínio</TableHead>
+                <TableHead className="text-sm hidden md:table-cell">Observações</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -840,23 +625,30 @@ export const SuperAdminDashboard = ({ onBack }: SuperAdminDashboardProps) => {
                 const condo = condominios.find(c => c.id === entrega.condominio_id);
                 return (
                   <TableRow key={entrega.id}>
-                    <TableCell>{new Date(entrega.created_at).toLocaleDateString()}</TableCell>
+                    <TableCell className="text-sm">{new Date(entrega.created_at).toLocaleDateString()}</TableCell>
                     <TableCell className="font-mono">
                       <div>
-                        <p>{entrega.codigo_retirada}</p>
+                        <p className="text-sm">{entrega.codigo_retirada}</p>
                         <p className="text-xs text-muted-foreground md:hidden truncate max-w-[100px]">{condo?.nome || 'Não encontrado'}</p>
                       </div>
                     </TableCell>
                     <TableCell>
-                      <Badge variant={entrega.status === 'entregue' ? "default" : "outline"}>
+                      <Badge variant={entrega.status === 'entregue' ? "default" : "outline"} className="text-sm">
                         {entrega.status}
                       </Badge>
                     </TableCell>
-                    <TableCell className="hidden md:table-cell">{condo?.nome || 'Não encontrado'}</TableCell>
-                    <TableCell className="max-w-xs truncate hidden md:table-cell">{entrega.observacoes || 'Nenhuma'}</TableCell>
+                    <TableCell className="text-sm hidden md:table-cell">{condo?.nome || 'Não encontrado'}</TableCell>
+                    <TableCell className="max-w-xs truncate text-sm hidden md:table-cell">{entrega.observacoes || 'Nenhuma'}</TableCell>
                   </TableRow>
                 );
               })}
+              {entregas.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
+                    Nenhuma entrega registrada
+                  </TableCell>
+                </TableRow>
+              )}
             </TableBody>
           </Table>
         </CardContent>
@@ -990,15 +782,15 @@ export const SuperAdminDashboard = ({ onBack }: SuperAdminDashboardProps) => {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 md:gap-0 pb-2">
         <div>
           <h1 className="text-2xl md:text-3xl font-bold text-primary">Super Admin</h1>
-          <p className="text-sm text-muted-foreground">Controle total do sistema EntregasZap</p>
+          <p className="text-sm md:text-base text-muted-foreground">Controle total do sistema EntregasZap</p>
         </div>
         <Button variant="outline" size="sm" className="w-full md:w-auto" onClick={onBack}>
           Voltar ao Dashboard
         </Button>
       </div>
 
-      <div className="w-full overflow-x-auto pb-2 mb-2 no-scrollbar">
-        <div className="flex space-x-2 border-b min-w-max">
+      {/* Fixed navigation without horizontal scrolling - responsive grid layout */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2 pb-2 mb-2">
         {[
           { key: 'overview', label: 'Visão Geral' },
           { key: 'condominios', label: 'Condomínios' },
@@ -1008,15 +800,14 @@ export const SuperAdminDashboard = ({ onBack }: SuperAdminDashboardProps) => {
         ].map((tab) => (
           <Button
             key={tab.key}
-            variant={currentView === tab.key ? "default" : "ghost"}
+            variant={currentView === tab.key ? "default" : "outline"}
             onClick={() => setCurrentView(tab.key as any)}
-            className="rounded-b-none text-xs md:text-base px-2 md:px-4 py-1.5 h-auto"
+            className="text-sm md:text-base py-2 h-auto whitespace-normal break-words text-center"
           >
             {tab.label}
           </Button>
         ))}
       </div>
-    </div>
 
       <div className="mt-4 md:mt-6">
         {currentView === 'overview' && renderOverview()}

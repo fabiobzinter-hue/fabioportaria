@@ -202,23 +202,23 @@ export const Dashboard = ({ authUser, onLogout, initialView }: DashboardProps) =
       {/* Header */}
       <header className="bg-dashboard-sidebar border-b border-border shadow-card">
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16 sm:h-18 py-2">
+          <div className="flex justify-between items-center h-16 sm:h-20 py-2">
             <div className="flex items-center gap-2 sm:gap-3">
               <div className="p-1.5 sm:p-2 bg-gradient-primary rounded-lg">
-                <Building2 className="h-5 w-5 sm:h-6 sm:w-6 text-primary-foreground" />
+                <Building2 className="h-6 w-6 sm:h-7 sm:w-7 text-primary-foreground" />
               </div>
               <div>
-                <h1 className="text-lg sm:text-xl font-bold text-foreground truncate">
+                <h1 className="text-xl sm:text-2xl font-bold text-foreground truncate">
                   Entregas Zap
                 </h1>
-                <p className="text-xs sm:text-sm text-muted-foreground truncate max-w-[150px] sm:max-w-none">
+                <p className="text-sm sm:text-base text-muted-foreground truncate max-w-[150px] sm:max-w-none">
                   {condominioNome}
                 </p>
               </div>
             </div>
             
             <div className="flex items-center gap-2 sm:gap-4">
-              <Badge variant="secondary" className="hidden sm:flex text-xs">
+              <Badge variant="secondary" className="hidden sm:flex text-base">
                 {authUser.funcionario.nome}
               </Badge>
               <Button
@@ -227,8 +227,8 @@ export const Dashboard = ({ authUser, onLogout, initialView }: DashboardProps) =
                 onClick={onLogout}
                 className="text-muted-foreground hover:text-foreground px-2 sm:px-3"
               >
-                <LogOut className="h-4 w-4 sm:mr-2" />
-                <span className="hidden sm:inline">Sair</span>
+                <LogOut className="h-5 w-5 sm:mr-2" />
+                <span className="text-base">Sair</span>
               </Button>
             </div>
           </div>
@@ -238,14 +238,14 @@ export const Dashboard = ({ authUser, onLogout, initialView }: DashboardProps) =
       {/* Navigation */}
       <nav className="bg-dashboard-sidebar border-b border-border">
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
-          <div className="flex overflow-x-auto gap-1 sm:gap-3 py-3 sm:py-4 no-scrollbar whitespace-nowrap">
+          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2 py-3 sm:py-4">
             <Button
               variant={currentView === "search" ? "default" : "ghost"}
               size="sm"
               onClick={() => setCurrentView("search")}
-              className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-2 text-xs sm:text-sm font-medium whitespace-nowrap"
+              className="flex items-center gap-2 sm:gap-2 px-3 sm:px-4 py-2 text-base font-medium whitespace-normal break-words h-auto min-h-[50px]"
             >
-              <Package className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
+              <Package className="h-5 w-5 sm:h-6 sm:w-6 flex-shrink-0" />
               <span className="truncate">Nova Entrega</span>
             </Button>
             
@@ -253,9 +253,9 @@ export const Dashboard = ({ authUser, onLogout, initialView }: DashboardProps) =
               variant={currentView === "withdrawal" ? "default" : "ghost"}
               size="sm"
               onClick={() => setCurrentView("withdrawal")}
-              className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-2 text-xs sm:text-sm font-medium whitespace-nowrap"
+              className="flex items-center gap-2 sm:gap-2 px-3 sm:px-4 py-2 text-base font-medium whitespace-normal break-words h-auto min-h-[50px]"
             >
-              <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
+              <CheckCircle className="h-5 w-5 sm:h-6 sm:w-6 flex-shrink-0" />
               <span className="truncate">Retiradas</span>
             </Button>
             
@@ -263,9 +263,9 @@ export const Dashboard = ({ authUser, onLogout, initialView }: DashboardProps) =
               variant={currentView === "reports" ? "default" : "ghost"}
               size="sm"
               onClick={() => setCurrentView("reports")}
-              className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-2 text-xs sm:text-sm font-medium whitespace-nowrap"
+              className="flex items-center gap-2 sm:gap-2 px-3 sm:px-4 py-2 text-base font-medium whitespace-normal break-words h-auto min-h-[50px]"
             >
-              <BarChart3 className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
+              <BarChart3 className="h-5 w-5 sm:h-6 sm:w-6 flex-shrink-0" />
               <span className="truncate">Relatórios</span>
             </Button>
             
@@ -273,9 +273,9 @@ export const Dashboard = ({ authUser, onLogout, initialView }: DashboardProps) =
               variant={currentView === "reminders" ? "default" : "ghost"}
               size="sm"
               onClick={() => setCurrentView("reminders")}
-              className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-2 text-xs sm:text-sm font-medium whitespace-nowrap"
+              className="flex items-center gap-2 sm:gap-2 px-3 sm:px-4 py-2 text-base font-medium whitespace-normal break-words h-auto min-h-[50px]"
             >
-              <Bell className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
+              <Bell className="h-5 w-5 sm:h-6 sm:w-6 flex-shrink-0" />
               <span className="truncate">Lembretes</span>
             </Button>
 
@@ -284,9 +284,9 @@ export const Dashboard = ({ authUser, onLogout, initialView }: DashboardProps) =
                 variant={currentView === "admin" ? "default" : "ghost"}
                 size="sm"
                 onClick={() => setCurrentView("admin")}
-                className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-2 text-xs sm:text-sm font-medium whitespace-nowrap"
+                className="flex items-center gap-2 sm:gap-2 px-3 sm:px-4 py-2 text-base font-medium whitespace-normal break-words h-auto min-h-[50px]"
               >
-                <Settings className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
+                <Settings className="h-5 w-5 sm:h-6 sm:w-6 flex-shrink-0" />
                 <span className="truncate">Admin</span>
               </Button>
             )}
@@ -296,9 +296,9 @@ export const Dashboard = ({ authUser, onLogout, initialView }: DashboardProps) =
                 variant={currentView === "superadmin" ? "default" : "ghost"}
                 size="sm"
                 onClick={() => setCurrentView("superadmin")}
-                className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-2 text-xs sm:text-sm font-medium bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white whitespace-nowrap"
+                className="flex items-center gap-2 sm:gap-2 px-3 sm:px-4 py-2 text-base font-medium bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white whitespace-normal break-words h-auto min-h-[50px]"
               >
-                <Building2 className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
+                <Building2 className="h-5 w-5 sm:h-6 sm:w-6 flex-shrink-0" />
                 <span className="truncate">Super</span>
               </Button>
             )}
@@ -314,7 +314,7 @@ export const Dashboard = ({ authUser, onLogout, initialView }: DashboardProps) =
       </div>
       {/* Footer de suporte */}
       <footer className="bg-dashboard-sidebar border-t border-border">
-        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-3 text-xs sm:text-sm flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-3 text-sm sm:text-base flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2">
           <span className="text-muted-foreground">Suporte:</span>
           <a
             href="https://wa.me/5511970307000"
@@ -322,10 +322,10 @@ export const Dashboard = ({ authUser, onLogout, initialView }: DashboardProps) =
             rel="noreferrer"
             className="inline-flex items-center gap-1 text-green-600 hover:underline"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-3 h-3 sm:w-4 sm:h-4">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4 sm:w-5 sm:h-5">
               <path d="M20.52 3.48A11.73 11.73 0 0012.01 0C5.4 0 .06 5.34.06 11.95c0 2.1.55 4.15 1.6 5.96L0 24l6.25-1.64a11.89 11.89 0 005.76 1.47h.01c6.61 0 11.95-5.34 11.95-11.95 0-3.2-1.25-6.2-3.45-8.4zM12.02 22a9.9 9.9 0 01-5.05-1.39l-.36-.21-3.72.98.99-3.63-.24-.37A9.93 9.93 0 012.1 12C2.1 6.98 6.99 2.1 12 2.1c2.63 0 5.1 1.03 6.96 2.9a9.81 9.81 0 012.88 6.98c0 5.02-4.89 9.9-9.82 9.9zm5.7-7.43c-.31-.16-1.83-.9-2.12-1.01-.28-.1-.49-.16-.7.16-.2.31-.8 1.01-.98 1.22-.18.2-.36.23-.67.08-.31-.16-1.32-.49-2.52-1.56-.93-.82-1.55-1.83-1.73-2.14-.18-.31-.02-.48.13-.64.14-.14.31-.36.47-.54.16-.18.2-.31.31-.52.1-.2.05-.39-.02-.54-.08-.16-.7-1.68-.96-2.3-.25-.6-.5-.51-.7-.52l-.6-.01c-.2 0-.52.07-.79.39-.27.31-1.03 1-.99 2.45.05 1.45 1.06 2.85 1.21 3.05.16.2 2.09 3.2 5.08 4.49.71.31 1.26.49 1.69.62.71.23 1.36.2 1.87.12.57-.08 1.83-.75 2.09-1.47.26-.72.26-1.34.18-1.47-.07-.13-.26-.21-.57-.36z"/>
             </svg>
-            <span className="text-xs sm:text-sm">WhatsApp: 55 11 97030-7000</span>
+            <span className="text-sm sm:text-base">WhatsApp: 55 11 97030-7000</span>
           </a>
         </div>
       </footer>
