@@ -1,18 +1,4 @@
-import wmill
-
-def main():
-    """
-    Gera APENAS o código TypeScript correto para o arquivo AdminCondominiums.tsx
-    """
-    
-    return {
-        "INSTRUCOES_IMPORTANTES": [
-            "🚨 ATENÇÃO: Cole APENAS o conteúdo de 'typescript_code' no GitHub!",
-            "❌ NÃO cole nada que tenha 'import wmill' ou 'def main()'",
-            "✅ Cole APENAS o código React/TypeScript puro"
-        ],
-        
-        "typescript_code": """import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
@@ -420,34 +406,3 @@ export const AdminCondominiums = () => {
                         variant="ghost"
                         size="sm"
                         onClick={() => handleEdit(condominio)}
-                      >
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleDelete(condominio.id)}
-                      >
-                        <Trash2 className="h-4 w-4 text-red-600" />
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
-    </div>
-  );
-};""",
-        
-        "passos_corretos": [
-            "1. 📋 COPIE APENAS o conteúdo de 'typescript_code' acima",
-            "2. 🌐 Vá para: https://github.com/fabiobzinter-hue/fabioportaria/edit/main/src/components/AdminCondominiums.tsx",
-            "3. ✂️ Selecione TODO o conteúdo atual (Ctrl+A)",
-            "4. 📝 Cole o código TypeScript (Ctrl+V)",
-            "5. 💾 Commit: 'fix: corrigir criação de condomínios'",
-            "6. ✅ Agora deve funcionar!"
-        ]
-    }
