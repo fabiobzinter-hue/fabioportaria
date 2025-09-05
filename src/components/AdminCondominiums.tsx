@@ -1,4 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import wmill
+
+def main():
+    """
+    Gera o arquivo AdminCondominiums.tsx COMPLETO e correto
+    """
+    
+    return {
+        "ARQUIVO_COMPLETO": """import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
@@ -406,3 +414,38 @@ export const AdminCondominiums = () => {
                         variant="ghost"
                         size="sm"
                         onClick={() => handleEdit(condominio)}
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleDelete(condominio.id)}
+                      >
+                        <Trash2 className="h-4 w-4 text-red-600" />
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+    </div>
+  );
+};""",
+        
+        "INSTRUCOES": [
+            "🚨 COPIE TODO o conteúdo de 'ARQUIVO_COMPLETO' acima",
+            "🌐 Vá para: https://github.com/fabiobzinter-hue/fabioportaria/edit/main/src/components/AdminCondominiums.tsx",
+            "✂️ Selecione TODO o conteúdo atual (Ctrl+A)",
+            "📝 Cole o arquivo completo (Ctrl+V)",
+            "💾 Commit: 'fix: arquivo completo com correção RPC'",
+            "✅ Agora deve funcionar!"
+        ]
+    }
+
+Parameters:
+
+{
