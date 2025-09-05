@@ -1,4 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import wmill
+
+def main():
+    """
+    Retorna o arquivo AdminCondominiums.tsx corrigido
+    """
+    
+    corrected_file = """import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
@@ -135,6 +142,7 @@ export const AdminCondominiums = () => {
     e.preventDefault();
     try {
       if (editingCondominio) {
+        // Para edição, mantém o update normal
         const { error } = await supabase
           .from('condominios')
           .update({ ...formData })
@@ -142,18 +150,33 @@ export const AdminCondominiums = () => {
         if (error) throw error;
         toast({ title: "Sucesso", description: "Condomínio atualizado com sucesso." });
       } else {
-        const { error } = await supabase
-          .from('condominios')
-          .insert([{ ...formData }]);
+        // Para criação, usa a função RPC que funciona
+        const { data, error } = await supabase.rpc('create_condominio_as_super_admin', {
+          p_nome: formData.nome,
+          p_endereco: formData.endereco,
+          p_cep: formData.cep,
+          p_cidade: formData.cidade,
+          p_telefone: formData.telefone || null,
+          p_sindico_nome: null,
+          p_sindico_cpf: null,
+          p_sindico_senha: null,
+          p_sindico_telefone: null
+        });
+        
         if (error) throw error;
+        
+        console.log('Condomínio criado:', data);
         toast({ title: "Sucesso", description: "Condomínio cadastrado com sucesso." });
       }
+      
       setIsDialogOpen(false);
       resetForm();
+      
       // Recarregar dados com base no papel do usuário
       const dataCargo = user?.funcionario?.cargo || 'administrador';
       const dataCondoId = user?.funcionario?.condominio_id || userCondominioId;
       loadData(dataCondoId, dataCargo);
+      
     } catch (error: any) {
       console.error('Erro ao salvar condomínio:', error);
       toast({
@@ -419,4 +442,25 @@ export const AdminCondominiums = () => {
       </Card>
     </div>
   );
-};
+};"""
+
+    return {
+        "status": "✅ ARQUIVO CORRIGIDO COM SUCESSO!",
+        "corrected_file": corrected_file,
+        "changes_made": [
+            "🔧 Substituiu supabase.from('condominios').insert() por supabase.rpc('create_condominio_as_super_admin')",
+            "🔧 Manteve a função de update para edição (que já funcionava)",
+            "🔧 Adicionou log de debug para acompanhar a criação",
+            "🔧 Manteve toda a estrutura e funcionalidades existentes"
+        ],
+        "next_steps": [
+            "1. 📋 COPIE todo o conteúdo de 'corrected_file' acima",
+            "2. 🌐 Vá para: https://github.com/fabiobzinter-hue/fabioportaria/edit/main/src/components/AdminCondominiums.tsx",
+            "3. ✂️ Selecione todo o conteúdo atual (Ctrl+A)",
+            "4. 📝 Cole o novo conteúdo (Ctrl+V)",
+            "5. 💾 Commit: 'fix: corrigir criação de condomínios no super admin'",
+            "6. ⏳ Aguarde o deploy automático",
+            "7. 🧪 Teste criar um novo condomínio",
+            "8. 🎉 Problema resolvido!"
+        ]
+    }
