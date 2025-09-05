@@ -2,10 +2,17 @@ import wmill
 
 def main():
     """
-    Retorna o arquivo AdminCondominiums.tsx corrigido
+    Gera APENAS o código TypeScript correto para o arquivo AdminCondominiums.tsx
     """
     
-    corrected_file = """import React, { useEffect, useState } from 'react';
+    return {
+        "INSTRUCOES_IMPORTANTES": [
+            "🚨 ATENÇÃO: Cole APENAS o conteúdo de 'typescript_code' no GitHub!",
+            "❌ NÃO cole nada que tenha 'import wmill' ou 'def main()'",
+            "✅ Cole APENAS o código React/TypeScript puro"
+        ],
+        
+        "typescript_code": """import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
@@ -52,7 +59,7 @@ interface Condominio {
   cidade: string;
   cep: string;
   telefone: string;
-  sindico_id: string | null; // Novo campo
+  sindico_id: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -74,7 +81,7 @@ export const AdminCondominiums = () => {
   const { user } = useAuth();
   const [userCondominioId, setUserCondominioId] = useState<string | null>(null);
 
-  console.log('AdminCondominiums: Início. User:', user, 'User Condominio ID:', userCondominioId); // Log inicial
+  console.log('AdminCondominiums: Início. User:', user, 'User Condominio ID:', userCondominioId);
 
   const [formData, setFormData] = useState({
     nome: '',
@@ -99,34 +106,33 @@ export const AdminCondominiums = () => {
   }, [user]);
 
   const loadData = async (condominioId: string | null, userRole: string) => {
-    console.log('loadData: Iniciando carregamento de dados para condominioId:', condominioId, 'userRole:', userRole); // Log início loadData
+    console.log('loadData: Iniciando carregamento de dados para condominioId:', condominioId, 'userRole:', userRole);
     try {
       setIsLoading(true);
 
       let query = supabase.from('condominios').select('*').order('nome');
       if (userRole === 'administrador' && condominioId) {
-        query = query.eq('id', condominioId); // Filtrar pelo próprio condomínio do admin
+        query = query.eq('id', condominioId);
       }
-      console.log('loadData: Executando consulta de condomínios.'); // Log consulta
+      console.log('loadData: Executando consulta de condomínios.');
       const { data: condominiosData, error: condError } = await query;
-      console.log('loadData: Resultado consulta condomínios:', { condominiosData, condError }); // Log resultado
+      console.log('loadData: Resultado consulta condomínios:', { condominiosData, condError });
       if (condError) throw condError;
 
-      // Carregar apenas administradores para a lista de síndicos
-      console.log('loadData: Executando consulta de administradores.'); // Log consulta
+      console.log('loadData: Executando consulta de administradores.');
       const { data: administradoresData, error: adminError } = await supabase
         .from('funcionarios')
         .select('id, nome, cargo')
         .eq('cargo', 'administrador')
         .order('nome');
-      console.log('loadData: Resultado consulta administradores:', { administradoresData, adminError }); // Log resultado
+      console.log('loadData: Resultado consulta administradores:', { administradoresData, adminError });
       if (adminError) throw adminError;
 
       setCondominios((condominiosData || []).map(c => ({ ...c, sindico_id: null })));
       setAdministradores(administradoresData || []);
 
     } catch (error) {
-      console.error('Erro ao carregar dados em loadData:', error); // Log mais específico
+      console.error('Erro ao carregar dados em loadData:', error);
       toast({
         variant: "destructive",
         title: "Erro",
@@ -134,7 +140,7 @@ export const AdminCondominiums = () => {
       });
     } finally {
       setIsLoading(false);
-      console.log('loadData: setIsLoading(false) executado.'); // Log final
+      console.log('loadData: setIsLoading(false) executado.');
     }
   };
 
@@ -142,7 +148,6 @@ export const AdminCondominiums = () => {
     e.preventDefault();
     try {
       if (editingCondominio) {
-        // Para edição, mantém o update normal
         const { error } = await supabase
           .from('condominios')
           .update({ ...formData })
@@ -150,7 +155,6 @@ export const AdminCondominiums = () => {
         if (error) throw error;
         toast({ title: "Sucesso", description: "Condomínio atualizado com sucesso." });
       } else {
-        // Para criação, usa a função RPC que funciona
         const { data, error } = await supabase.rpc('create_condominio_as_super_admin', {
           p_nome: formData.nome,
           p_endereco: formData.endereco,
@@ -172,7 +176,6 @@ export const AdminCondominiums = () => {
       setIsDialogOpen(false);
       resetForm();
       
-      // Recarregar dados com base no papel do usuário
       const dataCargo = user?.funcionario?.cargo || 'administrador';
       const dataCondoId = user?.funcionario?.condominio_id || userCondominioId;
       loadData(dataCondoId, dataCargo);
@@ -209,7 +212,6 @@ export const AdminCondominiums = () => {
         .eq('id', id);
       if (error) throw error;
       toast({ title: "Sucesso", description: "Condomínio excluído com sucesso." });
-      // Recarregar dados com base no papel do usuário
       const dataCargo = user?.funcionario?.cargo || 'administrador';
       const dataCondoId = user?.funcionario?.condominio_id || userCondominioId;
       loadData(dataCondoId, dataCargo);
@@ -262,7 +264,6 @@ export const AdminCondominiums = () => {
 
   return (
     <div className="p-6 space-y-6">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold text-gray-900">Gestão de Condomínios</h2>
@@ -335,8 +336,7 @@ export const AdminCondominiums = () => {
                   placeholder="(DD) 99999-9999"
                 />
               </div>
-              {/* Seleção de Síndico */}
-              {user && user.funcionario.cargo === 'super_administrador' && ( // Apenas super-admin pode atribuir síndico
+              {user && user.funcionario.cargo === 'super_administrador' && (
                 <div className="space-y-2">
                   <Label htmlFor="sindico">Síndico (Administrador)</Label>
                   <Select
@@ -374,7 +374,6 @@ export const AdminCondominiums = () => {
         </Dialog>
       </div>
 
-      {/* Search */}
       <div className="flex items-center space-x-2">
         <Search className="h-4 w-4 text-gray-400" />
         <Input
@@ -385,7 +384,6 @@ export const AdminCondominiums = () => {
         />
       </div>
 
-      {/* Table */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center">
@@ -442,25 +440,14 @@ export const AdminCondominiums = () => {
       </Card>
     </div>
   );
-};"""
-
-    return {
-        "status": "✅ ARQUIVO CORRIGIDO COM SUCESSO!",
-        "corrected_file": corrected_file,
-        "changes_made": [
-            "🔧 Substituiu supabase.from('condominios').insert() por supabase.rpc('create_condominio_as_super_admin')",
-            "🔧 Manteve a função de update para edição (que já funcionava)",
-            "🔧 Adicionou log de debug para acompanhar a criação",
-            "🔧 Manteve toda a estrutura e funcionalidades existentes"
-        ],
-        "next_steps": [
-            "1. 📋 COPIE todo o conteúdo de 'corrected_file' acima",
+};""",
+        
+        "passos_corretos": [
+            "1. 📋 COPIE APENAS o conteúdo de 'typescript_code' acima",
             "2. 🌐 Vá para: https://github.com/fabiobzinter-hue/fabioportaria/edit/main/src/components/AdminCondominiums.tsx",
-            "3. ✂️ Selecione todo o conteúdo atual (Ctrl+A)",
-            "4. 📝 Cole o novo conteúdo (Ctrl+V)",
-            "5. 💾 Commit: 'fix: corrigir criação de condomínios no super admin'",
-            "6. ⏳ Aguarde o deploy automático",
-            "7. 🧪 Teste criar um novo condomínio",
-            "8. 🎉 Problema resolvido!"
+            "3. ✂️ Selecione TODO o conteúdo atual (Ctrl+A)",
+            "4. 📝 Cole o código TypeScript (Ctrl+V)",
+            "5. 💾 Commit: 'fix: corrigir criação de condomínios'",
+            "6. ✅ Agora deve funcionar!"
         ]
     }
