@@ -22,7 +22,7 @@ const testWebhook = async () => {
   console.log('📤 Payload:', JSON.stringify(testPayload, null, 2));
   
   try {
-    const response = await fetch('https://n8n-webhook.xdc7yi.easypanel.host/webhook/portariainteligente', {
+    const response = await fetch('https://webhook.fbzia.com.br/webhook/portariainteligente', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
