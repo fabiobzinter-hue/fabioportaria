@@ -1,0 +1,41 @@
+WEBHOOK UPDATE LOG - Portaria Express Smart
+==========================================
+
+Data: 2025-09-14
+Projeto: fabioportaria-main
+
+ALTERAÇÕES REALIZADAS:
+======================
+
+1. OBJETIVO:
+   - Atualizar todos os webhooks do projeto para usar a nova URL:
+   - https://webhook.fbzia.com.br/webhook/portariainteligente
+
+2. ARQUIVOS ALTERADOS:
+   - src/components/SimpleDeliveryForm.tsx
+   - src/components/WithdrawalPanel.tsx
+
+3. ARQUIVOS QUE JÁ ESTAVAM CORRETOS:
+   - supabase/functions/send-whatsapp-message/index.ts
+   - src/components/RemindersPanel.tsx
+   - test-webhook.js
+
+4. FUNCIONALIDADES AFETADAS:
+   - Notificações de entrega (quando novos pacotes chegam)
+   - Confirmações de retirada (quando pacotes são retirados)
+   - Mensagens de lembrete (para entregas pendentes)
+   - Chamadas de teste do webhook
+
+5. STATUS:
+   ✅ Todos os webhooks atualizados com sucesso
+   ✅ Sistema pronto para usar a nova URL
+   ✅ Integração consistente em todos os componentes
+
+6. PRÓXIMOS PASSOS:
+   - Fazer commit das alterações
+   - Testar o sistema com a nova URL
+   - Verificar se as notificações WhatsApp funcionam corretamente
+
+==================================================
+Este arquivo foi criado para documentar as mudanças
+e permitir o commit das alterações no Git.
